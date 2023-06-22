@@ -1,0 +1,13 @@
+{
+    "id": "#uuid",
+    "providerSubject": "#uuid",
+    "providerName": "oauth-stub",
+    "name": "user1",
+    "profile":null,
+    "activeKeyPair": {
+        "encryptedPrivateKey": "#string",
+        "keyId": "#string",
+        "publicKey": "#string"
+    },
+    "inactiveKeyPairs": []
+}

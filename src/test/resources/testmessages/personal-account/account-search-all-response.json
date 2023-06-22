@@ -1,0 +1,67 @@
+[
+    {
+        "id": "#uuid",
+        "providerSubject": "#uuid",
+        "providerName": "oauth-stub",
+        "userName": "luke",
+        "fullName": "Luke Skywalker",
+        "givenName": "Luke",
+        "familyName": "Skywalker",
+        "inactiveKeyPairs": []
+    },
+    {
+        "id": "#uuid",
+        "providerSubject": "#uuid",
+        "providerName": "oauth-stub",
+        "userName": "user1",
+        "fullName": "Default1 User",
+        "givenName": "Default1",
+        "familyName": "User",
+        "activeKeyPair": "#notnull",
+        "inactiveKeyPairs": []
+    },
+    {
+        "id": "#uuid",
+        "providerSubject": "#uuid",
+        "providerName": "oauth-stub",
+        "userName": "user2",
+        "fullName": "Default2 User",
+        "givenName": "Default2",
+        "familyName": "User",
+        "activeKeyPair": "#notnull",
+        "inactiveKeyPairs": []
+    },
+    {
+        "id": "#uuid",
+        "providerSubject": "#uuid",
+        "providerName": "oauth-stub",
+        "userName": "user3",
+        "fullName": "Default3 User",
+        "givenName": "Default3",
+        "familyName": "User",
+        "activeKeyPair": "#notnull",
+        "inactiveKeyPairs": []
+    },
+    {
+        "id": "#uuid",
+        "providerSubject": "#uuid",
+        "providerName": "oauth-stub",
+        "userName": "user4",
+        "fullName": "Default4 User",
+        "givenName": "Default4",
+        "familyName": "User",
+        "activeKeyPair": "#notnull",
+        "inactiveKeyPairs": []
+    },
+    {
+        "id": "#uuid",
+        "providerSubject": "#uuid",
+        "providerName": "oauth-stub",
+        "userName": "user5",
+        "fullName": "Default5 User",
+        "givenName": "Default5",
+        "familyName": "User",
+        "activeKeyPair": "#notnull",
+        "inactiveKeyPairs": []
+    }
+]

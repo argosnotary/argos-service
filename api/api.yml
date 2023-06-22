@@ -1,0 +1,2146 @@
+#
+# Argos Notary - A new way to secure the Software Supply Chain
+#
+# Copyright (C) 2019 - 2020 Rabobank Nederland
+# Copyright (C) 2019 - 2022 Gerard Borst <gerard.borst@argosnotary.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+openapi: "3.0.3"
+info:
+  version: 1.0.0
+  title: Argos Service
+  license:
+    name: GPL v3
+servers:
+  - url: /api
+security:
+  - bearerAuth: []
+
+paths:
+  /oauthprovider:
+    get:
+      summary: get a list of configured oauth providers
+      operationId: getOAuthProviders
+      tags:
+        - oauthProvider
+      responses:
+        '200':
+          description: array of OAuthProviders
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 20
+                items:
+                  $ref: "#/components/schemas/OAuthProvider"
+        '500':
+          $ref:  '#/components/responses/Error'
+  
+  /organizations:
+    post:
+      summary: create an organization
+      operationId: createOrganization
+      tags:
+        - organization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Organization"
+      responses:
+        '201':
+          description: created
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: location where the created organization can be found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    get:
+      summary: get all organizations names and id's'
+      operationId: getOrganizations
+      tags:
+        - organization
+      responses:
+        '200':
+          description: list of organizations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Organization"
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /organizations/{organizationId}:
+    get:
+      summary: get a organization
+      operationId: getOrganization
+      tags:
+        - organization
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          description: this will be the organizationId id
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    delete:
+      summary: delete organization by id.
+      operationId: deleteorganizationById
+      tags:
+        - organization
+      parameters:
+        - name: organizationId
+          in: path
+          description: organization id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '204':
+          description: organization deleted
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /nodes/{parentId}/managementnodes:
+    post:
+      summary: create a management node
+      operationId: createManagementNode
+      tags:
+        - management node
+      parameters:
+        - name: parentId
+          in: path
+          required: true
+          description: this will be the parent id
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManagementNode"
+      responses:
+        '201':
+          description: created
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: location where the created management node can be found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagementNode"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /managementnodes:
+    get:
+      summary: get all management nodes for organizations
+      operationId: getManagementNodes
+      tags:
+        - management node
+      responses:
+        '200':
+          description: list of management nodes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ManagementNode"
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /managementnodes/{managementNodeId}:
+    get:
+      summary: get a management node
+      operationId: getManagementNode
+      tags:
+        - management node
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: managementNodeId
+          in: path
+          required: true
+          description: this will be the management node id
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManagementNode"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    delete:
+      summary: delete management node by id.
+      operationId: deleteManagementNodeById
+      tags:
+        - management node
+      parameters:
+        - name: managementNodeId
+          in: path
+          description: management node id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '204':
+          description: management node deleted
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+          
+  /nodes/{parentId}/project:
+    post:
+      summary: create a project
+      operationId: createProject
+      tags:
+        - project
+      parameters:
+        - name: parentId
+          in: path
+          required: true
+          description: this will be the parent id
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Project"
+      responses:
+        '201':
+          description: created
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: location where the created project can be found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+          
+  /projects:
+    get:
+      summary: get all projects for organizations
+      operationId: getProjects
+      tags:
+        - project
+      responses:
+        '200':
+          description: list of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        '500':
+          $ref: '#/components/responses/Error'        
+
+  /projects/{projectId}:
+    get:
+      summary: get a project
+      operationId: getProject
+      tags:
+        - project
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          description: this will be the project id
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    delete:
+      summary: delete project by id.
+      operationId: deleteProjectById
+      tags:
+        - project
+      parameters:
+        - name: projectId
+          in: path
+          description: project id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '204':
+          description: project deleted
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+          
+  /projects/{projectId}/serviceaccounts:
+    post:
+      summary: create a new service account
+      operationId: createServiceAccount
+      tags:
+        - service account
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceAccount"
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceAccount"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: location where the created service account can be found
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    get:
+      summary: get service accounts for a project
+      operationId: getServiceAccountsForProject
+      tags:
+        - service account
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: the supply chain
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceAccount"
+        '404':
+          description: not found
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /serviceaccounts:
+    get:
+      summary: get service accounts
+      operationId: getServiceAccounts
+      tags:
+        - service account
+      responses:
+        '200':
+          description: the supply chain
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceAccount"
+        '404':
+          description: not found
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /serviceaccounts/me/activekey:
+    get:
+      summary: return the active key pair
+      operationId: getServiceAccountKey
+      tags:
+        - service account
+      responses:
+        '200':
+          description: active key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyPair"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          description: no active key exists
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /projects/{projectId}/serviceaccounts/{serviceAccountId}:
+    get:
+      summary: find service account by id
+      operationId: getServiceAccountById
+      tags:
+        - service account
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+        - name: serviceAccountId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: service account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceAccount"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          description: the service account is not found
+        '500':
+          $ref: '#/components/responses/Error'
+    put:
+      summary: update service account by id
+      operationId: updateServiceAccountById
+      tags:
+        - service account
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+        - name: serviceAccountId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceAccount"
+      responses:
+        '200':
+          description: updated service account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceAccount"
+        '404':
+          description: the service account is not found
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    delete:
+      summary: deletes a service account
+      operationId: deleteServiceAccount
+      tags:
+        - service account
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+        - name: serviceAccountId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '204':
+          description: deleted service account
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          description: the service account is not found
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /projects/{projectId}/serviceaccounts/{serviceAccountId}/key:
+    post:
+      summary: create a new active key the old key will be made inactive
+      operationId: createServiceAccountKeyById
+      tags:
+        - service account
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+        - name: serviceAccountId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceAccountKeyPair"
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyPair"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: location where the created key can be found
+        '404':
+          description: the service account is not found
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    get:
+      summary: return the active key pair
+      operationId: getServiceAccountKeyById
+      tags:
+        - service account
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+        - name: serviceAccountId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyPair"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          description: no active key exists
+        '500':
+          $ref: '#/components/responses/Error'
+        
+  /projects/{projectId}/supplychain:
+    post:
+      summary: create a supplychain
+      operationId: createSupplyChain
+      tags:
+        - supply chain
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          description: this will be the project id
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplyChain"
+      responses:
+        '201':
+          description: created
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: location where the created supplychain can be found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupplyChain"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    get:
+      summary: get supplychains for a project
+      operationId: getSupplyChainsForProject
+      tags:
+        - supply chain
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: the supply chain
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SupplyChain"
+        '404':
+          description: not found
+        '500':
+          $ref: '#/components/responses/Error'
+          
+  /supplychains:
+    get:
+      summary: get supplychains
+      operationId: getSupplyChains
+      tags:
+        - supply chain
+      responses:
+        '200':
+          description: the supply chain
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SupplyChain"
+        '404':
+          description: not found
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /supplychains/{supplyChainId}:
+    get:
+      summary: get a supplychain
+      operationId: getSupplyChain
+      tags:
+        - supply chain
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: the supply chain item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupplyChain"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    put:
+      summary: update supplychain by id
+      operationId: updateSupplyChain
+      tags:
+        - supply chain
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupplyChain"
+      responses:
+        '200':
+          description: updated supply chain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplyChain'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    delete:
+      summary: delete supply chain by id. The layout, approval configs and link objects are also deleted
+      operationId: deleteSupplyChainById
+      tags:
+        - supply chain
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '204':
+          description: supply chain deleted
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /supplychains/{supplyChainId}/account/key:
+    get:
+      summary: searches on keys of service accounts and personal accounts
+      operationId: searchKeysFromAccount
+      security:
+        - bearerAuth: []
+      tags:
+        - searchAccount
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+        - name: keyIds
+          in: query
+          required: false
+          explode: false
+          schema:
+            type: array
+            maxItems: 256
+            items:
+              $ref: "#/components/schemas/SHA256Hash"
+
+      responses:
+        '200':
+          description: array of AccountKeyInfo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AccountKeyInfo"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /supplychains/{supplyChainId}/link:
+    get:
+      summary: find link
+      operationId: findLink
+      tags:
+        - link
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+        - name: hash
+          in: query
+          description: hash of product or material
+          required: false
+          schema:
+            $ref: "#/components/schemas/SHA256Hash"
+      responses:
+        '200':
+          description: array of links
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LinkMetaBlock"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    post:
+      summary: Create a link
+      operationId: createLink
+      tags:
+        - link
+      security:
+        - basicAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkMetaBlock"
+      responses:
+        '204':
+          description: no content
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /supplychains/{supplyChainId}/layout:
+    get:
+      summary: get layout
+      operationId: getLayout
+      tags:
+        - layout
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: layout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LayoutMetaBlock"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+        '404':
+          description: no layout found
+    post:
+      summary: create or update a layout
+      operationId: createOrUpdateLayout
+      tags:
+        - layout
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LayoutMetaBlock"
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LayoutMetaBlock"
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: location where the created layout metablock can be found
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /supplychains/{supplyChainId}/layout/validate:
+    post:
+      summary: validates a layout on data input and model consistency
+      operationId: validateLayout
+      tags:
+        - layout
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Layout"
+      responses:
+        '204':
+          description: layout is correct
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /supplychains/{supplyChainId}/layout/releaseconfig:
+    get:
+      summary: returns release configurations for a layout
+      operationId: getReleaseConfiguration
+      tags:
+        - layout
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: release configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReleaseConfiguration"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    post:
+      summary: create release configurations for a layout
+      operationId: createReleaseConfiguration
+      tags:
+        - layout
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReleaseConfiguration"
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReleaseConfiguration"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /supplychains/{supplyChainId}/layout/approvalconfig:
+    get:
+      summary: returns a list of approval configurations for a layout
+      operationId: getApprovalConfigurations
+      tags:
+        - layout
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: array of approval configurations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApprovalConfiguration"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    post:
+      summary: create approval configurations for a layout
+      operationId: createApprovalConfigurations
+      tags:
+        - layout
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              maxItems: 20
+              items:
+                $ref: "#/components/schemas/ApprovalConfiguration"
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApprovalConfiguration"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /supplychains/{supplyChainId}/layout/approvalconfig/me:
+    get:
+      summary: returns a list of approvals for the login user
+      operationId: getApprovalsForAccount
+      tags:
+        - layout
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: array of approvals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApprovalConfiguration"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+           
+  /supplychains/{supplyChainId}/verification:
+    post:
+      summary: creates a verification run
+      operationId: performVerification
+      tags:
+        - verification
+      security:
+        - basicAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArtifactArray"
+      responses:
+        '200':
+          description: VerificationResult
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResult'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /supplychains/{supplyChainId}/release:
+    post:
+      summary: releases a list of artifact sets these sets will be verified
+      operationId: createRelease
+      tags:
+        - release
+      parameters:
+        - name: supplyChainId
+          in: path
+          description: supply chain id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReleaseArtifacts"
+      responses:
+        '200':
+          description: VerificationResult
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReleaseResult'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /supplychains/verification:
+    get:
+      summary: checks verification on a release artifact set and possibly domains
+      operationId: getVerification
+      tags:
+        - verification
+      parameters:
+        - name: artifactHashes
+          in: query
+          explode: true
+          required: true
+          allowEmptyValue: false
+          schema:
+            type: array
+            maxItems: 4096
+            items:
+              $ref: "#/components/schemas/SHA256Hash"
+        - name: paths
+          in: query
+          required: false
+          schema:
+            type: array
+            maxItems: 20
+            items:
+              $ref: "#/components/schemas/HostnameString"
+      responses:
+        '200':
+          description: VerificationResult
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResult'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /roles/{resourceId}:
+    post:
+      summary: create a role assignment
+      operationId: createRoleAssignment
+      tags:
+        - role assignment
+      parameters:
+        - name: resourceId
+          in: path
+          description: resource id on which assignment is created
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleAssignment"
+      responses:
+        '201':
+          description: created
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: location where the created role assignment can be found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleAssignment"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+    get:
+      summary: get role assignments for resource
+      operationId: getRoleAssignments
+      tags:
+        - role assignment
+      parameters:
+        - name: resourceId
+          in: path
+          description: resource id on which assignment is created
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: the supply chain
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoleAssignment"
+        '404':
+          description: not found
+        '500':
+          $ref: '#/components/responses/Error'
+ 
+  /roles/{resourceId}/roleassignment/{roleAssignmentId}:          
+    delete:
+      summary: delete role assignment by id.
+      operationId: deleteRoleAssignemntById
+      tags:
+        - role assignment
+      parameters:
+        - name: resourceId
+          in: path
+          description: resource id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+        - name: roleAssignmentId
+          in: path
+          description: role assignment id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '204':
+          description: role assignment deleted
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'  
+  
+  /personalaccounts/me:
+    get:
+      summary: returns the personal account profile of the authenticated personal account based on the bearer token
+      operationId: whoAmI
+      tags:
+        - personal account
+      responses:
+        '200':
+          description: Personal Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalAccount'
+        '404':
+          description: personal account not found
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /personalaccounts/me/key:
+    post:
+      summary: creates a new active public and private key pair
+      operationId: createKey
+      tags:
+        - personal account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeyPair"
+      responses:
+        '204':
+          description: no content
+        '404':
+          description: personal account not found
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+
+    get:
+      summary: gets the currently active a key pair
+      operationId: getKeyPair
+      tags:
+        - personal account
+      responses:
+        '200':
+          description: Key pair
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyPair"
+        '404':
+          description: personal account not found
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+
+  /personalaccounts/me/logout:
+    put:
+      summary: logout
+      operationId: logout
+      tags:
+        - personal account
+      responses:
+        '204':
+          description: logged out
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /personalaccounts:
+    get:
+      summary: search
+      operationId: searchPersonalAccounts
+      tags:
+        - personal account
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 1024
+        - name: activeKeyId
+          in: query
+          required: false
+          explode: false
+          schema:
+            type: array
+            maxItems: 32
+            items:
+              $ref: "#/components/schemas/SHA256Hash"
+        - name: inactiveKeyIds
+          in: query
+          required: false
+          explode: false
+          schema:
+            type: array
+            maxItems: 32
+            items:
+              $ref: "#/components/schemas/SHA256Hash"
+      responses:
+        '200':
+          description: list of personal accounts without roles property
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PersonalAccount"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+                  
+  /personalaccounts/{accountId}:
+    get:
+      summary: get personal account by id
+      operationId: getPersonalAccountById
+      tags:
+        - personal account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: personal account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonalAccount"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/Error'
+  
+  /personalaccounts/{accountId}/key:
+    get:
+      summary: get active key by personal account id
+      operationId: getPersonalAccountKeyById
+      tags:
+        - personal account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        '200':
+          description: key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicKey"
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          description: no active key exists
+        '500':
+          $ref: '#/components/responses/Error'
+  
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    basicAuth:
+      type: http
+      scheme: basic
+  responses:
+    ValidationError:
+      description: validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationError"
+    Error:
+      description: server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: unauthorized
+  schemas:
+      
+    HexString:
+      type: string
+      maxLength: 1024
+      pattern: '^[0-9a-f]*$'
+
+    SHA256Hash:
+      type: string
+      minLength: 64
+      maxLength: 64
+      pattern: '^[0-9a-f]*$'
+
+    UUID:
+      type: string
+      format: uuid
+
+    UnixPath:
+      type: string
+      maxLength: 1024
+      pattern: '^(?!.*\\).*$'
+
+    NameString:
+      type: string
+      minLength: 1
+      maxLength: 63
+      pattern: '^([a-z]|[a-z][a-z0-9-]*[a-z0-9])?$'
+      
+    ByteString:
+      type: string
+      maxLength: 4096
+      format: byte
+      
+    HostnameString:
+      type: string
+      minLength: 1
+      maxLength: 1024
+      pattern: '^(([a-z]|[a-z][a-z0-9\\-]{0,61}[a-z0-9])\\.)*([a-z]|[a-z][a-z0-9\\-]{0,61}[a-z0-9])$'
+
+    ArtifactArray:
+      type: array
+      maxItems: 12288
+      items:
+        $ref: "#/components/schemas/Artifact"
+    
+    Organization:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          $ref: "#/components/schemas/NameString"
+        pathToRoot:
+          type: array
+          maxItems: 256
+          items:
+            $ref: "#/components/schemas/UUID"
+
+    ManagementNode:
+      type: object
+      required:
+        - name
+        - parentId
+        - pathToRoot
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          $ref: "#/components/schemas/NameString"
+        pathToRoot:
+          type: array
+          maxItems: 256
+          items:
+            $ref: "#/components/schemas/UUID"
+        parentId:
+          $ref: "#/components/schemas/UUID"
+          
+    Project:
+      type: object
+      required:
+        - name
+        - parentId
+        - pathToRoot
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          $ref: "#/components/schemas/NameString"
+        pathToRoot:
+          type: array
+          maxItems: 256
+          items:
+            $ref: "#/components/schemas/UUID"
+        parentId:
+          $ref: "#/components/schemas/UUID"
+    
+    SupplyChain:
+      type: object
+      required:
+        - name
+        - parentId
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+          readOnly: true
+        name:
+          $ref: "#/components/schemas/NameString"
+        pathToRoot:
+          type: array
+          maxItems: 256
+          items:
+            $ref: "#/components/schemas/UUID"
+        parentId:
+          $ref: "#/components/schemas/UUID"          
+    
+    VerificationResult:
+      type: object
+      required:
+        - runIsValid
+      properties:
+        runIsValid:
+          type: boolean
+
+    LinkMetaBlock:
+      type: object
+      required:
+        - link
+        - signature
+      properties:
+        link:
+          $ref: "#/components/schemas/Link"
+        signature:
+          $ref: "#/components/schemas/Signature"
+    
+    Signature:
+      type: object
+      required:
+        - hashAlgorithm
+        - keyAlgorithm
+        - keyId
+        - signature
+      properties:
+        hashAlgorithm:
+          $ref: '#/components/schemas/HashAlgorithm'
+        keyAlgorithm:
+          $ref: '#/components/schemas/KeyAlgorithm'
+        keyId:
+          $ref: '#/components/schemas/KeyId'
+        signature:
+          $ref: "#/components/schemas/HexString"
+    
+    Link:
+      type: object
+      required:
+        - materials
+        - products
+        - stepName
+      properties:
+        materials:
+          $ref: "#/components/schemas/ArtifactArray"
+        products:
+          $ref: "#/components/schemas/ArtifactArray"
+        stepName:
+          $ref: "#/components/schemas/NameString"
+
+    Artifact:
+      type: object
+      required:
+        - hash
+        - uri
+      properties:
+        hash:
+          $ref: "#/components/schemas/SHA256Hash"
+        uri:
+          $ref: "#/components/schemas/UnixPath"
+    
+    PublicKey:
+      type: object
+      required:
+        - keyId
+        - publicKey
+      properties:
+        keyId:
+          $ref: '#/components/schemas/KeyId'
+        publicKey:
+          $ref: '#/components/schemas/ByteString'
+    
+    KeyPair:
+      type: object
+      required:
+        - encryptedPrivateKey
+        - keyId
+        - publicKey
+      properties:
+        encryptedPrivateKey:
+          $ref: '#/components/schemas/ByteString'
+        keyId:
+          $ref: '#/components/schemas/KeyId'
+        publicKey:
+          $ref: '#/components/schemas/ByteString'
+
+    ServiceAccountKeyPair:
+      type: object
+      required:
+        - encryptedPrivateKey
+        - passphrase
+        - keyId
+        - publicKey
+      properties:
+        encryptedPrivateKey:
+          $ref: '#/components/schemas/ByteString'
+        passphrase:
+          type: string
+          maxLength: 80
+          pattern: '^(?=.*?[a-zA-Z\\d])[\\w@#&*+=$-]+$'
+        keyId:
+          $ref: '#/components/schemas/KeyId'
+        publicKey:
+          $ref: '#/components/schemas/ByteString'
+          #writeOnly: true
+          #description: used for authentication of a service account via http basic authentication
+    
+    LayoutMetaBlock:
+      type: object
+      required:
+        - layout
+        - signatures
+      properties:
+        layout:
+          $ref: "#/components/schemas/Layout"
+        signatures:
+          minItems: 1
+          maxItems: 20
+          type: array
+          items:
+            $ref: "#/components/schemas/Signature"
+    
+    Layout:
+      type: object
+      required:
+        - authorizedKeyIds
+        - expectedEndProducts
+        - keys
+        - steps
+      properties:
+        authorizedKeyIds:
+          type: array
+          minItems: 1
+          maxItems: 256
+          items:
+            $ref: "#/components/schemas/SHA256Hash"
+        expectedEndProducts:
+          type: array
+          minItems: 1
+          maxItems: 4096
+          items:
+            $ref: '#/components/schemas/MatchRule'
+        keys:
+          type: array
+          minItems: 1
+          maxItems: 256
+          items:
+            $ref: '#/components/schemas/PublicKey'
+        steps:
+          type: array
+          minItems: 1
+          maxItems: 256
+          items:
+            $ref: "#/components/schemas/Step"
+    
+    Rule:
+      type: object
+      required:
+        - pattern
+        - ruleType
+      properties:
+        destinationPathPrefix:
+          $ref: "#/components/schemas/UnixPath"
+        destinationStepName:
+          $ref: "#/components/schemas/NameString"
+        destinationType:
+          enum:
+            - PRODUCTS
+            - MATERIALS
+        pattern:
+          type: string
+          maxLength: 1024
+        ruleType:
+          enum:
+            - ALLOW
+            - CREATE
+            - CREATE_OR_MODIFY
+            - DELETE
+            - DISALLOW
+            - MATCH
+            - MODIFY
+            - REQUIRE
+        sourcePathPrefix:
+          $ref: "#/components/schemas/UnixPath"
+         
+    MatchRule:
+      type: object
+      required:
+        - destinationStepName
+        - destinationType
+        - pattern
+        - ruleType
+      properties:
+        destinationPathPrefix:
+          $ref: "#/components/schemas/UnixPath"
+        destinationStepName:
+          $ref: "#/components/schemas/NameString"
+        destinationType:
+          enum:
+            - PRODUCTS
+            - MATERIALS
+        pattern:
+          type: string
+          maxLength: 1024
+        ruleType:
+          enum:
+            - ALLOW
+            - CREATE
+            - CREATE_OR_MODIFY
+            - DELETE
+            - DISALLOW
+            - MATCH
+            - MODIFY
+            - REQUIRE
+        sourcePathPrefix:
+          $ref: "#/components/schemas/UnixPath"
+    
+    Step:
+      type: object
+      required:
+        - authorizedKeyIds
+        - expectedMaterials
+        - expectedProducts
+        - name
+        - requiredNumberOfLinks
+      properties:
+        authorizedKeyIds:
+          type: array
+          minItems: 1
+          maxItems: 256
+          items:
+            $ref: '#/components/schemas/KeyId'
+        expectedMaterials:
+          type: array
+          maxItems: 4096
+          items:
+            $ref: "#/components/schemas/Rule"
+        expectedProducts:
+          type: array
+          maxItems: 4096
+          items:
+            $ref: "#/components/schemas/Rule"
+        name:
+          $ref: "#/components/schemas/NameString"
+        requiredNumberOfLinks:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 20
+
+    KeyId:
+      $ref: "#/components/schemas/SHA256Hash"
+
+    KeyAlgorithm:
+      enum:
+        - EC
+
+    HashAlgorithm:
+      enum:
+        - SHA256
+        - SHA384
+        - SHA512
+      type: string
+          
+    Profile:
+      type: object
+      properties:
+        fullName:
+          type: string
+          maxLength: 1024
+        givenName:
+          type: string
+          maxLength: 1024
+        familyName:
+          type: string
+          maxLength: 1024
+        email:
+          type: string
+          maxLength: 1024
+        picture:
+          type: string
+          format: url
+
+    PersonalAccount:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+          readOnly: true
+        providerSubject:
+          type: string
+          maxLength: 1024
+          readOnly: true
+        providerName:
+          type: string
+          maxLength: 1024
+          readOnly: true
+        name:
+          $ref: "#/components/schemas/NameString"
+        profile:
+          $ref: "#/components/schemas/Profile"
+          nullable: true
+        activeKeyPair:
+          $ref: "#/components/schemas/KeyPair"
+        inactiveKeyPairs:
+          type: array
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/KeyPair"
+            
+    ServiceAccount:
+      type: object
+      required:
+        - name
+        - projectId
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+          readOnly: true
+        providerSubject:
+          type: string
+          maxLength: 1024
+          readOnly: true
+        name:
+          $ref: "#/components/schemas/NameString"
+        projectId:
+          $ref: "#/components/schemas/UUID"
+        activeKeyPair:
+          $ref: "#/components/schemas/KeyPair"
+        inactiveKeyPairs:
+          type: array
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/KeyPair"
+    
+    Permission:
+      enum:
+        - READ
+        - WRITE
+        - ROLE_WRITE
+        - LINK_ADD
+        - RELEASE
+    
+    Role:
+      type: object
+      required:
+        - permissions
+      properties:
+        permissions:
+          type: array
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/Permission"
+        
+    RoleAssignment:
+      type: object
+      required:
+        - resourceId
+        - identityId
+        - role
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        resourceId:
+          $ref: "#/components/schemas/UUID"
+        identityId:
+          $ref: "#/components/schemas/UUID"
+        role:
+            $ref: "#/components/schemas/Role"
+            
+    ReleaseConfiguration:
+      type: object
+      required:
+        - artifactCollectorSpecifications
+      properties:
+        artifactCollectorSpecifications:
+          type: array
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/ArtifactCollectorSpecification"
+            
+    ApprovalConfiguration:
+      type: object
+      required:
+        - stepName
+        - artifactCollectorSpecifications
+      properties:
+        stepName:
+          $ref: "#/components/schemas/NameString"
+        artifactCollectorSpecifications:
+          type: array
+          maxItems: 20
+          items:
+            $ref: "#/components/schemas/ArtifactCollectorSpecification"
+          minItems: 1
+          
+    ArtifactCollectorSpecification:
+      type: object
+      required:
+        - name
+        - type
+        - uri
+        - context
+      properties:
+        name:
+          $ref: "#/components/schemas/NameString"
+        type:
+          enum:
+            - XLDEPLOY
+            - GIT
+        uri:
+          description: base url of the artifact collector server
+          type: string
+          format: uri
+        context:
+          description: additional key value pair attributes that can vary per collector type for XLDEPLOY the key is 'applicationName'
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 1024
+            
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+    
+    ValidationError:
+      type: object
+      required:
+        - messages
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationMessage"
+    
+    ValidationMessage:
+      type: object
+      required:
+        - message
+        - type
+      properties:
+        field:
+          type: string
+        type:
+          enum:
+            - DATA_INPUT
+            - MODEL_CONSISTENCY
+        message:
+          type: string
+
+    AccountType:
+      enum:
+        - SERVICE_ACCOUNT
+        - PERSONAL_ACCOUNT
+    
+    AccountKeyInfo:
+      type: object
+      required:
+        - keyId
+        - keyStatus
+      properties:
+        accountId:
+          $ref: "#/components/schemas/UUID"
+        userName:
+          type: string
+          maxLength: 1024
+        path:
+          type: string
+        accountType:
+          $ref: '#/components/schemas/AccountType'
+        keyId:
+          $ref: '#/components/schemas/KeyId'
+        keyStatus:
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - DELETED
+
+    AccountInfo:
+      type: object
+      properties:
+        accountId:
+          $ref: "#/components/schemas/UUID"
+        userName:
+          type: string
+          maxLength: 1024
+        path:
+          type: string
+        accountType:
+          $ref: '#/components/schemas/AccountType'
+
+    ReleaseArtifacts:
+      type: object
+      properties:
+        releaseArtifacts:
+          type: array
+          minItems: 1
+          maxItems: 256
+          items:
+            type: array
+            minItems: 1
+            maxItems: 4096
+            items:
+              $ref: '#/components/schemas/Artifact'
+    ReleaseResult:
+      type: object
+      properties:
+        releaseIsValid:
+          type: boolean
+        releaseDossierMetaData:
+          $ref: '#/components/schemas/ReleaseDossierMetaData'
+
+    ReleaseDossierMetaData:
+      type: object
+      properties:
+        documentId:
+          type: string
+        releaseDate:
+          type: string
+          format: date-time
+        supplyChainPath:
+          type: string
+          $ref: "#/components/schemas/HostnameString"
+        releaseArtifacts:
+          type: array
+          minItems: 1
+          maxItems: 256
+          items:
+            type: array
+            minItems: 1
+            maxItems: 4096
+            items:
+              $ref: "#/components/schemas/SHA256Hash"
+
+    OAuthProvider:
+      type: object
+      properties:
+        name:
+          type: string
+
+    JwtToken:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+

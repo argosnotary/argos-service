@@ -1,0 +1,51 @@
+#
+# Argos Notary - A new way to secure the Software Supply Chain
+#
+# Copyright (C) 2019 - 2020 Rabobank Nederland
+# Copyright (C) 2019 - 2022 Gerard Borst <gerard.borst@argosnotary.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+#
+# For caching maven artifacts create first a docker volume with the command:
+#
+# docker volume create --name=maven_cache
+#
+
+version: '3.1'
+
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:19.0.3
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      TZ: Europe/Amsterdam
+    command:
+    - start-dev
+    - -Dkeycloak.migration.action=import
+    - -Dkeycloak.migration.provider=dir
+    - -Dkeycloak.migration.dir=/opt/keycloak/data/import
+    volumes:
+    - $PWD/keycloak/import:/opt/keycloak/data/import
+    ports:
+    - 9080:8080
+  
+  mongodb:
+    image: mongo:6
+    ports:
+    - 27017:27017
+

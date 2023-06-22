@@ -1,0 +1,15 @@
+{
+    "id": "#uuid",
+    "userName": "luke",
+    "email": "luke@skywalker.imp",
+    "roles": [
+        "ADMINISTRATOR"
+    ],
+    "providerSubject": "#uuid",
+    "providerName": "oauth-stub",
+    "inactiveKeyPairs": [],
+    "localPermissions": [],
+    "fullName": "Luke Skywalker",
+    "givenName": "Luke",
+    "familyName": "Skywalker"
+}

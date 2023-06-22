@@ -1,0 +1,15 @@
+{
+    "id": "#(accountId)",
+    "providerSubject": "#(extraAccount.personalAccount.providerSubject)",
+    "providerName": "oauth-stub",
+    "name": "user6",
+    "profile": {
+        "fullName": "Default6 User",
+        "givenName": "Default6",
+        "familyName": "User",
+        "email": "default6@nl.nl",
+        "picture": null
+    },
+    "activeKeyPair": "#notnull",
+    "inactiveKeyPairs": []
+}

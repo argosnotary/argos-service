@@ -1,0 +1,31 @@
+{
+  "signature": {
+    "keyId": "keyId1",
+    "signature": "sig1",
+    "keyAlgorithm": "EC",
+    "hashAlgorithm": "SHA384"
+  },
+  "link": {
+    "materials": [
+      {
+        "uri": "materialsUri1",
+        "hash": "materialsHash1"
+      },
+      {
+        "uri": "materialsUri2",
+        "hash": "materialsHash2"
+      }
+    ],
+    "stepName": "stepname",
+    "products": [
+      {
+        "uri": "productsUri1",
+        "hash": "productsHash1"
+      },
+      {
+        "uri": "productsUri12",
+        "hash": "productsHash2"
+      }
+    ]
+  }
+}

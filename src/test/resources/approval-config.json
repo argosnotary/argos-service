@@ -1,0 +1,13 @@
+{
+  "stepName": "stepName",
+  "artifactCollectorSpecifications": [
+    {
+      "name": "xl deploy",
+      "type": "XLDEPLOY",
+      "uri": "http://xldeploy.nl",
+      "context": {
+        "applicationName": "applicationName"
+      }
+    }
+  ]
+}

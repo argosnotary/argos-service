@@ -1,0 +1,36 @@
+[
+  {
+    "stepName": "stepname2",
+    "artifactCollectorSpecifications": [
+      {
+        "name": "xldeploy1",
+        "type": "XLDEPLOY",
+        "uri": "https://deploy.nl",
+        "context": {
+          "applicationName": "argos"
+        }
+      },
+      {
+        "name": "xkdeploy2",
+        "type": "XLDEPLOY",
+        "uri": "http://xldeploy2.nl",
+        "context": {
+          "applicationName": "argos"
+        }
+      }
+    ]
+  },
+  {
+    "stepName": "build",
+    "artifactCollectorSpecifications": [
+      {
+        "name": "git1",
+        "type": "GIT",
+        "uri": "http://git.nl",
+        "context": {
+          "repository": "argos"
+        }
+      }
+    ]
+  }
+]

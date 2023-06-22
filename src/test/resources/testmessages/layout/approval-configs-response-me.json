@@ -1,0 +1,15 @@
+[
+  {
+    "stepName": "build",
+    "artifactCollectorSpecifications": [
+      {
+        "name": "git1",
+        "type": "GIT",
+        "uri": "http://git.nl",
+        "context": {
+          "repository": "argos"
+        }
+      }
+    ]
+  }
+]

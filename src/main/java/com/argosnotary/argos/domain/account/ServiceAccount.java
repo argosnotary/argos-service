@@ -1,0 +1,74 @@
+/*
+ * Argos Notary - A new way to secure the Software Supply Chain
+ *
+ * Copyright (C) 2019 - 2020 Rabobank Nederland
+ * Copyright (C) 2019 - 2022 Gerard Borst <gerard.borst@argosnotary.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.argosnotary.argos.domain.account;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.argosnotary.argos.domain.crypto.KeyPair;
+import com.argosnotary.argos.domain.roles.Permission;
+import com.argosnotary.argos.domain.roles.Role;
+
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@Document(collection="serviceaccounts")
+public class ServiceAccount extends Account {
+
+	public static final String SA_PROVIDER_NAME = "saprovider";
+	
+    private UUID projectId;
+    
+    static {
+    	 Set<Permission> ps = new HashSet<>();
+    	 ps.addAll(new Role.Releaser().getPermissions());
+    	 ps.addAll(new Role.LinkAdder().getPermissions());
+    	 defaultPermissions = Collections.unmodifiableSet(ps);
+    }
+    
+    public static final Set<Permission> defaultPermissions;
+
+    @Builder
+    public ServiceAccount(
+    		UUID id,
+            String providerSubject,
+    		String name,
+    		KeyPair activeKeyPair,
+            Set<KeyPair> inactiveKeyPairs, 
+            UUID projectId) {
+        super(
+        		id,
+        		SA_PROVIDER_NAME,
+        		providerSubject,
+        		name,
+        		activeKeyPair,
+                inactiveKeyPairs);
+        this.projectId = projectId;
+    }
+}

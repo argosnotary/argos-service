@@ -1,0 +1,29 @@
+[
+  {
+    "name": "root1",
+    "type": "LABEL",
+    "referenceId": "#uuid",
+    "hasChildren": true,
+    "children": [
+    ],
+    "permissions": "#(^^paPermissions)"
+  },
+  {
+    "name": "root2",
+    "type": "LABEL",
+    "referenceId": "#uuid",
+    "hasChildren": true,
+    "children": [
+    ],
+    "permissions": "#(^^paPermissions)"
+  },
+  {
+    "name": "root3",
+    "type": "LABEL",
+    "referenceId": "#uuid",
+    "hasChildren": true,
+    "children": [
+    ],
+    "permissions": "#(^^paPermissions)"
+  }
+]

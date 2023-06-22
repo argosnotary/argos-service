@@ -1,0 +1,9 @@
+{
+    "messages": [
+        {
+            "field": "getSupplyChain.supplyChainId",
+            "type": "DATA_INPUT",
+            "message": "Invalid UUID string: invaliduuid"
+        }
+    ]
+}

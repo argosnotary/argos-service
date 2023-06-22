@@ -1,0 +1,15 @@
+[
+  {
+  "stepName": "build",
+    "artifactCollectorSpecifications": [
+    {
+      "name": "xldeploy",
+      "type": "XLDEPLOY",
+      "uri": "http://xldeploy.com",
+      "context": {
+        "applicationName": "argos"
+      }
+    }
+  ]
+  }
+]
