@@ -19,15 +19,17 @@
  */
 package com.argosnotary.argos.domain.link;
 
-import lombok.Builder;
-import lombok.Data;
-
 import java.io.Serializable;
 
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+
 @Builder
 @Data
+@AllArgsConstructor
 public class Artifact implements Serializable {
     private String uri;
     @Indexed

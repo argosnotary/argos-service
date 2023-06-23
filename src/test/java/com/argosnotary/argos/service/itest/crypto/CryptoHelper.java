@@ -20,9 +20,11 @@
 package com.argosnotary.argos.service.itest.crypto;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PKCS8Generator;
@@ -41,6 +44,7 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.util.io.pem.PemGenerationException;
 import org.bouncycastle.util.io.pem.PemObject;
 
+import com.argosnotary.argos.service.itest.rest.api.model.RestHashAlgorithm;
 import com.argosnotary.argos.service.itest.rest.api.model.RestKeyAlgorithm;
 import com.argosnotary.argos.service.itest.rest.api.model.RestKeyPair;
 import com.argosnotary.argos.service.itest.rest.api.model.RestLayoutMetaBlock;
@@ -65,7 +69,7 @@ public class CryptoHelper {
 		RestLayoutMetaBlock restLayoutMetaBlock = objectMapper.convertValue(restLayoutMetaBlockJson, RestLayoutMetaBlock.class);
 		
 		String ser = new JsonSigningSerializer().serialize(restLayoutMetaBlock.getLayout());
-		RestSignature signature = Signer.sign(keyPair, password.toCharArray(), new JsonSigningSerializer().serialize(restLayoutMetaBlock.getLayout()));
+		RestSignature signature = sign(keyPair, password.toCharArray(), new JsonSigningSerializer().serialize(restLayoutMetaBlock.getLayout()));
         List<RestSignature> signatures = new ArrayList<>(restLayoutMetaBlock.getSignatures());
         signatures.add(signature);
         restLayoutMetaBlock.setSignatures(signatures);
@@ -77,7 +81,7 @@ public class CryptoHelper {
 		RestKeyPair keyPair = objectMapper.convertValue(keyPairJson, RestKeyPair.class);
 		RestLinkMetaBlock restLinkMetaBlock = objectMapper.convertValue(restLinkMetaBlockJson, RestLinkMetaBlock.class);
 		
-		RestSignature signature = Signer.sign(keyPair, password.toCharArray(), new JsonSigningSerializer().serialize(restLinkMetaBlock.getLink()));
+		RestSignature signature = sign(keyPair, password.toCharArray(), new JsonSigningSerializer().serialize(restLinkMetaBlock.getLink()));
         restLinkMetaBlock.setSignature(signature);
         
         return objectMapper.writeValueAsString(restLinkMetaBlock);
@@ -103,6 +107,26 @@ public class CryptoHelper {
 	
 	private static String computeKeyId(PublicKey publicKey) {
         return DigestUtils.sha256Hex(publicKey.getEncoded());
+    }
+	
+	public static final RestKeyAlgorithm DEFAULT_KEY_ALGORITHM = RestKeyAlgorithm.EC;
+	public static final RestHashAlgorithm DEFAULT_HASH_ALGORITHM = RestHashAlgorithm.SHA384;
+
+    public static RestSignature sign(RestKeyPair keyPair, char[] keyPassphrase, String jsonRepresentation) throws OperatorCreationException, GeneralSecurityException, IOException, PKCSException {
+    	RestSignature sig = new RestSignature();
+    	sig.setKeyId(keyPair.getKeyId());
+    	sig.setHashAlgorithm(DEFAULT_HASH_ALGORITHM);
+    	sig.setKeyAlgorithm(DEFAULT_KEY_ALGORITHM);
+    	sig.setSignature(createSignature(CryptUtil.decryptPrivateKey(keyPassphrase, keyPair.getEncryptedPrivateKey()), 
+					jsonRepresentation, SignatureAlgorithm.getSignatureAlgorithm(sig.getKeyAlgorithm(), sig.getHashAlgorithm())));
+		return sig;
+    }
+
+    private static String createSignature(PrivateKey privateKey, String jsonRepr, SignatureAlgorithm algorithm) throws GeneralSecurityException {
+        java.security.Signature privateSignature = java.security.Signature.getInstance(algorithm.getStringValue());
+        privateSignature.initSign(privateKey);
+        privateSignature.update(jsonRepr.getBytes(StandardCharsets.UTF_8));
+        return Hex.encodeHexString(privateSignature.sign());
     }
 
 }

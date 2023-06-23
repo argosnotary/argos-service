@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.argosnotary.argos.domain.nodes.Node;
+import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.SupplyChain;
 
 import lombok.RequiredArgsConstructor;
@@ -50,17 +51,25 @@ public class SupplyChainServiceImpl implements SupplyChainService {
 	}
 
 	@Override
-	public Optional<String> getFullDomainName(UUID supplyChainId) {
+	public Optional<String> getQualifiedName(UUID supplyChainId) {
 		Optional<Node> supplyChainNode = nodeService.findById(supplyChainId);
 		if (supplyChainNode.isEmpty() || !(supplyChainNode.get() instanceof SupplyChain)) {
 			return Optional.empty();
 		}
-		return nodeService.getFullDomainName(supplyChainId);
+		return nodeService.getQualifiedName(supplyChainId);
 	}
 
 	@Override
 	public SupplyChain update(SupplyChain supplyChain) {
 		return (SupplyChain) nodeService.update(supplyChain);
+	}
+
+	@Override
+	public Optional<Organization> getOrganization(UUID supplyChainId) {
+		return nodeService.findRootNodeInPath(supplyChainId)
+				.filter(node -> node instanceof Organization)
+				.map(n -> Optional.of((Organization)n))
+				.orElse(Optional.empty());
 	}
 
 }

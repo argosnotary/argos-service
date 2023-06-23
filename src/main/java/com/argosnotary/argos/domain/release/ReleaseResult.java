@@ -20,13 +20,11 @@
 package com.argosnotary.argos.domain.release;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Builder
-@Getter
-@Setter
+@Data
 public class ReleaseResult {
     private boolean releaseIsValid;
-    private ReleaseDossierMetaData releaseDossierMetaData;
+    private Release release;
 }

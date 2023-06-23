@@ -2,6 +2,7 @@ package com.argosnotary.argos.service.verification;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class VerificationServiceImpl implements VerificationService {
 
 	@Override
 	public boolean getVerification(List<String> artifactHashes, List<String> paths) {
-        return releaseService.artifactsAreReleased(artifactHashes, paths);
+        return releaseService.artifactsAreReleased(artifactHashes.stream().collect(Collectors.toSet()), paths);
 	}
 
 	@Override

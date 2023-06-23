@@ -20,31 +20,10 @@
 package com.argosnotary.argos.domain.release;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static java.lang.String.join;
-import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
+import lombok.Data;
 
 @Builder
-@Getter
-@Setter
-@EqualsAndHashCode
+@Data
 public class ReleaseDossierMetaData {
-    private String documentId;
-    private OffsetDateTime releaseDate;
-    private String supplyChainPath;
-    private List<List<String>> releaseArtifacts;
-
-    public static String createHashFromArtifactList(List<String> artifactList) {
-        ArrayList<String> list = new ArrayList<>(artifactList);
-        Collections.sort(list);
-        return sha256Hex(join("", list));
-    }
+    private Release release;
 }

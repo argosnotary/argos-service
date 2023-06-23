@@ -26,14 +26,12 @@ import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Builder
-@Getter
-@Setter
+@Data
 public class ReleaseDossier {
-
+	
     private List<Account> accounts;
     private LayoutMetaBlock layoutMetaBlock;
     private List<LinkMetaBlock> linkMetaBlocks;

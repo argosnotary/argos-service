@@ -19,18 +19,25 @@
  */
 package com.argosnotary.argos.service.mongodb.release;
 
-import com.argosnotary.argos.domain.release.ReleaseDossier;
-import com.argosnotary.argos.domain.release.ReleaseDossierMetaData;
-
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
-public interface ReleaseRepository {
-    ReleaseDossierMetaData storeRelease(ReleaseDossierMetaData releaseDossierMetaData, ReleaseDossier releaseDossier);
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-    Optional<ReleaseDossierMetaData> findReleaseByReleasedArtifactsAndPath(List<List<String>> releasedArtifacts, String path);
+import com.argosnotary.argos.domain.release.Release;
 
-    Optional<String> getRawReleaseFileById(String id);
+public interface ReleaseRepository extends MongoRepository<Release, UUID> {
 
-    boolean artifactsAreReleased(List<String> releasedArtifacts, List<String> paths);
+    @Aggregation(pipeline = {
+    		"{$match: {'domainName' {$in: ?0}}}",
+    		"{$group: {_id: null,items: {$push: '$releasedProductsHashes'}}}",
+    		"{$project: {'results': {$reduce: {input: '$items',initialValue: [],in: { $concatArrays: [ '$$value', '$$this' ] }}},notReleased: {$setDifference: [ ['hash111', 'hash114'], '$results']}, _id: 0}}",
+    		"{$project: {releasedProductsHashes: {$setDifference: [ ?1, '$results']}}}"
+    })
+    Release artifactsNotReleased(List<String> domainNames, Set<String> releasedArtifacts);
+    
+    Optional<Release> findByReleasedProductsHashesHashAndSupplyChainId(String releasedProductsHashesHash, UUID supplyChainId);
 }

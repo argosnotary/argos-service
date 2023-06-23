@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.SupplyChain;
 
 public interface SupplyChainService {
@@ -21,6 +22,8 @@ public interface SupplyChainService {
 	
 	boolean exists(UUID supplyChainId);
 	
-	Optional<String> getFullDomainName(UUID supplyChainId);
+	Optional<String> getQualifiedName(UUID supplyChainId);
+	
+	Optional<Organization> getOrganization(UUID supplyChainId);
 
 }

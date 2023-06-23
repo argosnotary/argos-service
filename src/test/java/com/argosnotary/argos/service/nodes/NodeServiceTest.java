@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,9 +31,6 @@ import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.domain.roles.RoleAssignment;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.mongodb.nodes.NodeRepository;
-import com.argosnotary.argos.service.nodes.NodeDeleteService;
-import com.argosnotary.argos.service.nodes.NodeService;
-import com.argosnotary.argos.service.nodes.NodeServiceImpl;
 import com.argosnotary.argos.service.roles.RoleAssignmentService;
 
 @ExtendWith(MockitoExtension.class)
@@ -246,15 +244,19 @@ class NodeServiceTest {
 	@Test
 	void testGetFullDomainNameNodeAvailable() {
 		when(nodeRepository.findById(project1112.getId())).thenReturn(Optional.of(project1112));
-		when(nodeRepository.findWithResourceIds(project1112.getPathToRoot())).thenReturn(List.of(project1112, node11, node111, org1));
-		Optional<String> optDomain = nodeService.getFullDomainName(project1112.getId());
-		assertEquals(optDomain.get(), "project1112.node111.node11.org1.com");
+		project1112.setChildren(new HashSet<>());
+		node11.setChildren(new HashSet<>());
+		node111.setChildren(new HashSet<>());
+		org1.setChildren(new HashSet<>());
+		when(nodeRepository.findAllById(project1112.getPathToRoot())).thenReturn(List.of(project1112, node11, node111, org1));
+		Optional<String> optDomain = nodeService.getQualifiedName(project1112.getId());
+		assertEquals("com.org1.node11.node111.project1112", optDomain.get());
 	}
 	
 	@Test
 	void testGetFullDomainNameNodeNotFound() {
 		when(nodeRepository.findById(project1112.getId())).thenReturn(Optional.empty());
-		Optional<String> optDomain = nodeService.getFullDomainName(project1112.getId());
+		Optional<String> optDomain = nodeService.getQualifiedName(project1112.getId());
 		assertEquals(optDomain, Optional.empty());
 	}
 

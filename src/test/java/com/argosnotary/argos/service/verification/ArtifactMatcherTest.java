@@ -17,21 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.release;
+package com.argosnotary.argos.service.verification;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import com.argosnotary.argos.domain.link.Artifact;
-import com.argosnotary.argos.domain.release.ReleaseResult;
+class ArtifactMatcherTest {
 
-public interface ReleaseService {
-    ReleaseResult createRelease(UUID supplyChainId, List<Set<Artifact>> releaseArtifacts);
+    @BeforeEach
+    void setUp() throws Exception {
+    }
 
-    //Optional<String> getRawReleaseFileById(String id);
+    @Test
+    void matchesWithDoubleSlash() {
+        assertTrue(ArtifactMatcher.matches("foo/bar", "foo/*"));
+    }
+    
+    @Test
+    void matchesDoubleAndSingleStar() {
+        assertFalse(ArtifactMatcher.matches("foo/bar", "*"));
+        assertTrue(ArtifactMatcher.matches("foo/bar", "*/*"));
+        assertTrue(ArtifactMatcher.matches("foo/bar", "foo/*"));
+    }
 
-    boolean artifactsAreReleased(Set<String> releasedArtifacts, List<String> paths);
 }

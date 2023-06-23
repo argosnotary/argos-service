@@ -20,7 +20,6 @@
 package com.argosnotary.argos.service.release;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -34,12 +33,16 @@ import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 import com.argosnotary.argos.domain.link.Artifact;
+import com.argosnotary.argos.domain.nodes.Organization;
+import com.argosnotary.argos.domain.nodes.Organization;
+import com.argosnotary.argos.domain.release.Release;
 import com.argosnotary.argos.domain.release.ReleaseDossier;
 import com.argosnotary.argos.domain.release.ReleaseDossierMetaData;
 import com.argosnotary.argos.domain.release.ReleaseResult;
 import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.layout.LayoutMetaBlockService;
 import com.argosnotary.argos.service.link.LinkMetaBlockService;
+import com.argosnotary.argos.service.mongodb.release.ReleaseDossierRepository;
 import com.argosnotary.argos.service.mongodb.release.ReleaseRepository;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
 import com.argosnotary.argos.service.verification.VerificationProvider;
@@ -56,6 +59,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     private final VerificationProvider verificationProvider;
     private final LayoutMetaBlockService layoutMetaBlockService;
     private final ReleaseRepository releaseRepository;
+    private final ReleaseDossierRepository releaseDossierRepository;
     private final AccountService accountService;
     private final SupplyChainService supplyChainService;
     private final LinkMetaBlockService linkMetaBlockService;
@@ -63,27 +67,22 @@ public class ReleaseServiceImpl implements ReleaseService {
     @Override
     public ReleaseResult createRelease(UUID supplyChainId, List<Set<Artifact>> releaseArtifacts) {
         log.info("Release Artifacts [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
-
-        Optional<String> supplyChainPathOpt = supplyChainService.getFullDomainName(supplyChainId);
-        if (supplyChainPathOpt.isEmpty()) {
-        	return ReleaseResult.builder().releaseIsValid(false).build();
-        }
-        String supplyChainPath = supplyChainPathOpt.get();
-        List<List<String>> releaseArtifactHashes = convertToReleaseArtifactHashes(releaseArtifacts);
+        String releaseArtifactHashesHash = convertToReleaseArtifactHashesHash(releaseArtifacts);
         return releaseRepository
-                .findReleaseByReleasedArtifactsAndPath(releaseArtifactHashes, supplyChainPath)
-                .map(releaseDossierMetaData -> {
+        		.findByReleasedProductsHashesHashAndSupplyChainId(releaseArtifactHashesHash, supplyChainId)
+                .map(release -> {
                     log.info("Artifacts already released [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
                     return ReleaseResult
                         .builder()
                         .releaseIsValid(true)
-                        .releaseDossierMetaData(releaseDossierMetaData)
+                        .release(release)
                         .build();
                 })
-                .orElseGet(() -> verifyAndStoreRelease(supplyChainId, releaseArtifacts, supplyChainPath, releaseArtifactHashes));
+                .orElseGet(() -> verifyAndStoreRelease(supplyChainId, releaseArtifacts));
     }
 
-    private ReleaseResult verifyAndStoreRelease(UUID supplyChainId, List<Set<Artifact>> releaseArtifacts, String supplyChainPath, List<List<String>> releaseArtifactHashes) {
+    private ReleaseResult verifyAndStoreRelease(UUID supplyChainId, 
+    		List<Set<Artifact>> releaseArtifacts) {
         ReleaseResult.ReleaseResultBuilder releaseBuilder = ReleaseResult.builder();
         Optional<LayoutMetaBlock> optionalLayoutMetaBlock = layoutMetaBlockService.findBySupplyChainId(supplyChainId);
         if (optionalLayoutMetaBlock.isPresent()) {
@@ -95,14 +94,39 @@ public class ReleaseServiceImpl implements ReleaseService {
 
             VerificationRunResult verificationRunResult = verificationProvider.verifyRun(optionalLayoutMetaBlock.get(), allArtifacts);
             releaseBuilder.releaseIsValid(verificationRunResult.isRunIsValid());
+            
+            Optional<Organization> orgOpt = supplyChainService.getOrganization(supplyChainId);
+            if (orgOpt.isEmpty()) {
+            	log.info("Artifacts release invalid [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
+            	log.info("Organization for supply chain [{}] not found.", supplyChainId);
+                return ReleaseResult.builder().releaseIsValid(false).build();
+            }
+            
+            Optional<String> qualifiedNameOpt = supplyChainService.getQualifiedName(supplyChainId);
+            if (qualifiedNameOpt.isEmpty()) {
+            	log.info("Artifacts release invalid [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
+                return ReleaseResult.builder().releaseIsValid(false).build();
+            }
+            
+
+
+            String releaseArtifactHashesHash = convertToReleaseArtifactHashesHash(releaseArtifacts);
 
             if (verificationRunResult.isRunIsValid()) {
-                ReleaseDossierMetaData releaseDossierMetaData = createAndStoreRelease(
-                        supplyChainPath,
+                Release release = Release.builder()
+                		.id(UUID.randomUUID())
+                		.supplyChainId(supplyChainId)
+                		.qualifiedSupplyChainName(qualifiedNameOpt.get())
+                		.organization(orgOpt.get())
+                		.releaseDate(OffsetDateTime.now())
+                		.releasedProductsHashes(convertToReleaseArtifactHashes(releaseArtifacts))
+                		.releasedProductsHashesHash(releaseArtifactHashesHash)
+                		.build();
+                Release released = createAndStoreRelease(
+                				release,
                         optionalLayoutMetaBlock.get(),
-                        verificationRunResult,
-                        releaseArtifactHashes);
-                releaseBuilder.releaseDossierMetaData(releaseDossierMetaData);
+                        verificationRunResult);
+                releaseBuilder.release(released);
                 linkMetaBlockService.deleteBySupplyChainId(supplyChainId);
             }
             log.info("Artifacts released [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
@@ -112,16 +136,13 @@ public class ReleaseServiceImpl implements ReleaseService {
         return ReleaseResult.builder().releaseIsValid(false).build();
     }
 
-    private ReleaseDossierMetaData createAndStoreRelease(String supplyChainPath, LayoutMetaBlock layoutMetaBlock,
-                                                         VerificationRunResult verificationRunResult,
-                                                         List<List<String>> releaseArtifacts) {
+    private Release createAndStoreRelease(Release release, LayoutMetaBlock layoutMetaBlock,
+                                                         VerificationRunResult verificationRunResult) {
 
         List<Account> accounts = getAccounts(layoutMetaBlock);
 
         ReleaseDossierMetaData releaseDossierMetaData = ReleaseDossierMetaData.builder()
-                .releaseArtifacts(releaseArtifacts)
-                .releaseDate(OffsetDateTime.now(ZoneOffset.UTC))
-                .supplyChainPath(supplyChainPath)
+                .release(release)
                 .build();
 
         ReleaseDossier releaseDossier = ReleaseDossier.builder()
@@ -129,17 +150,21 @@ public class ReleaseServiceImpl implements ReleaseService {
                 .linkMetaBlocks(verificationRunResult.getValidLinkMetaBlocks())
                 .accounts(accounts)
                 .build();
-        ReleaseDossierMetaData rmd = releaseRepository.storeRelease(releaseDossierMetaData, releaseDossier);
-        return rmd;
+        ReleaseDossierMetaData rmd = releaseDossierRepository.storeRelease(releaseDossierMetaData, releaseDossier);
+        return releaseRepository.save(release);
     }
 
-    private List<List<String>> convertToReleaseArtifactHashes(List<Set<Artifact>> releaseArtifacts) {
+    private Set<String> convertToReleaseArtifactHashes(List<Set<Artifact>> releaseArtifacts) {
         return releaseArtifacts
                 .stream()
-                .map(s -> s.stream()
-                        .map(Artifact::getHash)
-                        .collect(Collectors.toList()))
-                .collect(Collectors.toList());
+                .flatMap(a -> a.stream())
+                .map(Artifact::getHash)
+                .collect(Collectors.toSet());
+    }
+    
+    private String convertToReleaseArtifactHashesHash(List<Set<Artifact>> releaseArtifacts) {
+    	Set<String> hashes = convertToReleaseArtifactHashes(releaseArtifacts);
+        return Release.calculateReleasedProductsHashesHash(hashes);
     }
 
     private List<Account> getAccounts(LayoutMetaBlock layoutMetaBlock) {
@@ -154,14 +179,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
 	@Override
-	public Optional<String> getRawReleaseFileById(String id) {
-		// TODO Auto-generated method stub
-		return Optional.empty();
-	}
-
-	@Override
-	public boolean artifactsAreReleased(List<String> releasedArtifacts, List<String> paths) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean artifactsAreReleased(Set<String> artifacts, List<String> domains) {
+		return releaseRepository.artifactsNotReleased(domains, artifacts).getReleasedProductsHashes().isEmpty();
 	}
 }

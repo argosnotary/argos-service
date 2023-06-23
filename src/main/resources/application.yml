@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-
 spring:
+  data.mongodb.auto-index-creation: true
   security:
     oauth2:
       client:
@@ -63,5 +63,5 @@ keycloak.admin-client.grant-type: client_credentials
 
 logging:
   level:
-    root: INFO
-    org.mongodb.driver: INFO
+    root: DEBUG
+    org.mongodb.driver: DEBUG

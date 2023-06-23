@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -92,6 +91,10 @@ public class NodeServiceImpl implements NodeService {
 		if (nodes.isEmpty()) {
 			return Optional.empty();
 		}
+		return Optional.of(createSubTree(nodeId, nodes));
+	}
+	
+	private Node createSubTree(UUID nodeId, List<Node> nodes) {
 		HashMap<UUID,Node> nodeMap = new HashMap<>();
 		nodes.forEach(n -> nodeMap.put(n.getId(), n));
 		nodes.forEach(n -> {
@@ -100,7 +103,8 @@ public class NodeServiceImpl implements NodeService {
 				nodeMap.get(n.getParentId()).getChildren().add(n);
 			}
 			});
-		return Optional.of(nodeMap.get(nodeId));
+		
+		return nodeMap.get(nodeId);
 	}
 
 	@Override
@@ -154,21 +158,40 @@ public class NodeServiceImpl implements NodeService {
 	}
 
 	@Override
-	public Optional<String> getFullDomainName(UUID resourceId) {
-		Optional<Node> node = nodeRepository.findById(resourceId);
-		if (node.isEmpty()) {
+	public Optional<String> getQualifiedName(UUID resourceId) {
+		Optional<Node> nodeOpt = findRootNodeInPath(resourceId);
+		if (nodeOpt.isEmpty()) {
 			return Optional.empty();
 		}
-		Map<UUID,Node> nodeMap = new HashMap();
-		nodeRepository.findWithResourceIds(node.get().getPathToRoot()).stream().forEach(n -> nodeMap.put(n.getId(), n));
-		String fullDomainName = nodeMap.get(resourceId).getPathToRoot().stream().map(n -> {
-			Node pathNode = nodeMap.get(n);
-			if (pathNode instanceof Organization) {
-				return ((Organization) pathNode).getDomain().getDomain();
-			} else {
-				return pathNode.getName();
-			}
-		}).collect(Collectors.joining("."));
-		return Optional.of(fullDomainName);
+		List<String> labels = getQualifiedName(nodeOpt.get());
+		return Optional.of(String.join(".", labels));
+	}
+	
+	private List<String> getQualifiedName(Node node) {
+		List<String> labels = new ArrayList<>();
+		if (node instanceof Organization) {
+			labels.addAll(((Organization) node).getDomain().reverseLabels());
+		} else {
+			labels.add(node.getName());
+		}
+		if (node.getChildren().isEmpty()) {
+			return labels;
+		}
+		List<String> tmp = getQualifiedName(node.getChildren().iterator().next());
+		labels.addAll(tmp);
+		return labels;
+	}
+
+	@Override
+	public Optional<Node> findRootNodeInPath(UUID resourceId) {
+		Optional<Node> nodeOpt = nodeRepository.findById(resourceId);
+		if (nodeOpt.isEmpty()) {
+			return Optional.empty();
+		}
+		List<UUID> path = nodeOpt.get().getPathToRoot();
+		UUID rootId = path.get(path.size()-1);
+		List<Node> nodes = nodeRepository.findAllById(path);
+		return Optional.of(createSubTree(rootId, nodes));
+
 	}
 }

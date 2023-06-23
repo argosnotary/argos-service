@@ -33,6 +33,8 @@ public interface NodeService {
 	
 	public boolean exists(String clazz, UUID resourceId);
 	
-	Optional<String> getFullDomainName(UUID resourceId);
+	Optional<String> getQualifiedName(UUID resourceId);
+	
+	Optional<Node> findRootNodeInPath(UUID resourceId);
 
 }
