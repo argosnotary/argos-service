@@ -18,7 +18,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 spring:
-  data.mongodb.auto-index-creation: true
+  data.mongodb:
+    auto-index-creation: true
+    database: argos
   security:
     oauth2:
       client:
@@ -63,5 +65,5 @@ keycloak.admin-client.grant-type: client_credentials
 
 logging:
   level:
-    root: DEBUG
-    org.mongodb.driver: DEBUG
+    root: INFO
+    org.mongodb.driver: INFO

@@ -1690,7 +1690,7 @@ components:
         passphrase:
           type: string
           maxLength: 80
-          pattern: '^(?=.*?[a-zA-Z\\d])[\\w@#&*+=$-]+$'
+          pattern: '^(?=.*?[a-zA-Z\d])[\w@#&*+=$-]+$'
         keyId:
           $ref: '#/components/schemas/KeyId'
         publicKey:
