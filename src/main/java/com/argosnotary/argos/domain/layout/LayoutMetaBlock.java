@@ -32,7 +32,7 @@ import com.argosnotary.argos.domain.crypto.Signature;
 
 @Builder
 @Data
-@Document
+@Document(collection="layoutmetablocks")
 public class LayoutMetaBlock {
 	@Id
     private UUID supplyChainId;

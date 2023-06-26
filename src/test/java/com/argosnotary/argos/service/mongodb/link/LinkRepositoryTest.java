@@ -17,9 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.mongodb;
+package com.argosnotary.argos.service.mongodb.link;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
@@ -42,11 +41,8 @@ import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.link.Link;
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
 import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
-import com.argosnotary.argos.service.mongodb.link.LinkMetaBlockRepository;
 
-/*
- * Integration tests of all repositories exept the Release Repository
- */
+
 @Testcontainers
 @DataMongoTest
 class LinkRepositoryTest {
@@ -65,13 +61,53 @@ class LinkRepositoryTest {
     private static final String STEP_NAME_NEW = "stepNameNew";
     private static final UUID SUPPLY_CHAIN_ID = UUID.randomUUID();
     private static final UUID OTHER_SUPPLY_CHAIN_ID = UUID.randomUUID();
-    private static final String HASH_1 = "74a88c1cb96211a8f648af3509a1207b2d4a15c0202cfaa10abad8cc26300c63";
-    private static final String HASH_2 = "1e6a4129c8b90e9b6c4727a59b1013d714576066ad1bad05034847f30ffb62b6";
-    private static final String ARGOS_TEST_IML = "argos-test.iml";
-    private static final String DOCKER_1_IML = "docker (1).iml";
+    private static final String HASH_1 = "hash1";
+    private static final String HASH_2 = "hash2";
+    private static final String HASH_3 = "hash3";
+    private static final String HASH_4 = "hash4";
+    private static final String uri1 = "uri1";
+    private static final String uri2 = "uri2";
+    private static final String uri3 = "uri3";
+    private static final String uri4 = "uri4";
+    private Artifact a1, a2, a3, a4;
+    private Link l1, l2, l3, l4;
+    
+    private LinkMetaBlock lb1, lb2, lb3, lb4;
 	
     @BeforeEach
     void setup() throws IOException, ClassNotFoundException {
+    	a1 = Artifact.builder().hash(HASH_1).uri(uri1).build();
+    	a2 = Artifact.builder().hash(HASH_2).uri(uri2).build();
+    	a3 = Artifact.builder().hash(HASH_3).uri(uri3).build();
+    	a4 = Artifact.builder().hash(HASH_4).uri(uri4).build();
+    	l1 = Link.builder().stepName(STEP_NAME).materials(List.of(a1)).products(List.of(a1)).build();
+    	l2 = Link.builder().stepName(STEP_NAME).materials(List.of(a1)).products(List.of(a2)).build();
+    	l3 = Link.builder().stepName(STEP_NAME).materials(List.of(a3)).products(List.of(a4)).build();
+    	l4 = Link.builder().stepName(STEP_NAME).materials(List.of(a4)).products(List.of(a2)).build();
+    	lb1 = LinkMetaBlock
+                .builder()
+                .supplyChainId(SUPPLY_CHAIN_ID)
+                .signature(createSignature())
+                .link(l1)
+                .build();
+        lb2 = LinkMetaBlock
+                .builder()
+                .supplyChainId(SUPPLY_CHAIN_ID)
+                .signature(createSignature())
+                .link(l2)
+                .build();
+        lb3 = LinkMetaBlock
+                .builder()
+                .supplyChainId(SUPPLY_CHAIN_ID)
+                .signature(createSignature())
+                .link(l3)
+                .build();
+        lb4 = LinkMetaBlock
+                .builder()
+                .supplyChainId(OTHER_SUPPLY_CHAIN_ID)
+                .signature(createSignature())
+                .link(l4)
+                .build();
     	linkMetaBlockRepository.deleteAll();
         createDataSet();
     }
@@ -79,13 +115,19 @@ class LinkRepositoryTest {
     @Test
     void findAll() {
         List<LinkMetaBlock> blocks = linkMetaBlockRepository.findAll();
-        assertThat(blocks, hasSize(3));
+        assertThat(blocks, hasSize(4));
     }
     
     @Test
     void findBySupplyChainId() {
         List<LinkMetaBlock> blocks = linkMetaBlockRepository.findBySupplyChainId(SUPPLY_CHAIN_ID);
-        assertThat(blocks, hasSize(2));
+        assertThat(blocks, hasSize(3));
+    }
+    
+    @Test
+    void findBySupplyChainIdAndHash() {
+        List<LinkMetaBlock> blocks = linkMetaBlockRepository.findBySupplyChainIdAndHash(SUPPLY_CHAIN_ID, HASH_2);
+        assertThat(blocks, hasSize(1));
     }
     
     @Test
@@ -98,24 +140,10 @@ class LinkRepositoryTest {
     
 
     void createDataSet() {
-        linkMetaBlockRepository.save(LinkMetaBlock
-                .builder()
-                .supplyChainId(SUPPLY_CHAIN_ID)
-                .signature(createSignature())
-                .link(createLink())
-                .build());
-        linkMetaBlockRepository.save(LinkMetaBlock
-                .builder()
-                .supplyChainId(SUPPLY_CHAIN_ID)
-                .signature(createSignature())
-                .link(createLink())
-                .build());
-        linkMetaBlockRepository.save(LinkMetaBlock
-                .builder()
-                .supplyChainId(OTHER_SUPPLY_CHAIN_ID)
-                .signature(createSignature())
-                .link(createLink())
-                .build());
+        linkMetaBlockRepository.save(lb1);
+        linkMetaBlockRepository.save(lb2);
+        linkMetaBlockRepository.save(lb3);
+        linkMetaBlockRepository.save(lb4);
     }
     
     private Signature createSignature() {
@@ -123,42 +151,5 @@ class LinkRepositoryTest {
                 .keyId("2392017103413adf6fa3b535e3714b30bc0a901229d0e76784f5ffca653f905e")
                 .signature("signature")
                 .build();
-    }
-
-    private Link createLink() {
-        return Link
-                .builder()
-                .stepName(STEP_NAME)
-                .materials(createMaterials())
-                .products(createProducts())
-                .build();
-    }
-
-    private List<Artifact> createMaterials() {
-        return asList(
-
-                Artifact.builder()
-                        .hash(HASH_1)
-                        .uri(ARGOS_TEST_IML)
-                        .build(),
-
-                Artifact.builder()
-                        .hash(HASH_2)
-                        .uri(DOCKER_1_IML)
-                        .build());
-    }
-
-    private List<Artifact> createProducts() {
-        return asList(
-
-                Artifact.builder()
-                        .hash(HASH_1)
-                        .uri(ARGOS_TEST_IML)
-                        .build(),
-
-                Artifact.builder()
-                        .hash(HASH_2)
-                        .uri(DOCKER_1_IML)
-                        .build());
     }
 }

@@ -119,6 +119,8 @@ class LayoutValidatorServiceTest {
 
         when(accountService.keyPairExists(publicKey1.getKeyId())).thenReturn(true);
         when(accountService.keyPairExists(publicKey2.getKeyId())).thenReturn(true);
+        
+        when(signatureValidatorService.validateSignature(layout, signature)).thenReturn(true);
 
         service.validate(layoutMetaBlock);
         verify(signatureValidatorService).validateSignature(layout, signature);
@@ -143,6 +145,8 @@ class LayoutValidatorServiceTest {
 
         when(accountService.keyPairExists(publicKey1.getKeyId())).thenReturn(true);
         when(accountService.keyPairExists(publicKey2.getKeyId())).thenReturn(true);
+        
+        when(signatureValidatorService.validateSignature(layout, signature)).thenReturn(true);
 
         LayoutValidationException layoutValidationException = assertThrows(LayoutValidationException.class, () -> {
             service.validate(layoutMetaBlock);

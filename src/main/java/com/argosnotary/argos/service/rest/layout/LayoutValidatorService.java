@@ -119,7 +119,12 @@ public class LayoutValidatorService {
         }
 
         layoutMetaBlock.getSignatures()
-                .forEach(signature -> signatureValidatorService.validateSignature(layoutMetaBlock.getLayout(), signature));
+                .forEach(signature -> {
+                	if(!signatureValidatorService.validateSignature(layoutMetaBlock.getLayout(), signature)) {
+                        report.addValidationMessage("signatures",
+                                "invalid signature with keyId "+signature.getKeyId());
+                	}
+                });
     }
 
     private void validateAutorizationKeyIds(LayoutValidationReport report, Layout layout) {

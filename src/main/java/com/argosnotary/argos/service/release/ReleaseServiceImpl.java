@@ -20,6 +20,7 @@
 package com.argosnotary.argos.service.release;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +35,8 @@ import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.nodes.Organization;
-import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.release.Release;
 import com.argosnotary.argos.domain.release.ReleaseDossier;
-import com.argosnotary.argos.domain.release.ReleaseDossierMetaData;
 import com.argosnotary.argos.domain.release.ReleaseResult;
 import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.layout.LayoutMetaBlockService;
@@ -109,16 +108,20 @@ public class ReleaseServiceImpl implements ReleaseService {
             }
             
 
+            OffsetDateTime releaseDate = OffsetDateTime.now(ZoneOffset.UTC);
 
             String releaseArtifactHashesHash = convertToReleaseArtifactHashesHash(releaseArtifacts);
+            
+            String releaseName =  qualifiedNameOpt.get()+ "-" + releaseDate.toInstant().getEpochSecond();
 
             if (verificationRunResult.isRunIsValid()) {
                 Release release = Release.builder()
                 		.id(UUID.randomUUID())
+                		.name(releaseName)
                 		.supplyChainId(supplyChainId)
                 		.qualifiedSupplyChainName(qualifiedNameOpt.get())
                 		.organization(orgOpt.get())
-                		.releaseDate(OffsetDateTime.now())
+                		.releaseDate(releaseDate)
                 		.releasedProductsHashes(convertToReleaseArtifactHashes(releaseArtifacts))
                 		.releasedProductsHashesHash(releaseArtifactHashesHash)
                 		.build();
@@ -141,17 +144,13 @@ public class ReleaseServiceImpl implements ReleaseService {
 
         List<Account> accounts = getAccounts(layoutMetaBlock);
 
-        ReleaseDossierMetaData releaseDossierMetaData = ReleaseDossierMetaData.builder()
-                .release(release)
-                .build();
-
         ReleaseDossier releaseDossier = ReleaseDossier.builder()
                 .layoutMetaBlock(layoutMetaBlock)
                 .linkMetaBlocks(verificationRunResult.getValidLinkMetaBlocks())
                 .accounts(accounts)
                 .build();
-        ReleaseDossierMetaData rmd = releaseDossierRepository.storeRelease(releaseDossierMetaData, releaseDossier);
-        return releaseRepository.save(release);
+        Release rel = releaseDossierRepository.storeRelease(release, releaseDossier);
+        return releaseRepository.save(rel);
     }
 
     private Set<String> convertToReleaseArtifactHashes(List<Set<Artifact>> releaseArtifacts) {

@@ -9,9 +9,7 @@ public interface LinkMetaBlockService {
 	public LinkMetaBlock save(LinkMetaBlock linkMetaBlock);
 	
 	public void deleteBySupplyChainId(UUID supplyChainId);
-	
-	public List<LinkMetaBlock> findBySupplyChainId(UUID supplyChainId);
     
-	public List<LinkMetaBlock> findBySupplyChainAndSha(UUID supplyChainId, String hash);
+	public List<LinkMetaBlock> find(UUID supplyChainId, String hash);
 
 }

@@ -21,13 +21,12 @@ package com.argosnotary.argos.service.rest;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.PublicKey;
+import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.argosnotary.argos.domain.crypto.KeyPair;
+import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.domain.crypto.Signature;
 import com.argosnotary.argos.domain.crypto.signing.SignatureValidator;
 import com.argosnotary.argos.domain.layout.Layout;
@@ -35,41 +34,47 @@ import com.argosnotary.argos.domain.link.Link;
 import com.argosnotary.argos.service.account.AccountService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SignatureValidatorService {
 
     private final AccountService accountService;
 
-    public void validateSignature(Layout layout, Signature signature) {
+    public boolean validateSignature(Layout layout, Signature signature) {
     	try {
-			if (!SignatureValidator.isValid(layout, signature, getPublicKey(signature))) {
-			    throwInValidSignatureException();
+    		Optional<java.security.PublicKey> key = getPublicKey(signature);
+    		if (key.isEmpty() || !SignatureValidator.isValid(layout, signature, key.get())) {
+			    return false;
 			}
 		} catch (GeneralSecurityException | IOException e) {
-		    throwInValidSignatureException();
+			log.error(e.getMessage());
+			return false;
 		}
+    	return true;
     }
 
-    public void validateSignature(Link link, Signature signature) {
+    public boolean validateSignature(Link link, Signature signature) {
         try {
-			if (!SignatureValidator.isValid(link, signature, getPublicKey(signature))) {
-			    throwInValidSignatureException();
+        	Optional<java.security.PublicKey> key = getPublicKey(signature);
+			if (key.isEmpty() || !SignatureValidator.isValid(link, signature, key.get())) {
+			    return false;
 			}
 		} catch (GeneralSecurityException | IOException e) {
-		    throwInValidSignatureException();
+			log.error(e.getMessage());
+			return false;
 		}
+        return true;
     }
 
-    private void throwInValidSignatureException() {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid signature");
-    }
-
-    private PublicKey getPublicKey(Signature signature) throws GeneralSecurityException, IOException {
-    	KeyPair keyPair = accountService.findKeyPairByKeyId(signature.getKeyId())
-    	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "signature with keyId [" + signature.getKeyId() + "] not found"));
-    	return com.argosnotary.argos.domain.crypto.PublicKey.instance(keyPair.getPublicKey());
+    private Optional<java.security.PublicKey> getPublicKey(Signature signature) throws GeneralSecurityException, IOException {
+    	Optional<KeyPair> keyPair = accountService.findKeyPairByKeyId(signature.getKeyId());
+    	if (keyPair.isEmpty()) {
+    		return Optional.empty();
+    	}
+    	return Optional.of(PublicKey.instance(keyPair.get().getPublicKey()));
     }
 
 }

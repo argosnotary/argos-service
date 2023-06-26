@@ -31,6 +31,7 @@ import lombok.Data;
 public class Release {
 	@Id
 	private UUID id;
+	private String name;
     private OffsetDateTime releaseDate;
     private String qualifiedSupplyChainName;
     private Organization organization;

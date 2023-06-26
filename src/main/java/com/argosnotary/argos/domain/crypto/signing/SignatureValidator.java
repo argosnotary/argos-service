@@ -19,6 +19,13 @@
  */
 package com.argosnotary.argos.domain.crypto.signing;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.security.GeneralSecurityException;
+
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.domain.crypto.Signature;
 import com.argosnotary.argos.domain.layout.Layout;
@@ -27,27 +34,19 @@ import com.argosnotary.argos.domain.link.Link;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-
-import java.security.GeneralSecurityException;
-import java.security.PublicKey;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignatureValidator {
 
-    public static boolean isValid(Link link, Signature signature, PublicKey publicKey) {
+    public static boolean isValid(Link link, Signature signature, java.security.PublicKey publicKey) {
         return isValid(new JsonSigningSerializer().serialize(link), signature, publicKey);
     }
 
-    public static boolean isValid(Layout layout, Signature signature, PublicKey publicKey) {
+    public static boolean isValid(Layout layout, Signature signature, java.security.PublicKey publicKey) {
         return isValid(new JsonSigningSerializer().serialize(layout), signature, publicKey);
     }
 
-    private static boolean isValid(String signableJson, Signature signature, PublicKey publicKey) {
+    private static boolean isValid(String signableJson, Signature signature, java.security.PublicKey publicKey) {
         try {
             java.security.Signature publicSignature = java.security.Signature.getInstance(signature.getAlgorithm().getStringValue());
             publicSignature.initVerify(publicKey);

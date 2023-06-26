@@ -20,24 +20,27 @@
 package com.argosnotary.argos.service.mongodb.release;
 
 import java.io.InputStream;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
+import com.argosnotary.argos.domain.release.Release;
 import com.argosnotary.argos.domain.release.ReleaseDossier;
 import com.argosnotary.argos.domain.release.ReleaseDossierMetaData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.client.model.Filters;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 @Slf4j
 public class ReleaseDossierRepository {
@@ -56,22 +59,27 @@ public class ReleaseDossierRepository {
     
     private final GridFsTemplate gridFsTemplate;
 
-    private final MongoTemplate mongoTemplate;
-
-    private final ObjectMapper releaseFileJsonMapper;
+    private final ObjectMapper releaseFileJsonMapper = new ObjectMapper();
 
     @SneakyThrows
-    public ReleaseDossierMetaData storeRelease(ReleaseDossierMetaData releaseDossierMetaData, ReleaseDossier releaseDossier) {
-        OffsetDateTime releaseDate = OffsetDateTime.now(ZoneOffset.UTC);
+    public Release storeRelease(Release release, ReleaseDossier releaseDossier) {
+
+        ReleaseDossierMetaData releaseDossierMetaData = ReleaseDossierMetaData.builder()
+                .release(release)
+                .build();
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             releaseFileJsonMapper.writeValue(outputStream, releaseDossier);
             try (InputStream inputStream = outputStream.toInputStream()) {
-                String fileName = releaseDossierMetaData.getRelease().getQualifiedSupplyChainName() + "-" + releaseDossierMetaData.getRelease().getReleaseDate().toInstant().getEpochSecond() + ".json";
+                String fileName = release.getName() + ".json";
                 ObjectId objectId = gridFsTemplate.store(inputStream, fileName, "application/json", releaseDossierMetaData);
-                releaseDossierMetaData.getRelease().setDossierId(objectId);
-                return releaseDossierMetaData;
+                release.setDossierId(objectId);
+                return release;
             }
         }
+    }
+    
+    public GridFSFile findByFileId(ObjectId fileId) {
+    	return gridFsTemplate.findOne(new Query(Criteria.where("_id").is(fileId)));
     }
 
 }

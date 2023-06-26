@@ -97,7 +97,8 @@ class LinkRestServiceTest {
         when(linkMetaBlock.getLink()).thenReturn(link);
         when(linkMetaBlock.getSignature()).thenReturn(signature);
         when(converter.convertFromRestLinkMetaBlock(restLinkMetaBlock)).thenReturn(linkMetaBlock);
-        when(supplyChainService.findById(SUPPLY_CHAIN_ID)).thenReturn(Optional.of(supplyChain));
+        when(supplyChainService.exists(SUPPLY_CHAIN_ID)).thenReturn(true);
+        when(signatureValidatorService.validateSignature(link, signature)).thenReturn(true);
         assertThat(restService.createLink(SUPPLY_CHAIN_ID, restLinkMetaBlock).getStatusCodeValue(), is(204));
         verify(linkMetaBlock).setSupplyChainId(SUPPLY_CHAIN_ID);
         verify(linkMetaBlockService).save(linkMetaBlock);
@@ -106,8 +107,8 @@ class LinkRestServiceTest {
 
     @Test
     void findLink() {
-        when(supplyChainService.findById(SUPPLY_CHAIN_ID)).thenReturn(Optional.of(supplyChain));
-        when(linkMetaBlockService.findBySupplyChainAndSha(SUPPLY_CHAIN_ID, HASH)).thenReturn(Collections.singletonList(linkMetaBlock));
+        when(supplyChainService.exists(SUPPLY_CHAIN_ID)).thenReturn(true);
+        when(linkMetaBlockService.find(SUPPLY_CHAIN_ID, HASH)).thenReturn(Collections.singletonList(linkMetaBlock));
         when(converter.convertToRestLinkMetaBlock(linkMetaBlock)).thenReturn(restLinkMetaBlock);
         ResponseEntity<List<RestLinkMetaBlock>> response = restService.findLink(SUPPLY_CHAIN_ID, HASH);
         assertThat(response.getBody(), hasSize(1));
@@ -117,7 +118,7 @@ class LinkRestServiceTest {
 
     @Test
     void findLinkUnknownSupplyChain() {
-        when(supplyChainService.findById(SUPPLY_CHAIN_ID)).thenReturn(Optional.empty());
+        when(supplyChainService.exists(SUPPLY_CHAIN_ID)).thenReturn(false);
         
         ResponseStatusException error = assertThrows(ResponseStatusException.class, () -> restService.findLink(SUPPLY_CHAIN_ID, HASH));
         assertThat(error.getStatusCode().value(), is(404));

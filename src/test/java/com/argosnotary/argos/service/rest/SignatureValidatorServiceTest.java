@@ -122,31 +122,27 @@ class SignatureValidatorServiceTest {
     @Test
     void validLayoutSignature() {
         when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.of(pair));
-        service.validateSignature(layout, layoutSignature);
+        assertThat(service.validateSignature(layout, layoutSignature), is(true));
     }
 
     @Test
     void inValidLayoutSignature() throws GeneralSecurityException {
         when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.of(pair));
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> service.validateSignature(layout2, layoutSignature2));
-        assertThat(exception.getStatusCode().value(), is(400));
-        assertThat(exception.getReason(), is("invalid signature"));
+        assertThat(service.validateSignature(layout2, layoutSignature2), is(false));
     }
 
     @Test
     void keyNotFoundLayoutSignature() {
         when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> service.validateSignature(layout, layoutSignature));
-        assertThat(exception.getStatusCode().value(), is(400));
-        assertThat(exception.getReason(), is(String.format("signature with keyId [%s] not found", keyId)));
+        assertThat(service.validateSignature(layout, layoutSignature), is(false));
     }
     
     @Test
     void validLinkSignature() {
         when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.of(pair));
-        service.validateSignature(link, linkSignature);
+        assertThat(service.validateSignature(link, linkSignature), is(true));
     	
     }
     
@@ -154,18 +150,13 @@ class SignatureValidatorServiceTest {
     void inValidLinkSignature() {
         when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.of(pair));
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> service.validateSignature(link, linkSignature2));
-        assertThat(exception.getStatusCode().value(), is(400));
-        assertThat(exception.getReason(), is("invalid signature"));
+        assertThat(service.validateSignature(link, linkSignature2), is(false));
     }
     
     @Test
     void keyNotFoundLinkSignature() {
         when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.empty());
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> service.validateSignature(link, linkSignature));
-        assertThat(exception.getStatusCode().value(), is(400));
-        assertThat(exception.getReason(), is(String.format("signature with keyId [%s] not found", keyId)));
+        assertThat(service.validateSignature(link, linkSignature), is(false));
     }
     
 
