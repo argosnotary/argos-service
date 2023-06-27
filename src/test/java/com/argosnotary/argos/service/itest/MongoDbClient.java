@@ -19,8 +19,11 @@
  */
 package com.argosnotary.argos.service.itest;
 
-import static com.mongodb.client.model.Filters.ne;
+import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
+import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Filters.nin;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,17 +32,27 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecProvider;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
+import org.bson.types.Binary;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
+
+
 
 public class MongoDbClient {
 	MongoClient mongoClient;
 	MongoDatabase database;
+	
+	CodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
+	CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
 
 	private static final Set<String> IGNORED_COLLECTIONS_FOR_ALL = Set.of(
 			"mongockChangeLog", 
@@ -58,11 +71,12 @@ public class MongoDbClient {
 		IGNORED_COLLECTIONS.add(PERSONALACCOUNTS);
 		IGNORED_COLLECTIONS.add("nodes");
 		IGNORED_COLLECTIONS.add("serviceaccounts");
+		IGNORED_COLLECTIONS.add("roleassignments");
 	}
 
 	public MongoDbClient(String url) {
 		mongoClient = MongoClients.create(url);
-		database = mongoClient.getDatabase("argos");
+		database = mongoClient.getDatabase("argos").withCodecRegistry(pojoCodecRegistry);;
 	}
 
 	public void resetNotAllRepositories() {
@@ -78,7 +92,14 @@ public class MongoDbClient {
 				));
 		deleteFromColl(query, PERSONALACCOUNTS);
 		
-		query = ne("name", "default-organization");
+		query = in("name", List.of("default-organization", "default-project"));
+		List<Binary> nodeIds = new ArrayList<>();
+		database.getCollection("nodes").find(query).forEach(doc ->nodeIds.add((Binary)doc.get("_id")));
+		
+		query = nin("resourceId", nodeIds);
+		deleteFromColl(query, "roleassignments");
+		
+		query = nin("name", List.of("default-organization", "default-project"));
 		deleteFromColl(query, "nodes");
 		
 		query = nin("name", List.of("default-sa1", "default-sa2", "default-sa3", "default-sa4", "default-sa5"));
@@ -92,9 +113,10 @@ public class MongoDbClient {
 	private void deleteNotIgnored(Set<String> ignoredSet) {
 		database.listCollectionNames().forEach(name -> {
 			if (!ignoredSet.contains(name.trim())) {
+				long aantal = database.getCollection(name).countDocuments();
 				DeleteResult result = database.getCollection(name).deleteMany(new Document());
 				long no = result.getDeletedCount();
-				System.out.println(String.format("Deleted document count from collection %s : %d", name, result.getDeletedCount()));
+				System.out.println(String.format("Deleted document count from collection %s with %d documents: %d", name, aantal, result.getDeletedCount()));
 			}
 		});		
 	}

@@ -77,8 +77,8 @@ public class RulesVerification implements Verification {
                         step))
                 .filter(result1 -> !result1)
                 .findFirst()
-                .map(result2 -> VerificationRunResult.builder().runIsValid(false).build())
-                .orElse(VerificationRunResult.builder().runIsValid(true).build());
+                .map(result2 -> VerificationRunResult.builder().verification(this.getPriority()).runIsValid(false).build())
+                .orElse(VerificationRunResult.builder().verification(this.getPriority()).runIsValid(true).build());
     }
 
     private boolean verifyStep(Map<String, Link> linksMap, Step step) {

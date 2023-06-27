@@ -51,7 +51,7 @@ import com.argosnotary.argos.service.rest.SignatureValidatorService;
 
 
 @ExtendWith(MockitoExtension.class)
-class LinkRestServiceTest {
+class LinkMetaBlockRestServiceTest {
 
     private static final UUID SUPPLY_CHAIN_ID = UUID.randomUUID();
     private static final String HASH = "hash";
@@ -74,7 +74,7 @@ class LinkRestServiceTest {
     @Mock
     private LinkMetaBlock linkMetaBlock;
 
-    private LinkRestService restService;
+    private LinkMetaBlockRestService restService;
 
     @Mock
     private SupplyChain supplyChain;
@@ -87,7 +87,7 @@ class LinkRestServiceTest {
 
     @BeforeEach
     void setUp() {
-        restService = new LinkRestServiceImpl(linkMetaBlockService, supplyChainService, converter, signatureValidatorService);
+        restService = new LinkMetaBlockRestServiceImpl(linkMetaBlockService, supplyChainService, converter, signatureValidatorService);
 
     }
 
@@ -99,16 +99,16 @@ class LinkRestServiceTest {
         when(converter.convertFromRestLinkMetaBlock(restLinkMetaBlock)).thenReturn(linkMetaBlock);
         when(supplyChainService.exists(SUPPLY_CHAIN_ID)).thenReturn(true);
         when(signatureValidatorService.validateSignature(link, signature)).thenReturn(true);
-        assertThat(restService.createLink(SUPPLY_CHAIN_ID, restLinkMetaBlock).getStatusCodeValue(), is(204));
+        assertThat(restService.createLink(SUPPLY_CHAIN_ID, restLinkMetaBlock).getStatusCodeValue(), is(201));
         verify(linkMetaBlock).setSupplyChainId(SUPPLY_CHAIN_ID);
-        verify(linkMetaBlockService).save(linkMetaBlock);
+        verify(linkMetaBlockService).create(linkMetaBlock);
         verify(signatureValidatorService).validateSignature(link, signature);
     }
 
     @Test
     void findLink() {
         when(supplyChainService.exists(SUPPLY_CHAIN_ID)).thenReturn(true);
-        when(linkMetaBlockService.find(SUPPLY_CHAIN_ID, HASH)).thenReturn(Collections.singletonList(linkMetaBlock));
+        when(linkMetaBlockService.find(SUPPLY_CHAIN_ID, Optional.of(HASH))).thenReturn(Collections.singletonList(linkMetaBlock));
         when(converter.convertToRestLinkMetaBlock(linkMetaBlock)).thenReturn(restLinkMetaBlock);
         ResponseEntity<List<RestLinkMetaBlock>> response = restService.findLink(SUPPLY_CHAIN_ID, HASH);
         assertThat(response.getBody(), hasSize(1));

@@ -38,16 +38,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-class ConfigurationMapperTest {
+class ApprovalConfigurationMapperTest {
 
-    private ConfigurationMapper approvalConfigMapper;
+    private ApprovalConfigurationMapper approvalConfigMapper;
     private ObjectMapper mapper;
     private String approvalConfigJson;
 
 
     @BeforeEach
     void setup() throws IOException {
-        approvalConfigMapper = Mappers.getMapper(ConfigurationMapper.class);
+        approvalConfigMapper = Mappers.getMapper(ApprovalConfigurationMapper.class);
         mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         approvalConfigJson = IOUtils.toString(getClass().getResourceAsStream("/approval-config.json"), UTF_8);

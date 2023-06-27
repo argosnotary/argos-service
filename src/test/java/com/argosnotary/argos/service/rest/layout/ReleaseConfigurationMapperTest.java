@@ -19,20 +19,28 @@
  */
 package com.argosnotary.argos.service.rest.layout;
 
-import org.mapstruct.Mapper;
+import java.io.IOException;
 
-import com.argosnotary.argos.domain.layout.ApprovalConfiguration;
-import com.argosnotary.argos.domain.layout.ReleaseConfiguration;
-import com.argosnotary.argos.service.openapi.rest.model.RestApprovalConfiguration;
-import com.argosnotary.argos.service.openapi.rest.model.RestReleaseConfiguration;
+import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Mapper(componentModel = "spring")
-public interface ConfigurationMapper {
-    ApprovalConfiguration convertFromRestApprovalConfiguration(RestApprovalConfiguration restApprovalConfiguration);
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-    RestApprovalConfiguration convertToRestApprovalConfiguration(ApprovalConfiguration approvalConfiguration);
+class ReleaseConfigurationMapperTest {
 
-    ReleaseConfiguration convertFromRestReleaseConfiguration(RestReleaseConfiguration restReleaseConfiguration);
+    private ApprovalConfigurationMapper approvalConfigMapper;
+    private ObjectMapper mapper;
+    private String approvalConfigJson;
 
-    RestReleaseConfiguration convertToRestReleaseConfiguration(ReleaseConfiguration releaseConfiguration);
+
+    @BeforeEach
+    void setup() throws IOException {
+
+    }
+
+    @Test
+    void shouldConvertCorrectLy() throws JsonProcessingException, JSONException {
+    }
 }

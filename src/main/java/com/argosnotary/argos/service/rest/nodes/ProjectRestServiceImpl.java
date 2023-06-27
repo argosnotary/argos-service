@@ -3,13 +3,11 @@ package com.argosnotary.argos.service.rest.nodes;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,6 +51,11 @@ public class ProjectRestServiceImpl implements ProjectRestService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent"); 
 		}
 		
+		if (nodeService.existsByParentIdAndName(restProject.getParentId(), restProject.getName())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+					String.format("Project with name [%s] already exists on parent [%s]", restProject.getName(), restProject.getParentId()));
+		}
+		
 		Project node = projectService
 				.create(projectMapper.convertFromRestProject(restProject));
 
@@ -82,9 +85,13 @@ public class ProjectRestServiceImpl implements ProjectRestService {
 	}
 
 	@Override
-    @PreAuthorize("isAuthenticated()")
-	public ResponseEntity<List<RestProject>> getProjects() {
-		return ResponseEntity.ok(projectService.find(Set.of())
+    @PermissionCheck(permissions = Permission.READ)
+	public ResponseEntity<List<RestProject>> getProjects(UUID ancestorId) {
+		Optional<Node> optNode = nodeService.findById(ancestorId);
+		if (optNode.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
+		}
+		return ResponseEntity.ok(projectService.find(optNode.get())
 				.stream().map(projectMapper::convertToRestProject).collect(Collectors.toList()));
 	}
 	

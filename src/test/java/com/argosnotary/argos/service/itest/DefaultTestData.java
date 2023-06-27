@@ -41,7 +41,9 @@ import com.argosnotary.argos.service.itest.crypto.CryptoHelper;
 import com.argosnotary.argos.service.itest.rest.api.client.PersonalAccountApi;
 import com.argosnotary.argos.service.itest.rest.api.client.RoleAssignmentApi;
 import com.argosnotary.argos.service.itest.rest.api.client.ServiceAccountApi;
+import com.argosnotary.argos.service.itest.rest.api.model.RestDomain;
 import com.argosnotary.argos.service.itest.rest.api.model.RestKeyPair;
+import com.argosnotary.argos.service.itest.rest.api.model.RestManagementNode;
 import com.argosnotary.argos.service.itest.rest.api.model.RestOrganization;
 import com.argosnotary.argos.service.itest.rest.api.model.RestPermission;
 import com.argosnotary.argos.service.itest.rest.api.model.RestPersonalAccount;
@@ -63,6 +65,7 @@ public class DefaultTestData {
     private String ownerToken;
     private Map<String, TestPersonalAccount> personalAccounts = new HashMap<>();
     private RestOrganization defaultOrganization;
+    private RestManagementNode defaultManagementNode;
     private RestProject defaultProject;
     private Map<String, TestServiceAccount> serviceAccounts = new HashMap<>();
 
@@ -74,8 +77,8 @@ public class DefaultTestData {
     public DefaultTestData() throws ClientProtocolException, IOException, NoSuchAlgorithmException, OperatorCreationException {
     	this.ownerToken = getToken(OWNER_USER, PASSPHRASE, properties.getPaAuthorizationUri());
     	this.defaultOrganization = createDefaultOrganization(ownerToken);
-    	this.personalAccounts = createDefaultPersonalAccount(this.ownerToken, this.defaultOrganization);
     	this.defaultProject = createDefaultProject(this.ownerToken, this.defaultOrganization.getId());
+    	this.personalAccounts = createDefaultPersonalAccount(this.ownerToken, this.defaultOrganization);
     	this.serviceAccounts = createDefaultSaAccounts(this.personalAccounts.get("default-pa1").token, this.defaultProject.getId());
     	
     }
@@ -109,12 +112,13 @@ public class DefaultTestData {
     private static RestOrganization createDefaultOrganization(String ownerToken) {
     	RestOrganization org = new RestOrganization();
     	org.setName("default-organization");
+    	org.setDomain(new RestDomain().domain("org.com"));
     	return getOrganizationApi(ownerToken).createOrganization(org);
     }
 
     private static RestProject createDefaultProject(String ownerToken, UUID parentId) {
     	RestProject node = new RestProject();
-    	node.setName("default-management-node");
+    	node.setName("default-project");
     	node.setParentId(parentId);
     	return getProjectApi(ownerToken).createProject(parentId, node);
     }

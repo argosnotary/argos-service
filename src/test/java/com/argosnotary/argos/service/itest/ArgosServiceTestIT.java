@@ -26,7 +26,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -47,7 +46,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+  properties="spring.data.mongodb.auto-index-creation=true")
 @Testcontainers
 @EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 class ArgosServiceTestIT {
@@ -74,6 +74,7 @@ class ArgosServiceTestIT {
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {
 		registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+		//registry.add("spring.data.mongodb.auto-index-creation", () -> true);
 		
 		String mongo = mongoDBContainer.getConnectionString();
 		
@@ -120,9 +121,64 @@ class ArgosServiceTestIT {
     Karate personalaccount() {
         return Karate.run("classpath:feature/account/personalaccount.feature").tags("~@ignore");
     }
-	
-//	@Test
-//	void initTest() {
-//		
-//	}
+
+    @Karate.Test
+    Karate serviceAccount() {
+        return Karate.run("classpath:feature/account/service-account.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate organization() {
+        return Karate.run("classpath:feature/nodes/organization.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate managementNode() {
+        return Karate.run("classpath:feature/nodes/management-node.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate project() {
+        return Karate.run("classpath:feature/nodes/project.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate supplychain() {
+        return Karate.run("classpath:feature/nodes/supplychain.feature").tags("~@ignore");
+    }
+
+    @Karate.Test()
+    Karate oauthProviders() {
+        return Karate.run("classpath:feature/oauthprovider/oauthprovider.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate roles() {
+        return Karate.run("classpath:feature/roles/roles.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate link() {
+        return Karate.run("classpath:feature/link/link.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate layout() {
+        return Karate.run("classpath:feature/layout/layout.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate verification() {
+        return Karate.run("classpath:feature/verification/verification.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate release() {
+        return Karate.run("classpath:feature/release/release.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
+    Karate verification2() {
+        return Karate.run("classpath:feature/verification2.0/verification2.0.feature").tags("~@ignore");
+    }
 }

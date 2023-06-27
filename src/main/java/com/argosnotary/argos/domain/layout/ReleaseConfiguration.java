@@ -19,15 +19,20 @@
  */
 package com.argosnotary.argos.domain.layout;
 
-import lombok.Builder;
-import lombok.Data;
-
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.Builder;
+import lombok.Data;
+
 @Builder
 @Data
+@Document(collection="releaseconfiguration")
 public class ReleaseConfiguration {
+	@Id
     private UUID supplyChainId;
     private List<ArtifactCollectorSpecification> artifactCollectorSpecifications;
 }

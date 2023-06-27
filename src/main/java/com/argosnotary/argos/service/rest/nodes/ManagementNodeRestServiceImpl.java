@@ -3,13 +3,11 @@ package com.argosnotary.argos.service.rest.nodes;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,6 +50,11 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent"); 
 		}
 		
+		if (nodeService.existsByParentIdAndName(restManagementNode.getParentId(), restManagementNode.getName())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+					String.format("Management Node with name [%s] already exists on parent [%s]", restManagementNode.getName(), restManagementNode.getParentId()));
+		}
+		
 		ManagementNode node = managementNodeService
 				.create(managementNodeMapper.convertFromRestManagementNode(restManagementNode));
 
@@ -81,9 +84,13 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
 	}
 
 	@Override
-    @PreAuthorize("isAuthenticated()")
-	public ResponseEntity<List<RestManagementNode>> getManagementNodes() {
-		return ResponseEntity.ok(managementNodeService.find(Set.of())
+    @PermissionCheck(permissions = Permission.READ)
+	public ResponseEntity<List<RestManagementNode>> getManagementNodes(UUID ancestorId) {
+		Optional<Node> optNode = nodeService.findById(ancestorId);
+		if (optNode.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
+		}
+		return ResponseEntity.ok(managementNodeService.find(optNode.get())
 				.stream()
 				.map(managementNodeMapper::convertToRestManagementNode)
 				.collect(Collectors.toList()));

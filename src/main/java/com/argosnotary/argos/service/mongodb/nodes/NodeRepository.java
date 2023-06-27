@@ -11,13 +11,21 @@ import com.argosnotary.argos.domain.nodes.Node;
 
 public interface NodeRepository extends MongoRepository<Node, UUID> {
 	
-	@Query("{ 'pathToRoot' : ?0 }")
-	public List<Node> findInPathToRoot(UUID resourceId);
+	public List<Node> findByPathToRoot(UUID resourceId);
 	
 	@Query("{_id: {$in: ?0}}")
 	public List<Node> findWithIds(Set<UUID> ids);
 	
-	@Query("{ 'pathToRoot' : {$in: ?1}}")
+//	@Aggregation(pipeline = {
+//			"{$match: {_id: {$in: ?0 }}}",
+//		    "{$group: {_id: null, pathIds: {$push: '$pathToRoot'}}}",
+//		    "{$project: {'result': {$reduce:{input: '$pathIds',initialValue: [],in:{ $concatArrays: [ '$$value', '$$this' ] }}}, _id: 0}}",
+//		    "{$lookup:{from: 'nodes', localField: 'result', foreignField: '_id', as: 'children'}}",
+//		    "{$unset: 'result'}"
+//    })
+//	public NodeList findClassInTree(Set<UUID> resourceIds);
+	
+	@Query("{ 'pathToRoot' : {$in: ?0}}")
 	public List<Node> findWithResourceIdsUpTree(Set<UUID> resourceIds);
 	
 	@Query("{ 'pathToRoot' : {$in: ?1}, '_class': ?0}")
@@ -29,8 +37,13 @@ public interface NodeRepository extends MongoRepository<Node, UUID> {
 	@Query("{ '_id' : {$in: ?0} }")
 	public List<Node> findWithResourceIds(List<UUID> resourceIds);
 	
-	@Query("{ '_id' : ?1,  '_class': ?0 }")
+	@Query(value="{ '_id' : ?1,  '_class': ?0 }", exists=true)
 	public boolean existsByClassAndId(String clazz, UUID id);
+	
+	@Query(value="{ 'name' : ?1,  '_class': ?0 }", exists=true)
+	public boolean existsByClassAndName(String clazz, String name);
+	
+	public Boolean existsByParentIdAndName(UUID parentId, String name);
 
 	
 }

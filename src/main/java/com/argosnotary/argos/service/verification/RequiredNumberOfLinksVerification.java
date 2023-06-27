@@ -48,7 +48,7 @@ public class RequiredNumberOfLinksVerification implements Verification {
                 .stream()
                 .filter(step -> !isValid(step, context))
                 .findFirst()
-                .map(segment -> VerificationRunResult.builder().runIsValid(false).build())
+                .map(segment -> VerificationRunResult.builder().verification(this.getPriority()).runIsValid(false).build())
                 .orElse(VerificationRunResult.okay());
 
     }

@@ -18,22 +18,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-Feature: Permissions
+@ignore
+Feature: using __arg
 
   Background:
     * url karate.properties['server.baseurl']
-    * def defaultTestData = call read('classpath:default-test-data.js')
-    * configure headers = call read('classpath:headers.js') { token: #(defaultTestData.ownerToken)}
 
-  Scenario: all roles requested from server will return 200
-    Given path '/api/permissions/global/role'
-    And method GET
-    Then status 200
-    And match response == ["ADMINISTRATOR"]
-
-  Scenario: all local permissions requested from server will return 200
-    Given path '/api/permissions'
-    And method GET
-    Then status 200
-    And match response == ["READ","TREE_EDIT","LOCAL_PERMISSION_EDIT","LINK_ADD","RELEASE","ASSIGN_ROLE"]
-
+  Scenario: create organization
+    Given path '/api/organizations'
+    And request org
+    When method POST
+    Then status 201

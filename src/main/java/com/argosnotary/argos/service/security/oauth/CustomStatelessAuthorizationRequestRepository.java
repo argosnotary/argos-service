@@ -29,27 +29,21 @@ import org.springframework.stereotype.Component;
 
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.service.security.helpers.CookieHelper;
-import com.argosnotary.argos.service.security.helpers.OAuth2AuthorizationRequestDeserializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class CustomStatelessAuthorizationRequestRepository implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
 
     private static final Duration OAUTH_COOKIE_EXPIRY = Duration.ofMinutes(5);
     
-    private static final ObjectMapper jsonMapper = new ObjectMapper();
-    
-    static {
-    	 SimpleModule module = new SimpleModule();
-    	 module.addDeserializer(OAuth2AuthorizationRequest.class, new OAuth2AuthorizationRequestDeserializer());
-    	 jsonMapper.registerModule(module);
-    }
+    private final ObjectMapper jsonMapper;
 
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {

@@ -64,7 +64,7 @@ class PermissionServiceTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		nodeService = new NodeServiceImpl(nodeRepository, nodeDeleteService, roleAssignmentService, accountSecurityContext);
+		//nodeService = new NodeServiceImpl(nodeRepository, nodeDeleteService, roleAssignmentService, accountSecurityContext);
 		proj1 = new Project();
 		proj1.setId(resourceId1);
 		proj1.setPathToRoot(List.of(resourceId1, resourceId2, resourceId3));

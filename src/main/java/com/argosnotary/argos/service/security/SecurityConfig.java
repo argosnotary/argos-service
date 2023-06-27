@@ -36,6 +36,7 @@ import com.argosnotary.argos.service.security.jwt.AccountUserDetailsFilter;
 import com.argosnotary.argos.service.security.oauth.CustomStatelessAuthorizationRequestRepository;
 import com.argosnotary.argos.service.security.oauth.OidcAuthenticationFailureHandler;
 import com.argosnotary.argos.service.security.oauth.OidcAuthenticationSuccessHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -54,7 +55,7 @@ public class SecurityConfig {
 		http.securityMatcher(
 				"/swagger/**"
 				, "/actuator/**"
-				, "/api/supplychain/verification/**"
+				, "/api/supplychains/verification/**"
 				, "/api/oauthprovider/**");
 		
 		http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
@@ -71,6 +72,9 @@ public class SecurityConfig {
 
 	@Autowired
 	private OidcAuthenticationFailureHandler oidcAuthenticationFailureHandler;
+	
+	@Autowired
+	private ObjectMapper mapper;
 
 	/*
 	 * By default, Spring OAuth2 uses
@@ -80,7 +84,7 @@ public class SecurityConfig {
 	 */
 	@Bean
 	public CustomStatelessAuthorizationRequestRepository cookieAuthorizationRequestRepository() {
-		return new CustomStatelessAuthorizationRequestRepository();
+		return new CustomStatelessAuthorizationRequestRepository(mapper);
 	}
 	
 	@Bean(name = "oidcFilterChain")

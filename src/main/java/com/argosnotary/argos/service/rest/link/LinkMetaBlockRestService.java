@@ -17,9 +17,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public interface LinkRestService extends LinkApi {
+public interface LinkMetaBlockRestService extends LinkApi {
 	@Override
-	public ResponseEntity<Void> createLink(
+	public ResponseEntity<RestLinkMetaBlock> createLink(
 			@Parameter(name = "supplyChainId", description = "supply chain id", required = true, in = ParameterIn.PATH) @PathVariable("supplyChainId") UUID supplyChainId,
 			@Parameter(name = "RestLinkMetaBlock", description = "") @Valid @RequestBody(required = false) RestLinkMetaBlock restLinkMetaBlock);
 

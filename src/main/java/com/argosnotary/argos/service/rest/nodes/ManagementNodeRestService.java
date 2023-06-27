@@ -30,6 +30,6 @@ public interface ManagementNodeRestService extends ManagementNodeApi {
 			@Parameter(name = "managementNodeId", description = "this will be the management node id", required = true, in = ParameterIn.PATH) @PathVariable("managementNodeId") UUID managementNodeId);
 
 	@Override
-	ResponseEntity<List<RestManagementNode>> getManagementNodes();
-
+	ResponseEntity<List<RestManagementNode>> getManagementNodes(
+			@Parameter(name = "parentId", description = "this is be the parent id", required = true, in = ParameterIn.PATH) @PathVariable("parentId") UUID parentId);
 }

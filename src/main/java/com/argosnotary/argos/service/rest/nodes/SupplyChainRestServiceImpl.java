@@ -3,13 +3,11 @@ package com.argosnotary.argos.service.rest.nodes;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,6 +50,11 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent"); 
 		}
 		
+		if (nodeService.existsByParentIdAndName(restSupplyChain.getParentId(), restSupplyChain.getName())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+					String.format("Supply Chain with name [%s] already exists on project [%s]", restSupplyChain.getName(), restSupplyChain.getParentId()));
+		}
+		
 		SupplyChain node = supplyChainService
 				.create(supplyChainMapper.convertFromRestSupplyChain(restSupplyChain));
 
@@ -83,16 +86,13 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
 	}
 
 	@Override
-    @PreAuthorize("isAuthenticated()")
-	public ResponseEntity<List<RestSupplyChain>> getSupplyChains() {
-		return ResponseEntity.ok(supplyChainService.find(Set.of())
-				.stream().map(supplyChainMapper::convertToRestSupplyChain).collect(Collectors.toList()));
-	}
-
-	@Override
     @PermissionCheck(permissions = Permission.READ)
-	public ResponseEntity<List<RestSupplyChain>> getSupplyChainsForProject(UUID projectId) {
-		return ResponseEntity.ok(supplyChainService.find(Set.of(projectId))
+	public ResponseEntity<List<RestSupplyChain>> getSupplyChains(UUID ancestorId) {
+		Optional<Node> optNode = nodeService.findById(ancestorId);
+		if (optNode.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
+		}
+		return ResponseEntity.ok(supplyChainService.find(optNode.get())
 				.stream().map(supplyChainMapper::convertToRestSupplyChain).collect(Collectors.toList()));
 	}
 
@@ -101,7 +101,7 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
     @AuditLog
 	public ResponseEntity<RestSupplyChain> updateSupplyChain(UUID supplyChainId,
 			@Valid RestSupplyChain restSupplyChain) {
-		if (!nodeService.exists(Project.class.getCanonicalName(), restSupplyChain.getParentId())) {
+		if (!nodeService.exists(Project.class, restSupplyChain.getParentId())) {
 			throw parentProjectNotFound(); 
 		}
 		Optional<SupplyChain> supplyChain = supplyChainService.findById(supplyChainId);

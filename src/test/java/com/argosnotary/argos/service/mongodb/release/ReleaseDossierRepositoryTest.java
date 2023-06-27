@@ -30,8 +30,10 @@ import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.release.Release;
 import com.argosnotary.argos.domain.release.ReleaseDossier;
+import com.argosnotary.argos.service.JsonMapperConfig;
 import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
 import com.argosnotary.argos.service.mongodb.MongoConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.gridfs.model.GridFSFile;
 
 @Testcontainers
@@ -55,6 +57,10 @@ class ReleaseDossierRepositoryTest {
 	@Autowired
 	private GridFsTemplate gridFsTemplate;
 	
+	JsonMapperConfig jsonMapperConfig = new JsonMapperConfig();
+	
+	private ObjectMapper mapper = jsonMapperConfig.objectMapper();
+	
 	@Mock
 	private LayoutMetaBlock layoutMetaBlock;
 	
@@ -66,10 +72,10 @@ class ReleaseDossierRepositoryTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		releaseDossierRepository = new ReleaseDossierRepository(gridFsTemplate);
+		releaseDossierRepository = new ReleaseDossierRepository(gridFsTemplate, mapper);
 		org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().domain("domainName1").build());
 		
-		r11 = Release.builder().name("releaseName11").qualifiedSupplyChainName("supply1.domainName1").releaseDate(OffsetDateTime.now(ZoneOffset.UTC)).supplyChainId(UUID.randomUUID()).id(UUID.randomUUID()).organization(org1).releasedProductsHashes(Set.of("hash111","hash112","hash113")).build();
+		r11 = Release.builder().name("releaseName11").qualifiedSupplyChainName("supply1.domainName1").releaseDate(OffsetDateTime.now(ZoneOffset.UTC)).supplyChainId(UUID.randomUUID()).id(UUID.randomUUID()).domain(Domain.builder().domain("domainName1").build()).releasedProductsHashes(Set.of("hash111","hash112","hash113")).build();
 		
 		
 	}

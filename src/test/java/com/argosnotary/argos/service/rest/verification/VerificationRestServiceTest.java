@@ -96,7 +96,7 @@ class VerificationRestServiceTest {
     
     @Test
     void testArtifactMapper() {
-    	List<Artifact> ff = artifactMapper.mapToArtifacts(List.of(restArtifact));
+    	List<Artifact> ff = List.of(artifactMapper.convertToArtifact(restArtifact));
         assertThat(ff.size(), is(1));
     }
 
@@ -106,7 +106,7 @@ class VerificationRestServiceTest {
         RestVerificationResult restVerificationResult = new RestVerificationResult();
         restVerificationResult.setRunIsValid(true);
         when(supplyChainService.exists(SUPPLYCHAIN_ID)).thenReturn(true);
-        when(layoutMetaBlockService.findBySupplyChainId(SUPPLYCHAIN_ID))
+        when(layoutMetaBlockService.getLayout(SUPPLYCHAIN_ID))
                 .thenReturn(Optional.of(layoutMetaBlockMetaBlock));
         when(verificationService.performVerification(layoutMetaBlockMetaBlock, Set.of(artifact))).thenReturn(runResult);
         ResponseEntity<RestVerificationResult> result = verificationRestService.performVerification(SUPPLYCHAIN_ID, List.of(restArtifact));
@@ -117,7 +117,7 @@ class VerificationRestServiceTest {
     @Test
     void performVerificationWithNoLayoutShouldReturnError() {
         when(supplyChainService.exists(SUPPLYCHAIN_ID)).thenReturn(true);
-        when(layoutMetaBlockService.findBySupplyChainId(SUPPLYCHAIN_ID))
+        when(layoutMetaBlockService.getLayout(SUPPLYCHAIN_ID))
                 .thenReturn(Optional.empty());
         ResponseStatusException error = assertThrows(ResponseStatusException.class, () -> verificationRestService.performVerification(SUPPLYCHAIN_ID, singletonList(restArtifact)));
         assertThat(error.getStatusCode().value(), is(400));

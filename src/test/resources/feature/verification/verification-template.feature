@@ -23,16 +23,19 @@ Feature: verification template
 
   Background:
     * url karate.properties['server.baseurl']
-    * def supplyChain = call read('classpath:feature/supplychain/create-supplychain.feature') { supplyChainName: 'name', parentLabelId: #(defaultTestData.defaultRootLabel.id)}
-    * def supplyChainPath = '/api/supplychain/'+ supplyChain.response.id
-    * def supplyChainId = supplyChain.response.id
+    Given path '/api/nodes/'+projectId+'/supplychains'
+    And request { name: 'name', parentId: #(projectId)}
+    When method POST
+    Then status 201
+    * def supplyChainId = response.id
+    * def supplyChainPath = '/api/supplychains/'+ supplyChainId
     # variables for substitution
     * def layoutKey = layoutSigner.personalAccount.activeKeyPair
     * def key2 = account2.serviceAccount.activeKeyPair
     * def key3 = account3.serviceAccount.activeKeyPair
     
-    * def layoutPath = '/api/supplychain/'+ supplyChain.response.id + '/layout'
-    * def linkPath = '/api/supplychain/'+ supplyChain.response.id + '/link'
+    * def layoutPath = '/api/supplychains/'+ supplyChainId + '/layout'
+    * def linkPath = '/api/supplychains/'+ supplyChainId + '/link'
 
   Scenario: run template
     Given print 'testDir : ', testDir
@@ -45,6 +48,7 @@ Feature: verification template
     * call read('classpath:feature/link/create-link.feature') stepLinksJson
     * configure headers = call read('classpath:headers.js') { token: #(defaultTestData.ownerToken)}
     Given path supplyChainPath + '/verification'
-    And request  verificationRequest
+    And request  expectedProducts
     When method POST
     Then status 200
+    

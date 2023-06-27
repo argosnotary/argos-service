@@ -2,7 +2,6 @@ package com.argosnotary.argos.service.nodes;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import com.argosnotary.argos.domain.nodes.Organization;
@@ -13,7 +12,7 @@ public interface OrganizationService {
 	 * Find all organizations where the account is authorized for
 	 * @return
 	 */
-	List<Organization> find(Set<UUID> resourceIds);
+	List<Organization> find();
 	
 	/**
 	 * 
@@ -21,6 +20,10 @@ public interface OrganizationService {
 	 * @return
 	 */
 	Optional<Organization> findById(UUID organizationId);
+	
+	public boolean existsByName(String name);
+	
+	boolean existsById(UUID organizationId);
 	
 	/**
 	 * Create an Organization

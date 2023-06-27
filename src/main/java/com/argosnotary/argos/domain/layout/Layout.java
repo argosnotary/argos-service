@@ -19,20 +19,16 @@
  */
 package com.argosnotary.argos.domain.layout;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.util.List;
 
 import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.domain.layout.rule.MatchRule;
 
-@Getter
-@Setter
+import lombok.Builder;
+import lombok.Data;
+
 @Builder
-@ToString
+@Data
 public class Layout {
     private List<PublicKey> keys;
     private List<String> authorizedKeyIds;

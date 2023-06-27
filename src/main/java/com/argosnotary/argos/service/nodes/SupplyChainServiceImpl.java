@@ -1,6 +1,5 @@
 package com.argosnotary.argos.service.nodes;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -21,9 +20,9 @@ public class SupplyChainServiceImpl implements SupplyChainService {
 	private final NodeService nodeService;
 
 	@Override
-	public List<SupplyChain>  find(Set<UUID> resourceIds) {
-		return nodeService.find(SupplyChain.class.getCanonicalName(), resourceIds)
-				.stream().map(n -> (SupplyChain) n).collect(Collectors.toList());
+	public Set<SupplyChain>  find(Node node) {
+		return nodeService.find(SupplyChain.class.getCanonicalName(), Optional.of(node))
+				.stream().map(n -> (SupplyChain) n).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -47,7 +46,7 @@ public class SupplyChainServiceImpl implements SupplyChainService {
 
 	@Override
 	public boolean exists(UUID supplyChainId) {
-		return nodeService.exists(SupplyChain.class.getCanonicalName(), supplyChainId);
+		return nodeService.exists(SupplyChain.class, supplyChainId);
 	}
 
 	@Override

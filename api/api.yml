@@ -123,7 +123,7 @@ paths:
           $ref: '#/components/responses/Error'
     delete:
       summary: delete organization by id.
-      operationId: deleteorganizationById
+      operationId: deleteOrganizationById
       tags:
         - organization
       parameters:
@@ -176,13 +176,18 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/Error'
-
-  /managementnodes:
     get:
-      summary: get all management nodes for organizations
+      summary: get all management nodes for a parent
       operationId: getManagementNodes
       tags:
         - management node
+      parameters:
+        - name: parentId
+          in: path
+          required: true
+          description: this is be the parent id
+          schema:
+            $ref: "#/components/schemas/UUID"
       responses:
         '200':
           description: list of management nodes
@@ -241,7 +246,7 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
           
-  /nodes/{parentId}/project:
+  /nodes/{parentId}/projects:
     post:
       summary: create a project
       operationId: createProject
@@ -276,13 +281,18 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/Error'
-          
-  /projects:
     get:
-      summary: get all projects for organizations
+      summary: get all projects for an ancestor
       operationId: getProjects
       tags:
         - project
+      parameters:
+        - name: parentId
+          in: path
+          required: true
+          description: this will be the parent id
+          schema:
+            $ref: "#/components/schemas/UUID"
       responses:
         '200':
           description: list of projects
@@ -293,7 +303,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Project"
         '500':
-          $ref: '#/components/responses/Error'        
+          $ref: '#/components/responses/Error'
 
   /projects/{projectId}:
     get:
@@ -602,14 +612,14 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
         
-  /projects/{projectId}/supplychain:
+  /nodes/{parentId}/supplychains:
     post:
       summary: create a supplychain
       operationId: createSupplyChain
       tags:
         - supply chain
       parameters:
-        - name: projectId
+        - name: parentId
           in: path
           required: true
           description: this will be the project id
@@ -638,36 +648,16 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
     get:
-      summary: get supplychains for a project
-      operationId: getSupplyChainsForProject
+      summary: get supplychains for a parent
+      operationId: getSupplyChains
       tags:
         - supply chain
       parameters:
-        - name: projectId
+        - name: parentId
           in: path
           required: true
           schema:
             $ref: "#/components/schemas/UUID"
-      responses:
-        '200':
-          description: the supply chain
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/SupplyChain"
-        '404':
-          description: not found
-        '500':
-          $ref: '#/components/responses/Error'
-          
-  /supplychains:
-    get:
-      summary: get supplychains
-      operationId: getSupplyChains
-      tags:
-        - supply chain
       responses:
         '200':
           description: the supply chain
@@ -847,8 +837,12 @@ paths:
             schema:
               $ref: "#/components/schemas/LinkMetaBlock"
       responses:
-        '204':
-          description: no content
+        '201':
+          description: link created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LinkMetaBlock"
         '400':
           $ref: '#/components/responses/ValidationError'
         '500':
@@ -1259,7 +1253,7 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
  
-  /roles/{resourceId}/roleassignment/{roleAssignmentId}:          
+  /roles/{resourceId}/roleassignments/{roleAssignmentId}:          
     delete:
       summary: delete role assignment by id.
       operationId: deleteRoleAssignemntById
@@ -1511,7 +1505,7 @@ components:
       type: string
       minLength: 1
       maxLength: 1024
-      pattern: '^(([a-z]|[a-z][a-z0-9\\-]{0,61}[a-z0-9])\\.)*([a-z]|[a-z][a-z0-9\\-]{0,61}[a-z0-9])$'
+      pattern: '^(([a-z]|[a-z][a-z0-9\-]{0,61}[a-z0-9])\.)*([a-z]|[a-z][a-z0-9\-]{0,61}[a-z0-9])$'
 
     ArtifactArray:
       type: array
@@ -1533,6 +1527,16 @@ components:
           maxItems: 256
           items:
             $ref: "#/components/schemas/UUID"
+        domain:
+          $ref: "#/components/schemas/Domain"
+            
+    Domain:
+      type: object
+      required:
+        - domain
+      properties:
+        domain:
+          $ref: "#/components/schemas/HostnameString"
 
     ManagementNode:
       type: object
@@ -2100,35 +2104,40 @@ components:
             maxItems: 4096
             items:
               $ref: '#/components/schemas/Artifact'
+              
     ReleaseResult:
       type: object
       properties:
         releaseIsValid:
           type: boolean
-        releaseDossierMetaData:
-          $ref: '#/components/schemas/ReleaseDossierMetaData'
+        release:
+          $ref: '#/components/schemas/Release'
 
-    ReleaseDossierMetaData:
+    Release:
       type: object
       properties:
-        documentId:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
           type: string
         releaseDate:
           type: string
-          format: date-time
-        supplyChainPath:
-          type: string
+        qualifiedSupplyChainName:
           $ref: "#/components/schemas/HostnameString"
-        releaseArtifacts:
+        domain:
+          $ref: "#/components/schemas/Domain"
+        dossierId:
+          $ref: "#/components/schemas/HexString"
+          minLength: 24
+          maxLength: 24
+        supplyChainId:
+          $ref: "#/components/schemas/UUID"
+        releasedProductsHashes:
           type: array
           minItems: 1
-          maxItems: 256
+          maxItems: 4096
           items:
-            type: array
-            minItems: 1
-            maxItems: 4096
-            items:
-              $ref: "#/components/schemas/SHA256Hash"
+            $ref: "#/components/schemas/SHA256Hash"
 
     OAuthProvider:
       type: object

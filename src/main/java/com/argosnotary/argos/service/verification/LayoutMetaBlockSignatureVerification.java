@@ -33,12 +33,10 @@ import com.argosnotary.argos.domain.crypto.signing.SignatureValidator;
 import com.argosnotary.argos.domain.layout.Layout;
 import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class LayoutMetaBlockSignatureVerification implements Verification {
 
     @Override

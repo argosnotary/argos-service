@@ -78,11 +78,10 @@ public class VerificationRestServiceImpl implements VerificationRestService {
     				verificationResultMapper.mapToRestVerificationResult(VerificationRunResult.builder().runIsValid(false).build()));
     	}
 
-        LayoutMetaBlock layoutMetaBlock = layoutMetaBlockService.findBySupplyChainId(supplyChainId)
+        LayoutMetaBlock layoutMetaBlock = layoutMetaBlockService.getLayout(supplyChainId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "no active layout could be found for supplychain:" + supplyChainId));
 
-        List<Artifact> ff = artifactMapper.mapToArtifacts(expectedProducts);
-        Set<Artifact> products = artifactMapper.mapToArtifacts(expectedProducts).stream().collect(Collectors.toSet());
+        Set<Artifact> products = expectedProducts.stream().map(artifactMapper::convertToArtifact).collect(Collectors.toSet());
         return ResponseEntity.ok(
         		verificationResultMapper.mapToRestVerificationResult(verificationService.performVerification(layoutMetaBlock, products)));
     }

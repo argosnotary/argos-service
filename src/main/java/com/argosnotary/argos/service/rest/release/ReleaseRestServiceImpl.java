@@ -19,7 +19,6 @@
  */
 package com.argosnotary.argos.service.rest.release;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -27,7 +26,6 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.release.ReleaseResult;
@@ -53,15 +51,9 @@ public class ReleaseRestServiceImpl implements ReleaseRestService {
     @PermissionCheck(permissions = Permission.RELEASE)
     @AuditLog
     public ResponseEntity<RestReleaseResult> createRelease(UUID supplyChainId, RestReleaseArtifacts restReleaseArtifacts) {
-        List<Set<Artifact>> artifacts = artifactMapper.mapToArtifacts(restReleaseArtifacts.getReleaseArtifacts());
+        List<Set<Artifact>> artifacts = restReleaseArtifacts.getReleaseArtifacts().stream().map(artifactMapper::mapToSetArtifacts).toList();
         ReleaseResult releaseResult = releaseService.createRelease(supplyChainId, artifacts);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{releaseId}")
-                .buildAndExpand(releaseResult.getRelease().getId())
-                .toUri();
         
-        return ResponseEntity.created(location).body(releaseResultMapper.maptoRestReleaseResult(releaseResult));
+        return ResponseEntity.ok(releaseResultMapper.maptoRestReleaseResult(releaseResult));
     }
 }

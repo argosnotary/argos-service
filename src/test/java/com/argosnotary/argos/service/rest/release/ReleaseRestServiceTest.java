@@ -40,15 +40,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.argosnotary.argos.domain.link.Artifact;
-import com.argosnotary.argos.domain.nodes.Organization;
+import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.release.Release;
 import com.argosnotary.argos.domain.release.ReleaseResult;
 import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.nodes.NodeService;
-import com.argosnotary.argos.service.openapi.rest.model.RestArtifact;
-import com.argosnotary.argos.service.openapi.rest.model.RestReleaseArtifacts;
 import com.argosnotary.argos.service.openapi.rest.model.RestReleaseResult;
 import com.argosnotary.argos.service.release.ReleaseService;
 import com.argosnotary.argos.service.security.helpers.LogContextHelper;
@@ -78,12 +78,6 @@ class ReleaseRestServiceTest {
     @MockBean
     private AccountService accountService;
 
-    @Mock
-    private RestReleaseArtifacts restReleaseArtifacts;
-
-    @Mock
-    private RestArtifact restArtifact;
-
     private ReleaseResult releaseResult;
 
     @Mock
@@ -91,7 +85,7 @@ class ReleaseRestServiceTest {
 
     private Artifact artifact;
 
-    private Organization org;
+    private Domain domain;
     
     @Mock
     private ObjectMapper mapper;
@@ -120,7 +114,7 @@ class ReleaseRestServiceTest {
         		.id(UUID.randomUUID())
         				.releasedProductsHashes(releaseArtifactHashes)
                         .releaseDate(OffsetDateTime.now(ZoneOffset.UTC))
-        				.organization(org)
+                        .domain(domain)
         				.supplyChainId(supplyChainId)
         				.build();
         releaseResult = ReleaseResult
@@ -132,7 +126,8 @@ class ReleaseRestServiceTest {
 
     @Test
     void createReleaseShouldReturn200() throws Exception {
-    	when(artifactMapper.mapToArtifacts(any())).thenReturn(List.of(Set.of(artifact)));
+    	when(artifactMapper.mapToSetArtifacts(any())).thenReturn(Set.of(artifact));
+    	when(releaseResultMapper.maptoRestReleaseResult(releaseResult)).thenReturn(restReleaseResult);
     	when(releaseService.createRelease(supplyChainId, List.of(Set.of(artifact)))).thenReturn(releaseResult);
         String releaseRequestBody = "{\n"
         		+ "    \"releaseArtifacts\": [\n"
@@ -144,9 +139,12 @@ class ReleaseRestServiceTest {
         		+ "        ]\n"
         		+ "    ]\n"
         		+ "}";
-        mockMvc.perform(post("/api/supplychains/1b721ae0-3320-442e-af78-6f57cf35f4e6/release")
+        MvcResult res = mockMvc.perform(post("/api/supplychains/1b721ae0-3320-442e-af78-6f57cf35f4e6/release")
                 .contentType(APPLICATION_JSON)
                 .content(releaseRequestBody))
-        .andExpect(status().isCreated());
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(status().isOk())
+        .andReturn();
+        String content = res.getResponse().getContentAsString();
     }
 }

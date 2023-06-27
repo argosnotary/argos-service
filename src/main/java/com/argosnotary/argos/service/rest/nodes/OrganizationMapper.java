@@ -23,16 +23,21 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
+import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.nodes.Organization;
+import com.argosnotary.argos.service.openapi.rest.model.RestDomain;
 import com.argosnotary.argos.service.openapi.rest.model.RestOrganization;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OrganizationMapper {
 
 	@Mapping(target = "children", ignore = true)
-	@Mapping(target = "domain", ignore = true)
 	@Mapping(target = "parent", ignore = true)
 	Organization convertFromRestOrganization(RestOrganization restOrganization);
 
     RestOrganization convertToRestOrganization(Organization organization);
+    
+//    RestDomain convertToRestDomain(Domain domain);
+//    
+//    Domain convertToDomain(RestDomain domain);
 }

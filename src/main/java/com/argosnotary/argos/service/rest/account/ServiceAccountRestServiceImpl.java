@@ -46,6 +46,10 @@ public class ServiceAccountRestServiceImpl implements ServiceAccountRestService 
 			@Valid RestServiceAccount restServiceAccount) {
 		verifyProjectId(projectId, restServiceAccount.getProjectId());
 		ServiceAccount serviceAccount = accountMapper.convertFromRestServiceAccount(restServiceAccount);
+		if (serviceAccountService.exists(projectId, serviceAccount.getName())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+					String.format("Service account already exists with projectId [%s] and name [%s]", projectId, serviceAccount.getName()));
+		}
         
 		serviceAccount = serviceAccountService.createServiceAccount(serviceAccount);
         

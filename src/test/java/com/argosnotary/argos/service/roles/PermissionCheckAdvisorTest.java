@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,11 +21,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.argosnotary.argos.domain.account.PersonalAccount;
+import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.service.account.ArgosUserDetails;
 import com.argosnotary.argos.service.nodes.NodeService;
-import com.argosnotary.argos.service.roles.PermissionCheck;
-import com.argosnotary.argos.service.roles.PermissionCheckAdvisor;
 
 @ExtendWith(MockitoExtension.class)
 class PermissionCheckAdvisorTest {
@@ -32,6 +32,12 @@ class PermissionCheckAdvisorTest {
 	private UUID resourceId = UUID.randomUUID();
 	
 	private PermissionCheckAdvisor permissionCheckAdvisor;
+	
+	@Mock
+	private Node node;
+	
+	@Mock
+	private RoleAssignmentService roleAssignmentService;
 	
 	@Mock
 	private NodeService nodeService;
@@ -59,7 +65,7 @@ class PermissionCheckAdvisorTest {
     
 	@BeforeEach
 	void setUp() throws Exception {
-		permissionCheckAdvisor = new PermissionCheckAdvisor(nodeService);
+		permissionCheckAdvisor = new PermissionCheckAdvisor(roleAssignmentService, nodeService);
 		SecurityContextHolder.setContext(securityContext);
 	}
 
@@ -67,7 +73,6 @@ class PermissionCheckAdvisorTest {
 	void testNotAuthenticated() {
 		when(securityContext.getAuthentication()).thenReturn(null);
 		when(joinPoint.getSignature()).thenReturn(signature);
-		when(joinPoint.getArgs()).thenReturn(new Object[] {resourceId});
 		when(signature.getName()).thenReturn("testMethode");
 		when(permissionCheck.permissions()).thenReturn(new Permission[] {Permission.READ});
 		assertThrows(AccessDeniedException.class,
@@ -79,9 +84,10 @@ class PermissionCheckAdvisorTest {
 	@Test
 	void testHasNoPermission() {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
-		when(nodeService.getAllPermissionDownTree(resourceId)).thenReturn(Set.of());
+		when(roleAssignmentService.findAllPermissionDownTree(node)).thenReturn(Set.of());
 		when(permissionCheck.permissions()).thenReturn(new Permission[] {Permission.READ});
 		when(joinPoint.getArgs()).thenReturn(new Object[] {resourceId});
+		when(nodeService.findById(resourceId)).thenReturn(Optional.of(node));
 		when(joinPoint.getSignature()).thenReturn(signature);
 		when(signature.getName()).thenReturn("testMethode");
 		assertThrows(AccessDeniedException.class,
@@ -94,7 +100,6 @@ class PermissionCheckAdvisorTest {
 	void testHasNotAuthenticated() {
 		when(securityContext.getAuthentication()).thenReturn(null);
 		when(permissionCheck.permissions()).thenReturn(new Permission[] {Permission.READ});
-		when(joinPoint.getArgs()).thenReturn(new Object[] {resourceId});
 		when(joinPoint.getSignature()).thenReturn(signature);
 		when(signature.getName()).thenReturn("testMethode");
 		assertThrows(AccessDeniedException.class,
@@ -119,9 +124,10 @@ class PermissionCheckAdvisorTest {
 	@Test
 	void testHasPermission() {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
-		when(nodeService.getAllPermissionDownTree(resourceId)).thenReturn(Set.of(Permission.READ));
+		when(roleAssignmentService.findAllPermissionDownTree(node)).thenReturn(Set.of(Permission.READ));
 		when(permissionCheck.permissions()).thenReturn(new Permission[] {Permission.READ});
 		when(joinPoint.getArgs()).thenReturn(new Object[] {resourceId});
+		when(nodeService.findById(resourceId)).thenReturn(Optional.of(node));
 		when(joinPoint.getSignature()).thenReturn(signature);
 		when(signature.getName()).thenReturn("testMethode");
 		assertDoesNotThrow(
@@ -133,10 +139,11 @@ class PermissionCheckAdvisorTest {
 	@Test
 	void testHasPermissionWithSeveral() {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
-		when(nodeService.getAllPermissionDownTree(resourceId)).thenReturn(Set.of(Permission.RELEASE,Permission.READ));
+		when(roleAssignmentService.findAllPermissionDownTree(node)).thenReturn(Set.of(Permission.RELEASE,Permission.READ));
 		when(permissionCheck.permissions()).thenReturn(new Permission[] {Permission.LINK_ADD,Permission.READ});
 		when(joinPoint.getArgs()).thenReturn(new Object[] {resourceId});
 		when(joinPoint.getSignature()).thenReturn(signature);
+		when(nodeService.findById(resourceId)).thenReturn(Optional.of(node));
 		when(signature.getName()).thenReturn("testMethode");
 		assertDoesNotThrow(
 	            ()->{

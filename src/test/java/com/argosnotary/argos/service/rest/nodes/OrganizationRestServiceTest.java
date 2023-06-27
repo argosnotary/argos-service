@@ -106,11 +106,11 @@ class OrganizationRestServiceTest {
 
 		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
-        when(organizationService.findById(org2.getId())).thenReturn(Optional.of(org2));
-        ResponseEntity<Void> response = organizationRestService.deleteorganizationById(org2.getId());
+        when(organizationService.existsById(org2.getId())).thenReturn(true);
+        ResponseEntity<Void> response = organizationRestService.deleteOrganizationById(org2.getId());
 
         assertThat(response.getStatusCode(), is(HttpStatusCode.valueOf(204)));
-		verify(organizationService).findById(org2.getId());
+		verify(organizationService).existsById(org2.getId());
 		verify(organizationService).delete(org2.getId());;
 		
 	}
@@ -119,10 +119,10 @@ class OrganizationRestServiceTest {
 	void testDeleteOrganizationByIdNotFound() {
 		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
-        when(organizationService.findById(org2.getId())).thenReturn(Optional.empty());
+        when(organizationService.existsById(org2.getId())).thenReturn(false);
         
         Throwable exception = assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
-        	organizationRestService.deleteorganizationById(org2.getId());
+        	organizationRestService.deleteOrganizationById(org2.getId());
           });
         
         assertEquals("404 NOT_FOUND \"Organization not found\"", exception.getMessage());

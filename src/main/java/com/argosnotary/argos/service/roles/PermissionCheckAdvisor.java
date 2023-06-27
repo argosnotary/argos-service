@@ -19,6 +19,7 @@
  */
 package com.argosnotary.argos.service.roles;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,9 +34,11 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.service.nodes.NodeService;
 
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @Order(value = 1)
 public class PermissionCheckAdvisor {
 
+    private final RoleAssignmentService roleAssignmentService;
     private final NodeService nodeService;
 
     @Pointcut("@annotation(permissionCheck)")
@@ -64,13 +68,17 @@ public class PermissionCheckAdvisor {
 		Authentication optionalAuthentication = securityContext.getAuthentication();
         Set<Permission> permissions = Set.of(permissionCheck.permissions());
         
-        if (permissions.size() == 0 || args.length == 0 || optionalAuthentication == null) {
+        if (permissions.size() == 0 || args == null || args.length == 0 || optionalAuthentication == null) {
         	throw new AccessDeniedException("Access denied");
         }
         
         UUID resourceId = (UUID) args[0];
+		Optional<Node> optNode = nodeService.findById(resourceId);
+		if (optNode.isEmpty()) {
+			throw new NotFoundException(String.format("Resource with id [%s] not found", resourceId));
+		}
 
-        if (!hasPermission(permissions, resourceId, optionalAuthentication)) {
+        if (!hasPermission(permissions, optNode.get())) {
             log.info("access denied for method:{} with permissions {}",
                     joinPoint.getSignature().getName(),
                     permissionCheck.permissions()
@@ -79,8 +87,8 @@ public class PermissionCheckAdvisor {
         }
     }
 
-    private boolean hasPermission(Set<Permission> permissionsToCheck, UUID resourceId, Authentication authentication) {
-    	Set<Permission> permissions = nodeService.getAllPermissionDownTree(resourceId);
+    private boolean hasPermission(Set<Permission> permissionsToCheck, Node node) {
+    	Set<Permission> permissions = roleAssignmentService.findAllPermissionDownTree(node);
     	if (permissions.isEmpty()) {
     		return false;
     	}

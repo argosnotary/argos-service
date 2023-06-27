@@ -53,8 +53,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     public MongoCustomConversions customConversions() {
         converterList.add(new OffsetDateTimeReadConverter());
         converterList.add(new OffSetDateTimeWriteConverter());
-        //converterList.add(new ReleaseDossierMetaDataToDocumentConverter());
-        //converterList.add(new DocumentToReleaseDossierMetaDataConverter());
         return new MongoCustomConversions(converterList);
     }
 
@@ -107,6 +105,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     
     @Override
     public Collection<String> getMappingBasePackages() {
-        return Collections.singleton("com.argosnotary.argos.service.domain");
+        return Collections.singleton("com.argosnotary.argos.domain");
     }
 }

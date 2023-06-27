@@ -50,19 +50,10 @@ import lombok.extern.slf4j.Slf4j;;
 @ToString
 public class ExpectedEndProductsVerification implements Verification {
 
-    private final List<RuleVerification> ruleVerificationList;
-
-    private Map<RuleType, RuleVerification> rulesVerificationMap = new EnumMap<>(RuleType.class);
-
     @Override
     public Priority getPriority() {
         return EXPECTED_END_PRODUCTS;
-    }
-
-    @PostConstruct
-    public void init() {
-        ruleVerificationList.forEach(ruleVerification -> rulesVerificationMap.put(ruleVerification.getRuleType(), ruleVerification));
-    }
+    }    
 
     @Override
     public VerificationRunResult verify(VerificationContext verificationContext) {
@@ -71,7 +62,7 @@ public class ExpectedEndProductsVerification implements Verification {
         Set<Artifact> matchedArtifacts = getMatchedArtifacts(linksMap, verificationContext.getLayoutMetaBlock().getLayout().getExpectedEndProducts());
         Set<Artifact> artifactsToRelease = verificationContext.getArtifactsToRelease();
         
-        return VerificationRunResult.builder().runIsValid(matchedArtifacts.containsAll(artifactsToRelease) && artifactsToRelease.containsAll(matchedArtifacts)).build();
+        return VerificationRunResult.builder().verification(this.getPriority()).runIsValid(matchedArtifacts.containsAll(artifactsToRelease) && artifactsToRelease.containsAll(matchedArtifacts)).build();
     }
 
     private Set<Artifact> getMatchedArtifacts(Map<String, Link> linksMap, List<MatchRule> expectedEndProducts) {

@@ -25,7 +25,7 @@ Feature: using __arg
     * url karate.properties['server.baseurl']
 
   Scenario: create service account key
-    Given path '/api/serviceaccount/'+accountId+'/key'
+    Given path '/api/projects/'+projectId+'/serviceaccounts/'+accountId+'/key'
     And request key
     When method POST
     Then status 201

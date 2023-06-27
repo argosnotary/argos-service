@@ -7,8 +7,7 @@
         "fullName": "Default6 User",
         "givenName": "Default6",
         "familyName": "User",
-        "email": "default6@nl.nl",
-        "picture": null
+        "email": "default6@nl.nl"
     },
     "activeKeyPair": "#notnull",
     "inactiveKeyPairs": []

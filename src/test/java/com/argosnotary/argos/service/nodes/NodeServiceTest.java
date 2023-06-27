@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,10 +25,8 @@ import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.Project;
-import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.domain.roles.RoleAssignment;
-import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.mongodb.nodes.NodeRepository;
 import com.argosnotary.argos.service.roles.RoleAssignmentService;
 
@@ -45,17 +42,14 @@ class NodeServiceTest {
 	NodeDeleteService nodeDeleteService;
 	@Mock 
 	RoleAssignmentService roleAssignmentService;
-	@Mock 
-	AccountSecurityContext accountSecurityContext;
 	
-	@Mock
 	ServiceAccount sa;
 	
 	PersonalAccount pa = PersonalAccount.builder().build();
 	
-    private Organization org1, org2, org3, org4;
-    private Project project111, project1111, project1112, project21, project211, project212, project2211, project311, project3111, project3112;
-    private ManagementNode node11, node111, node112, node21, node22, node221, node222, node31, node311, node312;
+    private Organization org1, org2, org3;
+    private Project project111, project1111, project1112, project211, project3111;
+    private ManagementNode node11, node111, node112, node21, node22, node221, node31, node311;
     private Organization org1Mongo;
     private ManagementNode node11Mongo, node111Mongo, node112Mongo;
     private Project project111Mongo, project1111Mongo, project1112Mongo;
@@ -64,12 +58,11 @@ class NodeServiceTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		
-		nodeService = new NodeServiceImpl(nodeRepository, nodeDeleteService, roleAssignmentService, accountSecurityContext);
+		nodeService = new NodeServiceImpl(nodeRepository, nodeDeleteService, roleAssignmentService);
 
         org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().domain("org1.com").build());
         org2 = new Organization(UUID.randomUUID(), "org2", Domain.builder().domain("org2.com").build());
         org3 = new Organization(UUID.randomUUID(), "org3", Domain.builder().domain("org3.com").build());
-        org4 = new Organization(UUID.randomUUID(), "org4", Domain.builder().domain("org4.com").build());
         
         node11 = new ManagementNode(UUID.randomUUID(), "node11", org1);
         node111 = new ManagementNode(UUID.randomUUID(), "node111", node11);
@@ -81,21 +74,14 @@ class NodeServiceTest {
         node21 = new ManagementNode(UUID.randomUUID(), "node21", org2);
         node22 = new ManagementNode(UUID.randomUUID(), "node22", org2);
         node221 = new ManagementNode(UUID.randomUUID(), "node221", node22);
-        node222 = new ManagementNode(UUID.randomUUID(), "node2211", node22);
         
         node31 = new ManagementNode(UUID.randomUUID(), "node31", org3);
         node311 = new ManagementNode(UUID.randomUUID(), "node311", node31);
-        node312 = new ManagementNode(UUID.randomUUID(), "node312", node31);
-
-        project21 = new Project(UUID.randomUUID(), "project21", org2);
-        project211 = new Project(UUID.randomUUID(), "project211", node21);
-        project212 = new Project(UUID.randomUUID(), "project212", node21);
-        project2211 = new Project(UUID.randomUUID(), "project2211", node221);
         
-        project311 = new Project(UUID.randomUUID(), "project311", node31);
+        project211 = new Project(UUID.randomUUID(), "project211", node21);
+        
         project3111 = new Project(UUID.randomUUID(), "project3111", node311);
-        project3112 = new Project(UUID.randomUUID(), "project3112", node31);
-
+        
         org1Mongo = new Organization();
         org1Mongo.setName("org1");
         org1Mongo.setId(org1.getId());
@@ -153,69 +139,27 @@ class NodeServiceTest {
         ra22 = RoleAssignment.builder().resourceId(node22.getId()).identityId(pa.getId()).role(new Role.Reader()).build();
         ra211 = RoleAssignment.builder().resourceId(project211.getId()).identityId(pa.getId()).role(new Role.Reader()).build();
         ra311 = RoleAssignment.builder().resourceId(node311.getId()).identityId(pa.getId()).role(new Role.LinkAdder()).build();
-	}
-
-	@Test
-	void testGetAllPermissionDownTreeNoAccount() {
-		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.empty());
-		assertThat(nodeService.getAllPermissionDownTree(org2.getId()), is(Set.of()));
-	}
-	
-	@Test
-	void testGetAllPermissionDownTreeServiceAccountWrongId() {
-		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(sa));
-		when(sa.getProjectId()).thenReturn(project211.getId());
-		assertThat(nodeService.getAllPermissionDownTree(org2.getId()), is(Set.of()));
-	}
-	
-	@Test
-	void testGetAllPermissionDownTreeServiceAccount() {
-		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(sa));
-		when(sa.getProjectId()).thenReturn(project211.getId());
-		assertThat(nodeService.getAllPermissionDownTree(project211.getId()), is(Set.of(Permission.LINK_ADD, Permission.RELEASE, Permission.READ)));
-	}
-	
-	@Test
-	void testGetAllPermissionDownTreePersonalAccountEmptyIntersect() {
-		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(pa));
-		when(nodeRepository.findById(node312.getId())).thenReturn(Optional.of(node312));
-		when(roleAssignmentService.findByNodeAndIdentityId(node312, pa.getId())).thenReturn(Set.of());
-		assertThat(nodeService.getAllPermissionDownTree(node312.getId()), is(Set.of()));
-	}
-	
-	@Test
-	void testGetAllPermissionDownTreePersonalAccount() {
-		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(pa));
-		when(nodeRepository.findById(project211.getId())).thenReturn(Optional.of(project211));
-		when(roleAssignmentService.findByNodeAndIdentityId(project211, pa.getId())).thenReturn(Set.of(Permission.READ));
-		assertThat(nodeService.getAllPermissionDownTree(project211.getId()), is(Set.of(Permission.READ)));
-	}
-	
-	@Test
-	void testGetAllPermissionDownTreePersonalAccount2() {
-		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(pa));
-		when(nodeRepository.findById(project3111.getId())).thenReturn(Optional.of(project3111));
-		when(roleAssignmentService.findByNodeAndIdentityId(project3111, pa.getId())).thenReturn(Set.of(Permission.LINK_ADD, Permission.READ));
-		assertThat(nodeService.getAllPermissionDownTree(project3111.getId()), is(Set.of(Permission.LINK_ADD, Permission.READ)));
+		
+		sa = ServiceAccount.builder().name("sa").projectId(project211.getId()).build();
 	}
 	
 	@Test
 	void testSave() {
 		when(nodeRepository.findById(node11.getParentId())).thenReturn(Optional.of(org1));
 		nodeService.create(node11);
-		verify(nodeRepository).save(node11);
+		verify(nodeRepository).insert(node11);
 	}
 	
 	@Test
 	void testDelete() {
-		when(nodeRepository.findInPathToRoot(project3111.getId())).thenReturn(List.of(project3111));
+		when(nodeRepository.findByPathToRoot(project3111.getId())).thenReturn(List.of(project3111));
 		nodeService.delete(project3111.getId());
 		verify(nodeDeleteService).deleteNode(project3111);
 	}
 	
 	@Test
 	void testGetSubTree() {
-		when(nodeRepository.findInPathToRoot(org1.getId())).thenReturn(List.of(org1Mongo,node11Mongo,node111Mongo,node112Mongo,project111Mongo,project1111Mongo,project1112Mongo));
+		when(nodeRepository.findByPathToRoot(org1.getId())).thenReturn(List.of(org1Mongo,node11Mongo,node111Mongo,node112Mongo,project111Mongo,project1111Mongo,project1112Mongo));
 		Optional<Node> treeNode = nodeService.getSubTree(org1.getId());
 		//assertEquals(org1, treeNode.get());
 		assertThat(org1.getChildren().size(), is(1));
@@ -224,7 +168,7 @@ class NodeServiceTest {
 	
 	@Test
 	void testGetSubTreeSub() {
-		when(nodeRepository.findInPathToRoot(node11Mongo.getId())).thenReturn(List.of(node11Mongo,node111Mongo,node112Mongo,project111Mongo,project1111Mongo,project1112Mongo));
+		when(nodeRepository.findByPathToRoot(node11Mongo.getId())).thenReturn(List.of(node11Mongo,node111Mongo,node112Mongo,project111Mongo,project1111Mongo,project1112Mongo));
 		Optional<Node> treeNode = nodeService.getSubTree(node11Mongo.getId());
 		assertEquals(node11, treeNode.get());
 		assertThat(node11.getChildren().size(), is(3));

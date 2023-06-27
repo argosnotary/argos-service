@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.HashMap;
@@ -42,6 +41,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.util.SerializationUtils;
 
 import com.argosnotary.argos.domain.ArgosError;
+import com.argosnotary.argos.service.JsonMapperConfig;
 import com.argosnotary.argos.service.security.helpers.CookieHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,6 +55,10 @@ class CustomStatelessAuthorizationRequestRepositoryTest {
 
     @Mock
     private CookieHelper cookieHelper;
+    
+    JsonMapperConfig jsonMapperConfig = new JsonMapperConfig();
+	
+	private ObjectMapper mapper = jsonMapperConfig.objectMapper();
 
     private CustomStatelessAuthorizationRequestRepository repository;
 
@@ -70,20 +74,20 @@ class CustomStatelessAuthorizationRequestRepositoryTest {
     
     private Cookie[] cookies = new Cookie[1];
     
-    private String strCcookie;
-    
-    private static final ObjectMapper jsonMapper = new ObjectMapper();
+    private String strCcookie; 
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
         oAuth2AuthorizationRequest = OAuth2AuthorizationRequest.authorizationCode().authorizationUri("http://some").clientId("is").build();
-        repository = new CustomStatelessAuthorizationRequestRepository();
+        repository = new CustomStatelessAuthorizationRequestRepository(mapper);
+        ObjectMapper jsonMapper = new ObjectMapper();
         base64OauthRequest = Base64.getEncoder().encodeToString(jsonMapper.writeValueAsBytes(oAuth2AuthorizationRequest));
         cookies[0] = CookieHelper.generate(CookieHelper.OAUTH_COOKIE_NAME, base64OauthRequest, Duration.ofMinutes(5));
     }
 
     @Test
     void loadAuthorizationRequestFound() throws JsonProcessingException {
+        ObjectMapper jsonMapper = new ObjectMapper();
     	when(request.getCookies()).thenReturn(cookies);
     	String actual = Base64.getEncoder().encodeToString(jsonMapper.writeValueAsBytes(repository.loadAuthorizationRequest(request)));
         assertEquals(base64OauthRequest, actual);

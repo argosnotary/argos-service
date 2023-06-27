@@ -41,7 +41,7 @@ public class Properties {
     }
 
     private Properties() {
-        Config conf = ConfigFactory.load();
+        Config conf = ConfigFactory.load("app.conf");
         apiBaseUrl = conf.getString("argos-service.rest-api.base-url");
         paAuthorizationUri = conf.getString("argos-service.rest-api.pa-authorization-uri");
         saAuthorizationUri = conf.getString("argos-service.rest-api.sa-authorization-uri");

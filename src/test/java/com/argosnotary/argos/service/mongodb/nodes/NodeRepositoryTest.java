@@ -6,6 +6,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIn.in;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +32,6 @@ import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.Project;
 import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
-import com.argosnotary.argos.service.mongodb.nodes.NodeRepository;
 
 @Testcontainers
 @DataMongoTest
@@ -103,6 +104,11 @@ class NodeRepositoryTest {
 		this.org3 = nodeRepository.save(org3);
         this.org4 = nodeRepository.save(org4); 
 	}
+	
+	@Test
+	void testParentIdNull() {
+
+	}
 
 	/**
 	 * @see #153
@@ -117,8 +123,22 @@ class NodeRepositoryTest {
 	}
 	
 	@Test
-	void findInPathToRoot() {
-		List<Node> nodes = nodeRepository.findInPathToRoot(node22.getId());
+	void existsByClassAndName() {
+		assertTrue(nodeRepository.existsByClassAndName(Organization.class.getCanonicalName(), "org1"));
+		assertFalse(nodeRepository.existsByClassAndName(Organization.class.getCanonicalName(), "bla"));
+		
+	}
+	
+	@Test
+	void existsByClassAndId() {
+		assertTrue(nodeRepository.existsByClassAndId(Organization.class.getCanonicalName(), org1.getId()));
+		assertFalse(nodeRepository.existsByClassAndId(Organization.class.getCanonicalName(), project21.getId()));
+		
+	}
+	
+	@Test
+	void findByPathToRoot() {
+		List<Node> nodes = nodeRepository.findByPathToRoot(node22.getId());
 		assertThat(nodes, containsInAnyOrder(node22,node221, node222, project2211));
 		
 	}

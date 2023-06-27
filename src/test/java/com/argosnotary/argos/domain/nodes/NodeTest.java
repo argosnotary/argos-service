@@ -105,18 +105,18 @@ class NodeTest {
     void visitOnlyRoot() {
         NodeVisitor<Map<String, Integer>> treeNodeVisitor = new TestVisitor();
         org1.visit(treeNodeVisitor);
-        assertThat(treeNodeVisitor.result().get(VISIT_ENTER), is(0));
-        assertThat(treeNodeVisitor.result().get(VISIT_EXIT), is(0));
-        assertThat(treeNodeVisitor.result().get(VISIT_END_POINT), is(1));
+        assertThat(treeNodeVisitor.result().get(VISIT_ENTER), is(1));
+        assertThat(treeNodeVisitor.result().get(VISIT_EXIT), is(1));
+        assertThat(treeNodeVisitor.result().get(VISIT_END_POINT), is(0));
     }
     
     @Test
     void visitTree() {
         NodeVisitor<Map<String, Integer>> treeNodeVisitor = new TestVisitor();
         org2.visit(treeNodeVisitor);
-        assertThat(treeNodeVisitor.result().get(VISIT_ENTER), is(4));
-        assertThat(treeNodeVisitor.result().get(VISIT_EXIT), is(4));
-        assertThat(treeNodeVisitor.result().get(VISIT_END_POINT), is(6));
+        assertThat(treeNodeVisitor.result().get(VISIT_ENTER), is(10));
+        assertThat(treeNodeVisitor.result().get(VISIT_EXIT), is(10));
+        assertThat(treeNodeVisitor.result().get(VISIT_END_POINT), is(0));
     }
     
     @Test

@@ -19,19 +19,15 @@
  */
 package com.argosnotary.argos.domain.layout;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-@Setter
-@Getter
+import lombok.Builder;
+import lombok.Data;
+
 @Builder
-@ToString
+@Data
 public class ArtifactCollectorSpecification {
     public enum CollectorType {XLDEPLOY, GIT}
     private String name;

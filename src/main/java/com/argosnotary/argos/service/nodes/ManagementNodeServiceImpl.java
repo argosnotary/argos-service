@@ -1,6 +1,5 @@
 package com.argosnotary.argos.service.nodes;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -20,9 +19,9 @@ public class ManagementNodeServiceImpl implements ManagementNodeService {
 	private final NodeService nodeService;
 
 	@Override
-	public List<ManagementNode> find(Set<UUID> resourceIds) {
-		return nodeService.find(ManagementNode.class.getCanonicalName(), resourceIds)
-				.stream().map(n -> (ManagementNode) n).collect(Collectors.toList());
+	public Set<ManagementNode> find(Node node) {
+		return nodeService.find(ManagementNode.class.getCanonicalName(), Optional.of(node))
+				.stream().map(n -> (ManagementNode) n).collect(Collectors.toSet());
 	}
 
 	@Override

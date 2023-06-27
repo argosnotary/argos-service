@@ -1,6 +1,5 @@
 package com.argosnotary.argos.service.nodes;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -20,9 +19,9 @@ public class ProjectServiceImpl implements ProjectService {
 	private final NodeService nodeService;
 
 	@Override
-	public List<Project> find(Set<UUID> resourceIds) {
-		return nodeService.find(Project.class.getCanonicalName(), resourceIds)
-				.stream().map(n -> (Project) n).collect(Collectors.toList());
+	public Set<Project> find(Node node) {
+		return nodeService.find(Project.class.getCanonicalName(), Optional.of(node))
+				.stream().map(n -> (Project) n).collect(Collectors.toSet());
 	}
 
 	@Override

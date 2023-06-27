@@ -24,7 +24,7 @@ public class VerificationServiceImpl implements VerificationService {
 
 	@Override
 	public boolean getVerification(List<String> artifactHashes, List<String> paths) {
-        return releaseService.artifactsAreReleased(artifactHashes.stream().collect(Collectors.toSet()), paths);
+        return releaseService.artifactsAreTrusted(artifactHashes.stream().collect(Collectors.toSet()), paths);
 	}
 
 	@Override

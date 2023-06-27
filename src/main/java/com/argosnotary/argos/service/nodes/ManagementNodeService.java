@@ -1,11 +1,11 @@
 package com.argosnotary.argos.service.nodes;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import com.argosnotary.argos.domain.nodes.ManagementNode;
+import com.argosnotary.argos.domain.nodes.Node;
 
 public interface ManagementNodeService {
 	
@@ -13,7 +13,7 @@ public interface ManagementNodeService {
 	 * Find all management nodes where the account is authorized for
 	 * @return
 	 */
-	List<ManagementNode> find(Set<UUID> resourceIds);
+	Set<ManagementNode> find(Node node);
 	
 	/**
 	 * 

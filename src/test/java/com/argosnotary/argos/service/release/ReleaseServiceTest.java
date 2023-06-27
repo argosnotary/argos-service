@@ -1,6 +1,7 @@
 package com.argosnotary.argos.service.release;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -94,6 +95,9 @@ class ReleaseServiceTest {
 		releaseArtifacts.add(Set.of(a11,a12));
 		releaseArtifacts.add(Set.of(a21,a22, a23));
 		
+
+		org = new Organization(UUID.randomUUID(), "org", Domain.builder().domain("org.com").build());
+		
 		releaseArtifactHashes = convertToReleaseArtifactHashes(releaseArtifacts);
 		
 		releaseArtifactHashesHash = Release.calculateReleasedProductsHashesHash(releaseArtifactHashes
@@ -112,13 +116,25 @@ class ReleaseServiceTest {
 				.collect(Collectors.toSet());
 		
 		release = Release.builder()
-				.organization(org)
+				.domain(org.getDomain())
 				.supplyChainId(SUPPLYCHAIN_ID)
 				.releasedProductsHashes(releasedProductsHashes)
 				.releasedProductsHashesHash(releaseArtifactHashesHash)
 				.build();
 		validVerificationRunResult = VerificationRunResult.builder().runIsValid(true).build();
-		org = new Organization(UUID.randomUUID(), "org", Domain.builder().domain("org.com").build());
+	}
+	
+	@Test
+	void testArtifactsAreTrusted() {
+		when(releaseRepository.existsByDomainNamesAndHashes(List.of("org.com"), release.getReleasedProductsHashes())).thenReturn(true);
+		assertTrue(releaseService.artifactsAreTrusted(release.getReleasedProductsHashes(), List.of("org.com")));
+	}
+	
+	void testArtifactsAreNotTrusted() {
+		Set<String> hashes = release.getReleasedProductsHashes();
+		hashes.add("randomHash");
+		when(releaseRepository.existsByDomainNamesAndHashes(List.of("org.com"), hashes)).thenReturn(true);
+		assertFalse(releaseService.artifactsAreTrusted(release.getReleasedProductsHashes(), List.of("org.com")));
 	}
 
 	@Test
@@ -132,7 +148,7 @@ class ReleaseServiceTest {
 	void testCreateReleaseCreate() {
 		when(supplyChainService.getQualifiedName(SUPPLYCHAIN_ID)).thenReturn(Optional.of(fullDomainName));
 		when(releaseRepository.findByReleasedProductsHashesHashAndSupplyChainId(releaseArtifactHashesHash, SUPPLYCHAIN_ID)).thenReturn(Optional.empty());
-		when(layoutMetaBlockService.findBySupplyChainId(SUPPLYCHAIN_ID)).thenReturn(Optional.of(layoutMetaBlock));
+		when(layoutMetaBlockService.getLayout(SUPPLYCHAIN_ID)).thenReturn(Optional.of(layoutMetaBlock));
 		when(layoutMetaBlock.getLayout()).thenReturn(layout);
 		when(layout.getKeys()).thenReturn(List.of(key));
 		when(key.getKeyId()).thenReturn("keyId");
@@ -141,7 +157,7 @@ class ReleaseServiceTest {
 		when(releaseRepository.save(any())).thenReturn(release);
 		ReleaseResult res = releaseService.createRelease(SUPPLYCHAIN_ID, releaseArtifacts);
 		assertTrue(res.isReleaseIsValid());
-		assertEquals(release.getOrganization(), res.getRelease().getOrganization());
+		assertEquals(release.getDomain(), res.getRelease().getDomain());
 		assertEquals(release.getQualifiedSupplyChainName(), res.getRelease().getQualifiedSupplyChainName());
 		assertEquals(release.getReleasedProductsHashes(), res.getRelease().getReleasedProductsHashes());
 		assertEquals(release.getReleasedProductsHashesHash(), res.getRelease().getReleasedProductsHashesHash());

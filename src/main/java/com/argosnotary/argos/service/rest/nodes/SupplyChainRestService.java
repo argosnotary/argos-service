@@ -18,7 +18,7 @@ public interface SupplyChainRestService extends SupplyChainApi {
 
 	@Override
 	ResponseEntity<RestSupplyChain> createSupplyChain(
-			@Parameter(name = "projectId", description = "this will be the project id", required = true, in = ParameterIn.PATH) @PathVariable("projectId") UUID projectId,
+			@Parameter(name = "parentId", description = "this will be the project id", required = true, in = ParameterIn.PATH) @PathVariable("parentId") UUID parentId,
 			@Parameter(name = "RestSupplyChain", description = "") @Valid @RequestBody(required = false) RestSupplyChain restSupplyChain);
 
 	@Override
@@ -30,11 +30,8 @@ public interface SupplyChainRestService extends SupplyChainApi {
 			@Parameter(name = "supplyChainId", description = "supply chain id", required = true, in = ParameterIn.PATH) @PathVariable("supplyChainId") UUID supplyChainId);
 
 	@Override
-	ResponseEntity<List<RestSupplyChain>> getSupplyChains();
-
-	@Override
-	ResponseEntity<List<RestSupplyChain>> getSupplyChainsForProject(
-			@Parameter(name = "projectId", description = "", required = true, in = ParameterIn.PATH) @PathVariable("projectId") UUID projectId);
+	ResponseEntity<List<RestSupplyChain>> getSupplyChains(
+			@Parameter(name = "parentId", description = "", required = true, in = ParameterIn.PATH) @PathVariable("parentId") UUID parentId);
 
 	@Override
 	ResponseEntity<RestSupplyChain> updateSupplyChain(

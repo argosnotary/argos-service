@@ -19,17 +19,20 @@
  */
 package com.argosnotary.argos.service.verification;
 
+import java.util.List;
+
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
+import com.argosnotary.argos.service.verification.Verification.Priority;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @Builder
 public class VerificationRunResult {
     private boolean runIsValid;
     private final List<LinkMetaBlock> validLinkMetaBlocks;
+    private Priority verification;
 
     public static VerificationRunResult valid(boolean runIsValid) {
         return VerificationRunResult.builder().runIsValid(runIsValid).build();
