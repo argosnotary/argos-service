@@ -60,12 +60,17 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
 	@Override
 	public ServiceAccount createServiceAccount(ServiceAccount serviceAccount) {
         serviceAccountProviderService.registerServiceAccount(serviceAccount);
-		return serviceAccountRepository.save(serviceAccount);
+		return serviceAccountRepository.insert(serviceAccount);
 	}
 
 	@Override
 	public boolean exists(UUID accountId) {
 		return serviceAccountRepository.existsById(accountId);
+	}
+
+	@Override
+	public boolean exists(UUID projectId, String name) {
+		return serviceAccountRepository.existsByProjectIdAndName(projectId, name);
 	}
 
 }

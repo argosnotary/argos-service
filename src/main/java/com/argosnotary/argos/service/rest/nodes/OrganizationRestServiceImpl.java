@@ -58,6 +58,10 @@ public class OrganizationRestServiceImpl implements OrganizationRestService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid account"); 
 		}
 		
+		if (organizationService.existsByName(restOrganization.getName())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Organization with name [%s] already exists", restOrganization.getName()));
+		}
+		
 		Organization org = organizationService
 				.create(organizationMapper.convertFromRestOrganization(restOrganization));
 
@@ -74,10 +78,12 @@ public class OrganizationRestServiceImpl implements OrganizationRestService {
     @PermissionCheck(permissions = Permission.WRITE)
     @Transactional
     @AuditLog
-	public ResponseEntity<Void> deleteorganizationById(
+	public ResponseEntity<Void> deleteOrganizationById(
 	        @Parameter(name = "organizationId", description = "organization id", required = true, in = ParameterIn.PATH) @PathVariable("organizationId") UUID organizationId
 		    ) {
-		organizationService.findById(organizationId).orElseThrow(this::organizationNotFound);
+		if (!organizationService.existsById(organizationId)) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found");
+		}
 		organizationService.delete(organizationId);
 		return ResponseEntity.noContent().build();
 	}
@@ -87,7 +93,7 @@ public class OrganizationRestServiceImpl implements OrganizationRestService {
 	public ResponseEntity<RestOrganization> getOrganization(
 	        @Parameter(name = "organizationId", description = "this will be the organizationId id", required = true, in = ParameterIn.PATH) @PathVariable("organizationId") UUID organizationId
 	    ) {
-		Organization org = organizationService.findById(organizationId).orElseThrow(this::organizationNotFound);
+		Organization org = organizationService.findById(organizationId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found"));
 		return ResponseEntity.ok(organizationMapper.convertToRestOrganization(org));
 	}
 	
@@ -96,14 +102,10 @@ public class OrganizationRestServiceImpl implements OrganizationRestService {
 	public  ResponseEntity<List<RestOrganization>> getOrganizations(
 	        
 		    ) {
-		return ResponseEntity.ok(organizationService.find(Set.of())
+		return ResponseEntity.ok(organizationService.find()
 				.stream()
 				.map(organizationMapper::convertToRestOrganization)
 				.collect(Collectors.toList()));
-	}
-	
-	private ResponseStatusException organizationNotFound() {
-		return new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found");
 	}
 
 }

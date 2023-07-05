@@ -56,7 +56,8 @@ class JsonSigningSerializerTest {
                         Artifact.builder().uri("_bc.jar").hash("hash3").build(),
                         Artifact.builder().uri("_abc.jar").hash("hash4").build()))
                 .build());
-        assertThat(serialized, is(getExpectedJson("/expectedLinkSigning.json")));
+        String expectedJson = getExpectedJson("/expectedLinkSigning.json");
+        assertThat(serialized, is(expectedJson));
     }
 
     @Test
@@ -101,12 +102,13 @@ class JsonSigningSerializerTest {
                 .authorizedKeyIds(Arrays.asList("key2", "key1"))
                 .build();
         String serialized = new JsonSigningSerializer().serialize(layout);
-        assertThat(serialized, is(getExpectedJson("/expectedLayoutSigning.json")));
+        String expectedJson = getExpectedJson("/expectedLayoutSigning.json");
+        assertThat(serialized, is(expectedJson));
     }
 
     private String getExpectedJson(String name) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readValue(getClass().getResourceAsStream(name), JsonNode.class);
+        JsonNode jsonNode = objectMapper.readValue(this.getClass().getResourceAsStream(name), JsonNode.class);
         return jsonNode.toString();
     }
 }

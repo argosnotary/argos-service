@@ -83,7 +83,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     private ReleaseResult verifyAndStoreRelease(UUID supplyChainId, 
     		List<Set<Artifact>> releaseArtifacts) {
         ReleaseResult.ReleaseResultBuilder releaseBuilder = ReleaseResult.builder();
-        Optional<LayoutMetaBlock> optionalLayoutMetaBlock = layoutMetaBlockService.findBySupplyChainId(supplyChainId);
+        Optional<LayoutMetaBlock> optionalLayoutMetaBlock = layoutMetaBlockService.getLayout(supplyChainId);
         if (optionalLayoutMetaBlock.isPresent()) {
 
             Set<Artifact> allArtifacts = releaseArtifacts
@@ -92,6 +92,10 @@ public class ReleaseServiceImpl implements ReleaseService {
                     .collect(Collectors.toSet());
 
             VerificationRunResult verificationRunResult = verificationProvider.verifyRun(optionalLayoutMetaBlock.get(), allArtifacts);
+            if (!verificationRunResult.isRunIsValid()) {
+            	log.info("Artifacts release invalid [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
+            	return ReleaseResult.builder().releaseIsValid(false).build();
+            }
             releaseBuilder.releaseIsValid(verificationRunResult.isRunIsValid());
             
             Optional<Organization> orgOpt = supplyChainService.getOrganization(supplyChainId);
@@ -120,7 +124,7 @@ public class ReleaseServiceImpl implements ReleaseService {
                 		.name(releaseName)
                 		.supplyChainId(supplyChainId)
                 		.qualifiedSupplyChainName(qualifiedNameOpt.get())
-                		.organization(orgOpt.get())
+                		.domain(orgOpt.get().getDomain())
                 		.releaseDate(releaseDate)
                 		.releasedProductsHashes(convertToReleaseArtifactHashes(releaseArtifacts))
                 		.releasedProductsHashesHash(releaseArtifactHashesHash)
@@ -178,7 +182,14 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
 	@Override
-	public boolean artifactsAreReleased(Set<String> artifacts, List<String> domains) {
-		return releaseRepository.artifactsNotReleased(domains, artifacts).getReleasedProductsHashes().isEmpty();
+	public boolean artifactsAreTrusted(Set<String> artifacts, List<String> domains) {
+		if (artifacts == null || artifacts.isEmpty()) {
+			return false;
+		}
+		
+		if (domains == null || domains.isEmpty()) {
+			return releaseRepository.existsByHashes(artifacts);
+		}
+		return releaseRepository.existsByDomainNamesAndHashes(domains, artifacts);
 	}
 }

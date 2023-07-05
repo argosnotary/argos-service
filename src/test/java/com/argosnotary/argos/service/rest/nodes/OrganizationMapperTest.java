@@ -2,7 +2,6 @@ package com.argosnotary.argos.service.rest.nodes;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNull;
 
 import java.util.Optional;
 import java.util.Set;
@@ -16,7 +15,6 @@ import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.service.openapi.rest.model.RestOrganization;
-import com.argosnotary.argos.service.rest.nodes.OrganizationMapper;
 
 class OrganizationMapperTest {
 	
@@ -42,7 +40,7 @@ class OrganizationMapperTest {
 		RestOrganization restOrg = organizationMapper.convertToRestOrganization(org2);
 		Organization org = organizationMapper.convertFromRestOrganization(restOrg);
 		assertThat(org.getChildren(), is(Set.of()));
-		assertNull(org.getDomain());
+		assertThat(org.getDomain(), is(Domain.builder().build()));
 		assertThat(org.getParent(), is(Optional.empty()));
 	}
 

@@ -49,7 +49,7 @@ public class RoleAssignmentRestServiceImpl implements RoleAssignmentRestService 
 	}
 
 	@Override
-    @PermissionCheck(permissions = Permission.READ)
+    @PermissionCheck(permissions = Permission.ROLE_WRITE)
 	public ResponseEntity<List<RestRoleAssignment>> getRoleAssignments(UUID resourceId) {
 		return ResponseEntity.ok(roleAssignmentService.findByResourceId(resourceId).stream()
 				.map(roleAssignmentMapper::convertToRestRoleAssignment)

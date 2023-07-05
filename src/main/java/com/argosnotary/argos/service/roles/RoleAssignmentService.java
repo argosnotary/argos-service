@@ -21,11 +21,9 @@ public interface RoleAssignmentService {
 	
 	public List<RoleAssignment> findByResourceId(UUID resourceId);
 	
-	public List<RoleAssignment> findByIdentityId(UUID identityId);
+	public List<RoleAssignment> findByIdentity();
 	
-	public Set<Permission> findByNodeAndIdentityId(Node node, UUID accountId);
-	
-	//public List<RoleAssignment> findByPathToRootAndAccountId(UUID accountId);
+	public Set<Permission> findAllPermissionDownTree(Node node);
 	
 
 }

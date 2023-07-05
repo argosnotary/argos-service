@@ -29,12 +29,9 @@ import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.account.PersonalAccount.Profile;
 import com.argosnotary.argos.service.openapi.rest.model.RestPersonalAccount;
 import com.argosnotary.argos.service.openapi.rest.model.RestProfile;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PersonalAccountMapper {
-	
-	ObjectMapper mapper = new ObjectMapper();
 
     public RestPersonalAccount convertToRestPersonalAccount(PersonalAccount personalAccount);
     

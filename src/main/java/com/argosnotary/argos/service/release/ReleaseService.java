@@ -21,7 +21,6 @@ package com.argosnotary.argos.service.release;
 
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,5 +32,5 @@ public interface ReleaseService {
 
     //Optional<String> getRawReleaseFileById(String id);
 
-    boolean artifactsAreReleased(Set<String> releasedArtifacts, List<String> paths);
+    boolean artifactsAreTrusted(Set<String> releasedArtifacts, List<String> paths);
 }

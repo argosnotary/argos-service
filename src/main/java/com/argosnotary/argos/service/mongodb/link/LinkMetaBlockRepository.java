@@ -14,6 +14,6 @@ public interface LinkMetaBlockRepository extends MongoRepository<LinkMetaBlock, 
 	
 	public List<LinkMetaBlock> findBySupplyChainId(UUID supplyChainId);
 	
-	@Query("{$and: [{supplyChainId: ?0},{$or:[{'link.materials.hash': ?1}, {'link.products.hash': ?1}]}]}")
+	@Query("{$and: [{supplyChainId: ?0}, {$or: [{'link.materials.hash': ?1}, {'link.products.hash': ?1}]}]}")
 	public List<LinkMetaBlock> findBySupplyChainIdAndHash(UUID supplyChainId, String hash);
 }

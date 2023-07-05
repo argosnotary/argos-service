@@ -55,6 +55,10 @@ public class VerificationProvider {
         
         List<VerificationContext> possibleVerificationContexts = verificationContextsProvider
                 .createPossibleVerificationContexts(layoutMetaBlock, productsToVerify);
+        
+        for (VerificationContext context : possibleVerificationContexts) {
+        	
+        }
 
         List<VerificationRunResult> verificationRunResults = possibleVerificationContexts
                 .stream()

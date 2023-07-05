@@ -28,9 +28,7 @@ import com.argosnotary.argos.domain.layout.ApprovalConfiguration;
 
 public interface ApprovalConfigurationRepository extends MongoRepository<ApprovalConfiguration, UUID> {
 
-	List<ApprovalConfiguration> insert(List<ApprovalConfiguration> approvalConfigurations);
-
-    List<ApprovalConfiguration> findBySupplyChainId(UUID supplyChainId);
+	List<ApprovalConfiguration> findBySupplyChainId(UUID supplyChainId);
 
     void deleteBySupplyChainId(UUID supplyChainId);
 }

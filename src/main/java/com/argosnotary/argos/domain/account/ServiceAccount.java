@@ -23,12 +23,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.argosnotary.argos.domain.crypto.KeyPair;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.Role;
+import com.argosnotary.argos.domain.roles.RoleAssignment;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -39,6 +43,9 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @Document(collection="serviceaccounts")
+@CompoundIndexes({
+    @CompoundIndex(name = "projectId_name", def = "{'projectId' : 1, 'name': 1}", unique=true)
+})
 public class ServiceAccount extends Account {
 
 	public static final String SA_PROVIDER_NAME = "saprovider";
@@ -46,13 +53,13 @@ public class ServiceAccount extends Account {
     private UUID projectId;
     
     static {
-    	 Set<Permission> ps = new HashSet<>();
-    	 ps.addAll(new Role.Releaser().getPermissions());
-    	 ps.addAll(new Role.LinkAdder().getPermissions());
-    	 defaultPermissions = Collections.unmodifiableSet(ps);
+    	 Set<Role> rs = new HashSet<>();
+    	 rs.add(new Role.Releaser());
+    	 rs.add(new Role.LinkAdder());
+    	 roles = Collections.unmodifiableSet(rs);
     }
     
-    public static final Set<Permission> defaultPermissions;
+    public static final Set<Role> roles;
 
     @Builder
     public ServiceAccount(
@@ -70,5 +77,11 @@ public class ServiceAccount extends Account {
         		activeKeyPair,
                 inactiveKeyPairs);
         this.projectId = projectId;
+    }
+    
+    public Set<RoleAssignment> getRoleAssignments() {
+    	return roles.stream()
+    			.map(r -> RoleAssignment.builder().identityId(getId()).resourceId(projectId).role(r).build())
+    			.collect(Collectors.toSet());
     }
 }

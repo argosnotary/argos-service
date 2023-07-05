@@ -116,8 +116,7 @@ class ExpectedEndProductsVerificationTest {
 
     @BeforeEach
     void setUp() {
-        verification = new ExpectedEndProductsVerification(List.of(matchRuleVerification));
-        verification.init();
+        verification = new ExpectedEndProductsVerification();
         
     }
 

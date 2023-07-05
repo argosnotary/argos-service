@@ -91,11 +91,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public List<Account> findByKeyIds(Set<String> keyIds) {
-		List<Account> accounts = personalAccountRepository.findByKeyIds(keyIds)
-				.stream()
-				.map(p -> {p.setProfile(null);
-					return p;})
-				.collect(Collectors.toList());
+		List<Account> accounts = personalAccountRepository.findByKeyIds(keyIds);
 		accounts.addAll(serviceAccountRepository.findByKeyIds(keyIds));
 		return accounts;
 	}

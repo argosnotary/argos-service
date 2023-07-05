@@ -19,8 +19,6 @@
  */
 package com.argosnotary.argos.service.rest.verification;
 
-import java.util.List;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
@@ -29,5 +27,5 @@ import com.argosnotary.argos.service.openapi.rest.model.RestArtifact;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ArtifactMapper {
-    List<Artifact> mapToArtifacts(List<RestArtifact> restArtifacts);
+	Artifact convertToArtifact(RestArtifact restArtifact);
 }

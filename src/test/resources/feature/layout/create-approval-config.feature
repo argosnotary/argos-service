@@ -23,7 +23,7 @@ Feature: create a valid approval config
 
   Background:
     * url karate.properties['server.baseurl']
-    * def layoutPath = '/api/supplychain/'+ __arg.supplyChainId + '/layout'
+    * def layoutPath = '/api/supplychains/'+ __arg.supplyChainId + '/layout'
     
   Scenario: create ApprovalConfiguration should return a 201
     Given path layoutPath+'/approvalconfig'

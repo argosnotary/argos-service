@@ -163,17 +163,17 @@ class SupplyChainRestServiceTest {
 
     @Test
     void updateSupplyChain() {
-    	when(nodeService.exists(Project.class.getCanonicalName(), PARENT_ID)).thenReturn(true);
+    	when(nodeService.exists(Project.class, PARENT_ID)).thenReturn(true);
         when(supplyChainService.findById(supplyChain.getId())).thenReturn(Optional.of(supplyChain));
         when(supplyChainService.update(supplyChain)).thenReturn(supplyChain);
         ResponseEntity<RestSupplyChain> response = supplyChainRestService.updateSupplyChain(supplyChain.getId(), restSupplyChain);
-        assertThat(response.getStatusCodeValue(), is(201));
+        assertThat(response.getStatusCode().value(), is(201));
         assertEquals(response.getBody(), restSupplyChain);
     }
 
     @Test
     void updateSupplyChainNotExits() {
-    	when(nodeService.exists(Project.class.getCanonicalName(), PARENT_ID)).thenReturn(true);
+    	when(nodeService.exists(Project.class, PARENT_ID)).thenReturn(true);
         when(supplyChainService.findById(supplyChain.getId())).thenReturn(Optional.empty());
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> supplyChainRestService.updateSupplyChain(SUPPLY_CHAIN_ID, restSupplyChain));
         assertThat(exception.getStatusCode().value(), is(404));
@@ -182,7 +182,7 @@ class SupplyChainRestServiceTest {
 
     @Test
     void updateProjectNotExits() {
-        when(nodeService.exists(Project.class.getCanonicalName(), PARENT_ID)).thenReturn(false);
+        when(nodeService.exists(Project.class, PARENT_ID)).thenReturn(false);
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> supplyChainRestService.updateSupplyChain(SUPPLY_CHAIN_ID, restSupplyChain));
         assertThat(exception.getStatusCode().value(), is(400));
         assertThat(exception.getMessage(), is("400 BAD_REQUEST \"Parent project not found\""));

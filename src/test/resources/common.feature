@@ -21,7 +21,7 @@ function() {
 """
 function(args) {
      var KarateClient = Java.type('com.argosnotary.argos.service.itest.KarateClient');
-     return KarateClient.signLayout(args.passphrase, karate.toJava(args.keyPair), karate.toJava   (args.layoutMetaBlock));
+     return KarateClient.signLayout(args.passphrase, karate.toJava(args.keyPair), karate.toJava(args.layoutMetaBlock));
 }
 """
     * def signLink =

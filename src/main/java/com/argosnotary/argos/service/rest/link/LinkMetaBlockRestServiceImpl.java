@@ -23,6 +23,7 @@ package com.argosnotary.argos.service.rest.link;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class LinkRestServiceImpl implements LinkRestService {
+public class LinkMetaBlockRestServiceImpl implements LinkMetaBlockRestService {
 
     private final LinkMetaBlockService linkMetaBlockService;
 
@@ -62,7 +63,7 @@ public class LinkRestServiceImpl implements LinkRestService {
     @PermissionCheck(permissions = Permission.LINK_ADD)
     @AuditLog
     @Transactional
-    public ResponseEntity<Void> createLink(UUID supplyChainId, RestLinkMetaBlock restLinkMetaBlock) {
+    public ResponseEntity<RestLinkMetaBlock> createLink(UUID supplyChainId, RestLinkMetaBlock restLinkMetaBlock) {
         log.info("createLink supplyChainId : {}", supplyChainId);
         if (!supplyChainService.exists(supplyChainId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "supply chain not found : " + supplyChainId);
@@ -73,18 +74,18 @@ public class LinkRestServiceImpl implements LinkRestService {
         	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid signature");
         }
         linkMetaBlock.setSupplyChainId(supplyChainId);
-        linkMetaBlockService.save(linkMetaBlock);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        LinkMetaBlock link = linkMetaBlockService.create(linkMetaBlock);
+        return ResponseEntity.status(HttpStatus.CREATED).body(linkMetaBlockMapper.convertToRestLinkMetaBlock(link));
     }
 
     @Override
     @PermissionCheck(permissions = Permission.READ)
-    public ResponseEntity<List<RestLinkMetaBlock>> findLink(UUID supplyChainId, String optionalHash) {
+    public ResponseEntity<List<RestLinkMetaBlock>> findLink(UUID supplyChainId, String hash) {
         if (!supplyChainService.exists(supplyChainId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "supply chain not found : " + supplyChainId);
         }
 
-        return new ResponseEntity<>(linkMetaBlockService.find(supplyChainId, optionalHash)
+        return new ResponseEntity<>(linkMetaBlockService.find(supplyChainId, Optional.ofNullable(hash))
                 .stream().map(linkMetaBlockMapper::convertToRestLinkMetaBlock).collect(toList()), HttpStatus.OK);
     }
 

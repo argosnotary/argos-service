@@ -1,6 +1,5 @@
 package com.argosnotary.argos.service.nodes;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -9,8 +8,6 @@ import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.roles.Permission;
 
 public interface NodeService {
-	
-	public Set<Permission> getAllPermissionDownTree(UUID resourceId);
 	
 	public Node create(Node node);
 	
@@ -29,9 +26,13 @@ public interface NodeService {
 	 * @param resourceIds
 	 * @return
 	 */
-	public List<Node> find(String clazz, Set<UUID> resourceIds);
+	public Set<Node> find(String clazz, Optional<Node> node);
 	
-	public boolean exists(String clazz, UUID resourceId);
+	public boolean exists(Class clazz, UUID resourceId);
+	
+	public boolean exists(Class clazz, String name);
+	
+	public boolean existsByParentIdAndName(UUID parentId, String name);
 	
 	Optional<String> getQualifiedName(UUID resourceId);
 	

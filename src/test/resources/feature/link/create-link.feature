@@ -32,4 +32,4 @@ Feature: create a valid link
     Given path linkPath
     And request signedLink
     When method POST
-    Then status 204
+    Then status 201

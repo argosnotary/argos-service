@@ -33,6 +33,8 @@ public interface ServiceAccountService {
     
     public boolean exists(UUID accountId);
     
+    public boolean exists(UUID projectId, String name);
+    
     public ServiceAccount createServiceAccount(ServiceAccount serviceAccount);
     
     public ServiceAccount activateNewKey(ServiceAccount account, KeyPair newKeyPair, char[] passphrase);

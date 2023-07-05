@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 
-public interface LayoutRestService extends LayoutApi {
+public interface LayoutMetaBlockRestService extends LayoutApi {
 	@Override
 	public ResponseEntity<List<RestApprovalConfiguration>> createApprovalConfigurations(
 			@Parameter(name = "supplyChainId", description = "supply chain id", required = true, in = ParameterIn.PATH) @PathVariable("supplyChainId") UUID supplyChainId,

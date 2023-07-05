@@ -23,6 +23,7 @@ import static java.util.Comparator.comparing;
 
 import org.mapstruct.factory.Mappers;
 
+import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.service.itest.rest.api.model.RestArtifact;
 import com.argosnotary.argos.service.itest.rest.api.model.RestLayout;
 import com.argosnotary.argos.service.itest.rest.api.model.RestLink;
@@ -30,9 +31,14 @@ import com.argosnotary.argos.service.itest.rest.api.model.RestStep;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 public class JsonSigningSerializer implements SigningSerializer {
+	
+	private static final JsonMapper jsonMapper = JsonMapper.builder()
+			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+			.serializationInclusion(JsonInclude.Include.NON_NULL)
+			.build();
 
     @Override
     public String serialize(RestLink link) throws JsonProcessingException {
@@ -49,11 +55,12 @@ public class JsonSigningSerializer implements SigningSerializer {
         return serializeSignable(layoutClone);
 	}
 
-    private String serializeSignable(Object signable) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        return objectMapper.writeValueAsString(signable);
+    private String serializeSignable(Object signable) {
+        try {
+            return jsonMapper.writeValueAsString(signable);
+        } catch (JsonProcessingException e) {
+            throw new ArgosError(e.getMessage(), e);
+        }
     }
 
 }

@@ -30,6 +30,7 @@ public interface ProjectRestService extends ProjectApi {
 			@Parameter(name = "projectId", description = "this will be the project id", required = true, in = ParameterIn.PATH) @PathVariable("projectId") UUID projectId);
 
 	@Override
-	ResponseEntity<List<RestProject>> getProjects();
+	ResponseEntity<List<RestProject>> getProjects(
+			@Parameter(name = "parentId", description = "this will be the parent id", required = true, in = ParameterIn.PATH) @PathVariable("parentId") UUID parentId);
 
 }

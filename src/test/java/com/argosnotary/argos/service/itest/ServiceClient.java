@@ -45,7 +45,6 @@ import com.argosnotary.argos.service.itest.rest.api.client.ProjectApi;
 import com.argosnotary.argos.service.itest.rest.api.client.RoleAssignmentApi;
 import com.argosnotary.argos.service.itest.rest.api.client.ServiceAccountApi;
 import com.argosnotary.argos.service.itest.rest.api.client.SupplyChainApi;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;

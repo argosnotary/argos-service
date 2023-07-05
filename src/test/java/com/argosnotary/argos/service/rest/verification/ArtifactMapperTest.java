@@ -49,7 +49,7 @@ class ArtifactMapperTest {
         RestArtifact restArtifact = new RestArtifact();
         restArtifact.setHash(HASH);
         restArtifact.setUri(URI);
-        List<Artifact> artifacts = artifactMapper.mapToArtifacts(List.of(restArtifact));
+        List<Artifact> artifacts = List.of(artifactMapper.convertToArtifact(restArtifact));
         assertThat(artifacts, hasSize(1));
         assertThat(artifacts.iterator().next().getHash(), is(HASH));
         assertThat(artifacts.iterator().next().getUri(), is(URI));

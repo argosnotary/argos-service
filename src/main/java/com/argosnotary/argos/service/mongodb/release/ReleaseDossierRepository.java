@@ -22,7 +22,6 @@ package com.argosnotary.argos.service.mongodb.release;
 import java.io.InputStream;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -34,7 +33,6 @@ import com.argosnotary.argos.domain.release.ReleaseDossier;
 import com.argosnotary.argos.domain.release.ReleaseDossierMetaData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import com.mongodb.client.model.Filters;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -59,7 +57,7 @@ public class ReleaseDossierRepository {
     
     private final GridFsTemplate gridFsTemplate;
 
-    private final ObjectMapper releaseFileJsonMapper = new ObjectMapper();
+    private final ObjectMapper releaseFileJsonMapper;
 
     @SneakyThrows
     public Release storeRelease(Release release, ReleaseDossier releaseDossier) {

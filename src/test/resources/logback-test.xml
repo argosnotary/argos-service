@@ -29,7 +29,7 @@
 
     <logger name="com.intuit.karate" level="DEBUG"/>
 
-    <logger name="feign.Logger" level="INFO"/>
+    <logger name="argos.AuditLog" level="INFO"/>
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>

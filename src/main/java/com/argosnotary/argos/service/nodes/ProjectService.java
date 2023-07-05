@@ -1,10 +1,10 @@
 package com.argosnotary.argos.service.nodes;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.nodes.Project;
 
 public interface ProjectService {
@@ -14,7 +14,7 @@ public interface ProjectService {
 	 * @param resourceIds
 	 * @return
 	 */
-	List<Project> find(Set<UUID> resourceIds);
+	Set<Project> find(Node node);
 	
 	Project create(Project project);
 	

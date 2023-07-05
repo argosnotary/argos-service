@@ -1,13 +1,17 @@
 {
-  "releaseIsValid": true,
-  "releaseDossierMetaData": {
-    "documentId": "#string",
-    "releaseDate": "#string",
-    "supplyChainPath": "#string",
-    "releaseArtifacts": [
-      [
-        "#string"
-      ]
-    ]
-  }
+    "releaseIsValid": true,
+    "release": {
+        "id": "#uuid",
+        "name": "#string",
+        "releaseDate": "#string",
+        "qualifiedSupplyChainName": "#string",
+        "domain": {
+            "domain": "#string"
+        },
+        "dossierId": "#string",
+        "supplyChainId": "#uuid",
+        "releasedProductsHashes": [
+            "#string"
+        ]
+    }
 }

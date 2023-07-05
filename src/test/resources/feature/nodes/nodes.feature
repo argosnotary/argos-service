@@ -54,12 +54,12 @@ Feature: Hierarchy
     
 
   Scenario: get root nodes with HierarchyMode all should return full trees
+    * def expectedResponse =  read('classpath:testmessages/hierarchy/expected-hierarchy-rootnodes-all.json')
     * configure headers = call read('classpath:headers.js') { token: #(personalAccount1.token)}
     Given path '/api/hierarchy'
     And param HierarchyMode = 'ALL'
     When method GET
     Then status 200
-    * def expectedResponse =  read('classpath:testmessages/hierarchy/expected-hierarchy-rootnodes-all.json')
     And match response == expectedResponse
 
   Scenario: get root nodes with default user and no hierarchy permissions should return empty array

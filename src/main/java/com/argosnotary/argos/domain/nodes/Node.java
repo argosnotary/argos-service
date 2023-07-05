@@ -26,23 +26,24 @@ import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.NotNull;
 
 
 @Document(collection="nodes")
+@CompoundIndexes({
+    @CompoundIndex(name = "parentId_name", def = "{'parentId' : 1, 'name': 1}", unique=true)
+})
 public interface Node {
 
-    default public void visit(NodeVisitor<?> treeNodeVisitor) {
-        if (isLeaf()) {
-            treeNodeVisitor.visitEndPoint(this);
-        } else {
-        	treeNodeVisitor.visitEnter(this);
-        	getChildren().forEach(child -> child.visit(treeNodeVisitor));
-            treeNodeVisitor.visitExit(this);
-        }
-    }
+	default public void visit(NodeVisitor<?> treeNodeVisitor) {
+		treeNodeVisitor.visitEnter(this);
+		getChildren().forEach(child -> child.visit(treeNodeVisitor));
+		treeNodeVisitor.visitExit(this);
+	}
     
     default public void visitDown(NodeVisitor<?> treeNodeVisitor) {
         if (isRoot()) {

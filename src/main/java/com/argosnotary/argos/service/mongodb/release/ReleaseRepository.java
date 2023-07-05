@@ -24,20 +24,24 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import com.argosnotary.argos.domain.release.Release;
 
 public interface ReleaseRepository extends MongoRepository<Release, UUID> {
 
-    @Aggregation(pipeline = {
-    		"{$match: {'domainName' {$in: ?0}}}",
-    		"{$group: {_id: null,items: {$push: '$releasedProductsHashes'}}}",
-    		"{$project: {'results': {$reduce: {input: '$items',initialValue: [],in: { $concatArrays: [ '$$value', '$$this' ] }}},notReleased: {$setDifference: [ ['hash111', 'hash114'], '$results']}, _id: 0}}",
-    		"{$project: {releasedProductsHashes: {$setDifference: [ ?1, '$results']}}}"
-    })
-    Release artifactsNotReleased(List<String> domainNames, Set<String> releasedArtifacts);
+//    @Aggregation(pipeline = {
+//    		"{$match: {'organization.domain.domain': {$in: ?0}}}",
+//    		"{$group: {_id: null,items: {$push: '$releasedProductsHashes'}}}",
+//    		"{$project: {'results': {$reduce: {input: '$items',initialValue: [],in: { $concatArrays: [ '$$value', '$$this' ] }}}, _id: 0}}",
+//    		"{$project: {releasedProductsHashes: {$setDifference: [ ?1, '$results']}}}"
+//    })
+	@Query(value="{'domain.domain': {$in: ?0}, 'releasedProductsHashes': {$in: ?1}}", exists=true)
+    boolean existsByDomainNamesAndHashes(List<String> domainNames, Set<String> releasedArtifacts);
+	
+	@Query(value="{'releasedProductsHashes': {$in: ?0}}", exists=true)
+	boolean existsByHashes(Set<String> releasedArtifacts);
     
     Optional<Release> findByReleasedProductsHashesHashAndSupplyChainId(String releasedProductsHashesHash, UUID supplyChainId);
 }

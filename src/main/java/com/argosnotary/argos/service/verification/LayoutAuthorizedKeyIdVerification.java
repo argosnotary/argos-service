@@ -51,7 +51,7 @@ public class LayoutAuthorizedKeyIdVerification implements Verification {
                                 signature.getKeyId()
                         )
                 );
-        return VerificationRunResult.builder().runIsValid(failedLayoutAuthorizedKeyIdVerification.isEmpty()).build();
+        return VerificationRunResult.builder().verification(this.getPriority()).runIsValid(failedLayoutAuthorizedKeyIdVerification.isEmpty()).build();
     }
 
     private static boolean layoutWasNotSignedByAuthorizedFunctionary(VerificationContext context, Signature signature) {

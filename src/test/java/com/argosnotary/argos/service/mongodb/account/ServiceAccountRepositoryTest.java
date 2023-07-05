@@ -1,9 +1,11 @@
 package com.argosnotary.argos.service.mongodb.account;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
@@ -25,7 +28,7 @@ import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
 
 
 @Testcontainers
-@DataMongoTest
+@DataMongoTest(properties={"spring.data.mongodb.auto-index-creation=true","spring.data.mongodb.database=argos"})
 class ServiceAccountRepositoryTest {
 	
 	@Container //
@@ -95,6 +98,23 @@ class ServiceAccountRepositoryTest {
 	void testDeleteByProjectId() {
 		serviceAccountRepository.deleteByProjectId(projectId);
 		assertThat(serviceAccountRepository.findByProjectId(projectId).size(), is(0));
+		
+	}
+	
+	@Test
+	void testExists() {
+		assertTrue(serviceAccountRepository.existsByProjectIdAndName(sa2.getProjectId(), sa2.getName()));
+	}
+	
+	@Test
+	void testUniqueNamePerProject() {
+		ServiceAccount sa2 = ServiceAccount.builder().name("sa2").activeKeyPair(kp2).projectId(projectId).providerSubject("subject2").build();
+		Throwable exception = assertThrows(DuplicateKeyException.class, () -> {
+			serviceAccountRepository.insert(sa2);
+          });
+        
+        assertThat(exception.getMessage(), containsString("duplicate key error"));
+		
 		
 	}
 

@@ -1,0 +1,17 @@
+db.nodes.aggregate([
+    {$match: {_id: {$in: ?0 }}},
+    {$group: {_id: null, pathIds: {$push: '$pathToRoot'}}},
+    {$project: {'result': {$reduce:{input: '$pathIds',initialValue: [],in:{ $concatArrays: [ '$$value', '$$this' ] }}}, _id: 0}},
+    {$lookup:{from: 'nodes', localField: 'result', foreignField: '_id', as: 'children'}},
+    {$unset: 'result'}]
+])
+
+{$match: { 'pathToRoot' : {$in: [
+        Binary(Buffer.from("4d44a00cfdf76faea371c0ecea4e8eb1", "hex"), 3),
+        Binary(Buffer.from("fd453fd3bf90017242ff5fb324ac1187", "hex"), 3)
+        ]}}},
+        {$group: {_id: null, children: {$push: '$_id'}}},
+        {$project: {children: 1, _id: 0}}
+        ])
+    { $unionWith: { coll: "warehouses", pipeline: [
+    

@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.argosnotary.argos.domain.nodes.Organization;
+import com.argosnotary.argos.domain.nodes.Domain;
 
 import lombok.Builder;
 import lombok.Data;
@@ -34,7 +34,7 @@ public class Release {
 	private String name;
     private OffsetDateTime releaseDate;
     private String qualifiedSupplyChainName;
-    private Organization organization;
+    private Domain domain;
     @Indexed
     private UUID supplyChainId;
     @Indexed

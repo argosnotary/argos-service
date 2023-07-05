@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.nodes.Organization;
+import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.roles.RoleAssignmentService;
@@ -28,8 +30,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final AccountSecurityContext accountSecurityContext;
 
 	@Override
-	public List<Organization> find(Set<UUID> resourceIds) {
-		return nodeService.find(Organization.class.getCanonicalName(), resourceIds)
+	public List<Organization> find() {
+		return nodeService.find(Organization.class.getCanonicalName(), Optional.empty())
 				.stream().map(n -> (Organization) n).collect(Collectors.toList());
 	}
 
@@ -56,6 +58,17 @@ public class OrganizationServiceImpl implements OrganizationService {
 	@Override
 	public void delete(UUID organizationId) {
 		nodeService.delete(organizationId);
+	}
+
+	@Override
+	public boolean existsById(UUID organizationId) {
+		return nodeService.exists(Organization.class, organizationId);
+	}
+
+	@Override
+	public boolean existsByName(String name) {
+		// TODO Auto-generated method stub
+		return nodeService.exists(Organization.class, name);
 	}
 
 }

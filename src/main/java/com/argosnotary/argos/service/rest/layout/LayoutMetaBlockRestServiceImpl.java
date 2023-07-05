@@ -21,13 +21,10 @@ package com.argosnotary.argos.service.rest.layout;
 
 import static com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage.TypeEnum.MODEL_CONSISTENCY;
 import static com.argosnotary.argos.service.rest.layout.ValidationHelper.throwLayoutValidationException;
-import static java.util.Collections.emptyList;
 import static org.springframework.http.ResponseEntity.ok;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -39,20 +36,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.argosnotary.argos.domain.ArgosError;
-import com.argosnotary.argos.domain.account.Account;
-import com.argosnotary.argos.domain.crypto.KeyPair;
 import com.argosnotary.argos.domain.layout.ApprovalConfiguration;
 import com.argosnotary.argos.domain.layout.Layout;
 import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 import com.argosnotary.argos.domain.layout.ReleaseConfiguration;
-import com.argosnotary.argos.domain.layout.Step;
 import com.argosnotary.argos.domain.roles.Permission;
-import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.auditlog.AuditLog;
-import com.argosnotary.argos.service.layout.ApprovalConfigurationService;
 import com.argosnotary.argos.service.layout.LayoutMetaBlockService;
-import com.argosnotary.argos.service.layout.ReleaseConfigurationService;
 import com.argosnotary.argos.service.openapi.rest.model.RestApprovalConfiguration;
 import com.argosnotary.argos.service.openapi.rest.model.RestArtifactCollectorSpecification;
 import com.argosnotary.argos.service.openapi.rest.model.RestLayout;
@@ -67,15 +57,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class LayoutRestServiceImpl implements LayoutRestService {
+public class LayoutMetaBlockRestServiceImpl implements LayoutMetaBlockRestService {
 
     private final LayoutMetaBlockMapper layoutMetaBlockConverter;
     private final LayoutMetaBlockService layoutMetaBlockService;
     private final LayoutValidatorService validator;
-    private final ApprovalConfigurationService approvalConfigurationService;
-    private final ReleaseConfigurationService releaseConfigurationService;
-    private final ConfigurationMapper configurationMapper;
-    private final AccountSecurityContext accountSecurityContext;
+    private final ApprovalConfigurationMapper approvalConfigurationMapper;
+    private final ReleaseConfigurationMapper releaseConfigurationMapper;
 
 
     @Override
@@ -89,7 +77,6 @@ public class LayoutRestServiceImpl implements LayoutRestService {
     @Override
     @PermissionCheck(permissions = Permission.WRITE)
     @AuditLog
-    @Transactional
     public ResponseEntity<RestLayoutMetaBlock> createOrUpdateLayout(UUID supplyChainId, RestLayoutMetaBlock restLayoutMetaBlock) {
         log.info("createLayout for supplyChainId {}", supplyChainId);
         LayoutMetaBlock layoutMetaBlock = layoutMetaBlockConverter.convertFromRestLayoutMetaBlock(restLayoutMetaBlock);
@@ -103,22 +90,21 @@ public class LayoutRestServiceImpl implements LayoutRestService {
     @Override
     @PermissionCheck(permissions = Permission.READ)
     public ResponseEntity<RestLayoutMetaBlock> getLayout(UUID supplyChainId) {
-        return layoutMetaBlockService.findBySupplyChainId(supplyChainId)
+        return layoutMetaBlockService.getLayout(supplyChainId)
                 .map(layoutMetaBlockConverter::convertToRestLayoutMetaBlock)
                 .map(ResponseEntity::ok).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "layout not found"));
     }
 
     @Override
-    @Transactional
     @PermissionCheck(permissions = Permission.WRITE)
     public ResponseEntity<List<RestApprovalConfiguration>> createApprovalConfigurations(UUID supplyChainId, 
             List<RestApprovalConfiguration> restApprovalConfigurations) {
         List<ApprovalConfiguration> approvalConfigurations = restApprovalConfigurations.stream()
                 .map(restApprovalConfiguration -> convertAndValidate(supplyChainId, restApprovalConfiguration))
                 .collect(Collectors.toList());
-        approvalConfigurationService.save(supplyChainId, approvalConfigurations);
+        approvalConfigurations = layoutMetaBlockService.createApprovalConfigurations(approvalConfigurations);
         return ResponseEntity.ok(approvalConfigurations.stream()
-                .map(configurationMapper::convertToRestApprovalConfiguration)
+                .map(approvalConfigurationMapper::convertToRestApprovalConfiguration)
                 .collect(Collectors.toList()));
 
     }
@@ -126,30 +112,16 @@ public class LayoutRestServiceImpl implements LayoutRestService {
     @Override
     @PermissionCheck(permissions = Permission.READ)
     public ResponseEntity<List<RestApprovalConfiguration>> getApprovalConfigurations(UUID supplyChainId) {
-        return ResponseEntity.ok(approvalConfigurationService
-                .findBySupplyChainId(supplyChainId)
+        return ResponseEntity.ok(layoutMetaBlockService.getApprovalConfigurations(supplyChainId)
                 .stream()
-                .map(configurationMapper::convertToRestApprovalConfiguration)
+                .map(approvalConfigurationMapper::convertToRestApprovalConfiguration)
                 .collect(Collectors.toList()));
     }
 
     @Override
     @PermissionCheck(permissions = Permission.LINK_ADD)
     public ResponseEntity<List<RestApprovalConfiguration>> getApprovalsForAccount(UUID supplyChainId) {
-
-        Account account = accountSecurityContext.getAuthenticatedAccount().orElseThrow(() -> new ArgosError("not logged in"));
-
-        Optional<KeyPair> optionalKeyPair = Optional.ofNullable(account.getActiveKeyPair());
-        Optional<LayoutMetaBlock> optionalLayoutMetaBlock = layoutMetaBlockService.findBySupplyChainId(supplyChainId);
-
-        if (optionalKeyPair.isPresent() && optionalLayoutMetaBlock.isPresent()) {
-            String activeAccountKeyId = optionalKeyPair.get().getKeyId();
-            Layout layout = optionalLayoutMetaBlock.get().getLayout();
-            return ok(approvalConfigurationService.findBySupplyChainId(supplyChainId).stream().filter(approvalConf -> canApprove(approvalConf, activeAccountKeyId, layout)
-            ).map(configurationMapper::convertToRestApprovalConfiguration).collect(Collectors.toList()));
-        } else {
-            return ok(emptyList());
-        }
+        return ok(layoutMetaBlockService.getApprovalsForAccount(supplyChainId).stream().map(approvalConfigurationMapper::convertToRestApprovalConfiguration).collect(Collectors.toList()));
     }
 
     @Override
@@ -158,25 +130,18 @@ public class LayoutRestServiceImpl implements LayoutRestService {
     public ResponseEntity<RestReleaseConfiguration> createReleaseConfiguration(UUID supplyChainId, 
             RestReleaseConfiguration restReleaseConfiguration) {
         validateContextFieldsForCollectorSpecification(restReleaseConfiguration);
-        ReleaseConfiguration releaseConfiguration = configurationMapper.convertFromRestReleaseConfiguration(restReleaseConfiguration);
+        ReleaseConfiguration releaseConfiguration = releaseConfigurationMapper.convertFromRestReleaseConfiguration(restReleaseConfiguration);
         releaseConfiguration.setSupplyChainId(supplyChainId);
-        releaseConfigurationService.save(releaseConfiguration);
+        layoutMetaBlockService.createReleaseConfiguration(releaseConfiguration);
         return ResponseEntity.ok(restReleaseConfiguration);
     }
 
     @Override
     @PermissionCheck(permissions = Permission.READ)
     public ResponseEntity<RestReleaseConfiguration> getReleaseConfiguration(UUID supplyChainId) {
-        return ResponseEntity.ok(releaseConfigurationService.findBySupplyChainId(supplyChainId)
-                .map(configurationMapper::convertToRestReleaseConfiguration)
+        return ResponseEntity.ok(layoutMetaBlockService.getReleaseConfiguration(supplyChainId)
+                .map(releaseConfigurationMapper::convertToRestReleaseConfiguration)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "release configuration not found")));
-    }
-    
-    private boolean canApprove(ApprovalConfiguration approvalConf, String activeAccountKeyId, Layout layout) {
-        Optional<Boolean> canApprove = layout.getSteps().stream()
-                .filter(step -> step.getName().equals(approvalConf.getStepName()))
-                .map(step -> step.getAuthorizedKeyIds().contains(activeAccountKeyId)).findFirst();
-        return canApprove.isPresent() && canApprove.get();
     }
 
     private void validateContextFieldsForCollectorSpecification(RestApprovalConfiguration approvalConfiguration) {
@@ -195,31 +160,22 @@ public class LayoutRestServiceImpl implements LayoutRestService {
 
     private ApprovalConfiguration convertAndValidate(UUID supplyChainId, RestApprovalConfiguration restApprovalConfiguration) {
         validateContextFieldsForCollectorSpecification(restApprovalConfiguration);
-        ApprovalConfiguration approvalConfiguration = configurationMapper.convertFromRestApprovalConfiguration(restApprovalConfiguration);
+        ApprovalConfiguration approvalConfiguration = approvalConfigurationMapper.convertFromRestApprovalConfiguration(restApprovalConfiguration);
         approvalConfiguration.setSupplyChainId(supplyChainId);
         verifyStepNameExistInLayout(approvalConfiguration);
         return approvalConfiguration;
     }
 
     private void verifyStepNameExistInLayout(ApprovalConfiguration approvalConfiguration) {
-        Set<String> stepNames = getSteps(approvalConfiguration);
-        if (!stepNames.contains(approvalConfiguration.getStepName())) {
+    	LayoutMetaBlock layoutMetaBlock = layoutMetaBlockService.getLayout(approvalConfiguration.getSupplyChainId())
+    			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "layout not found"));
+    	
+        if (!layoutMetaBlockService.stepNameExistInLayout(layoutMetaBlock.getLayout(), approvalConfiguration.getStepName())) {
             throwLayoutValidationException(
                     MODEL_CONSISTENCY,
                     "stepName",
                     "step with name: " + approvalConfiguration.getStepName() + " does not exist in layout"
             );
         }
-    }
-
-    private Set<String> getSteps(ApprovalConfiguration approvalConfiguration) {
-        return layoutMetaBlockService.findBySupplyChainId(approvalConfiguration.getSupplyChainId())
-                .map(layoutMetaBlock -> layoutMetaBlock
-                    .getLayout().getSteps()
-                    .stream()
-                    .map(Step::getName)
-                    .collect(Collectors.toSet())
-                )
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "layout not found"));
     }
 }

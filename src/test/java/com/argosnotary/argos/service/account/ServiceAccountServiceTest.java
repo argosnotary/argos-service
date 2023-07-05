@@ -44,7 +44,7 @@ class ServiceAccountServiceTest {
 	@Test
 	void testCreateServiceAccount() {
 		serviceAccountService.createServiceAccount(sa1);
-		verify(serviceAccountRepository).save(sa1);
+		verify(serviceAccountRepository).insert(sa1);
 		verify(serviceAccountProviderService).registerServiceAccount(sa1);
 	}
 

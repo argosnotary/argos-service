@@ -21,7 +21,7 @@ public interface OrganizationRestService extends OrganizationApi {
 			@Parameter(name = "RestOrganization", description = "") @Valid @RequestBody(required = false) RestOrganization restOrganization);
 
 	@Override
-	public ResponseEntity<Void> deleteorganizationById(
+	public ResponseEntity<Void> deleteOrganizationById(
 			@Parameter(name = "organizationId", description = "organization id", required = true, in = ParameterIn.PATH) @PathVariable("organizationId") UUID organizationId);
 
 	@Override

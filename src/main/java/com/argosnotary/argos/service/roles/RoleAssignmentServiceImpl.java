@@ -1,16 +1,20 @@
 package com.argosnotary.argos.service.roles;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.argosnotary.argos.domain.account.Account;
+import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.domain.roles.RoleAssignment;
+import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.mongodb.roles.RoleAssignmentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +24,9 @@ import lombok.RequiredArgsConstructor;
 public class RoleAssignmentServiceImpl implements RoleAssignmentService {
 	
 	private final RoleAssignmentRepository roleAssignmentRepository;
+	
+	private final AccountSecurityContext accountSecurityContext;
+	
 
 	@Override
 	public RoleAssignment save(RoleAssignment roleAssignment) {
@@ -61,18 +68,38 @@ public class RoleAssignmentServiceImpl implements RoleAssignmentService {
 	}
 
 	@Override
-	public Set<Permission> findByNodeAndIdentityId(Node node, UUID identityId) {
-		List<UUID> resourceIds = node.getPathToRoot();
-		return roleAssignmentRepository.findByResourceIdsAndIdentityId(resourceIds, identityId)
+	public List<RoleAssignment> findByIdentity() {
+		Optional<Account> optAccount  = accountSecurityContext.getAuthenticatedAccount();
+		if (optAccount.isEmpty()) {
+			return List.of();
+		}
+		// authenticated
+		return roleAssignmentRepository.findByIdentityId(optAccount.get().getId());
+	}
+
+	@Override
+	public Set<Permission> findAllPermissionDownTree(Node node) {
+
+		Optional<Account> optAccount  = accountSecurityContext.getAuthenticatedAccount();
+		if (optAccount.isEmpty()) {
+			return Set.of();
+		}
+		List<UUID> pathResourceIds = node.getPathToRoot();
+
+		if (optAccount.get() instanceof ServiceAccount) {
+			return ((ServiceAccount)optAccount.get()).getRoleAssignments().stream()
+					.filter(ra -> pathResourceIds.contains(ra.getResourceId()))
+					.map(rs -> rs.getRole().getPermissions())
+					.flatMap(Set::stream)
+					.collect(Collectors.toSet());
+		}
+		
+		// account is personal account
+		return roleAssignmentRepository.findByResourceIdsAndIdentityId(pathResourceIds, optAccount.get().getId())
 			.stream()
 			.map(ras -> ras.getRole().getPermissions())
 			.flatMap(Set::stream)
 			.collect(Collectors.toSet());
-	}
-
-	@Override
-	public List<RoleAssignment> findByIdentityId(UUID accountId) {
-		return roleAssignmentRepository.findByIdentityId(accountId);
 	}
 
 }
