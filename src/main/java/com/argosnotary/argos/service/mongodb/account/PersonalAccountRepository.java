@@ -16,10 +16,10 @@ public interface PersonalAccountRepository extends MongoRepository<PersonalAccou
 	@Query(value="{'activeKeyPair.keyId': ?0}", exists=true)
 	public Boolean existsByActiveKey(String keyId);
 	
-	@Query(value="{'activeKeyPair.keyId': ?0}", fields="{'profile': 0}")
+	@Query(value="{'activeKeyPair.keyId': ?0}", fields="{'profile': 0, 'activeKeyPair.encryptedPrivateKey': 0, 'inActiveKeyPair.encryptedPrivateKey': 0}")
 	public Optional<PersonalAccount> findFirstByActiveKeyId(String keyId);
 	
-	@Query(value="{$or: [{'activeKeyPair.keyId': {$in: ?0}}, {'inActiveKeyPair.keyId': {$in: ?0}}]}", fields="{'profile': 0}")
+	@Query(value="{$or: [{'activeKeyPair.keyId': {$in: ?0}}, {'inActiveKeyPair.keyId': {$in: ?0}}]}", fields="{'profile': 0, 'activeKeyPair.encryptedPrivateKey': 0, 'inActiveKeyPair.encryptedPrivateKey': 0}")
 	public List<Account> findByKeyIds(Set<String> keyIds);
 	
 	public Optional<PersonalAccount> findFirstByProviderNameAndProviderSubject(String providerName, String providerSubject);

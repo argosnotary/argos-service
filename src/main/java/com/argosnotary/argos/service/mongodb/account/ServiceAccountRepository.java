@@ -20,12 +20,12 @@ public interface ServiceAccountRepository extends MongoRepository<ServiceAccount
 
 	public Optional<ServiceAccount> findFirstByProviderSubject(String providerSubject);
 	
-	@Query(value="{'activeKeyPair.keyId': ?0}")
+	@Query(value="{'activeKeyPair.keyId': ?0}", fields="{'activeKeyPair.encryptedPrivateKey': 0, 'inActiveKeyPair.encryptedPrivateKey': 0}")
 	public Optional<ServiceAccount> findFirstByActiveKeyId(String keyId);
 
 	public List<ServiceAccount> findByProjectId(UUID projectId);
 	
-	@Query(value="{$or: [{'activeKeyPair.keyId': {$in: ?0}}, {'inActiveKeyPair.keyId': {$in: ?0}}]}")
+	@Query(value="{$or: [{'activeKeyPair.keyId': {$in: ?0}}, {'inActiveKeyPair.keyId': {$in: ?0}}]}", fields="{'activeKeyPair.encryptedPrivateKey': 0, 'inActiveKeyPair.encryptedPrivateKey': 0}")
 	public List<Account> findByKeyIds(Set<String> keyIds);
     
     public void deleteByProjectId(UUID projectId);
