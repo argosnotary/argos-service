@@ -41,16 +41,19 @@ class PersonalAccountRepositoryTest {
 
 	@Autowired PersonalAccountRepository personalAccountRepository;
 	
-	private PersonalAccount pa1, pa1WithoutProfile;
-	private KeyPair kp1, kp2;
+	private PersonalAccount pa1, pa1WithoutProfileAndKey;
+	private KeyPair kp1, kp2, kp1NoKey, kp2NoKey;
 
 	@BeforeEach
 	void setUp() throws Exception {
 		kp1 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		kp2 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		
+		kp1NoKey = new KeyPair(kp1.getKeyId(),kp1.getPublicKey(), null);
+		kp2NoKey = new KeyPair(kp2.getKeyId(),kp2.getPublicKey(), null);
+		
 		pa1 = PersonalAccount.builder().id(UUID.randomUUID()).name("pa1").profile(Profile.builder().build()).activeKeyPair(kp1).providerName("provider1").providerSubject("subject1").build();
-		pa1WithoutProfile = PersonalAccount.builder().id(pa1.getId()).name("pa1").activeKeyPair(kp1).providerName("provider1").providerSubject("subject1").build();
+		pa1WithoutProfileAndKey = PersonalAccount.builder().id(pa1.getId()).name("pa1").activeKeyPair(kp1NoKey).providerName("provider1").providerSubject("subject1").build();
 		
 		personalAccountRepository.deleteAll();
 		personalAccountRepository.save(pa1);
@@ -69,9 +72,7 @@ class PersonalAccountRepositoryTest {
 	
 	@Test
 	void testFindFirstByActiveKeyId() {
-		assertThat(personalAccountRepository.findFirstByActiveKeyId(kp1.getKeyId()).get(), is(pa1WithoutProfile));
-		
-		Optional<PersonalAccount> optPa = personalAccountRepository.findFirstByActiveKeyId(kp1.getKeyId());
+		assertThat(personalAccountRepository.findFirstByActiveKeyId(kp1.getKeyId()).get(), is(pa1WithoutProfileAndKey));
 
 		assertTrue(personalAccountRepository.findFirstByActiveKeyId(kp2.getKeyId()).isEmpty());
 		
@@ -79,7 +80,7 @@ class PersonalAccountRepositoryTest {
 	
 	@Test
 	void testFindByKeyId() {
-		assertThat(personalAccountRepository.findByKeyIds(Set.of(kp1.getKeyId())), is(List.of(pa1WithoutProfile)));
+		assertThat(personalAccountRepository.findByKeyIds(Set.of(kp1.getKeyId())), is(List.of(pa1WithoutProfileAndKey)));
 		
 	}
 	

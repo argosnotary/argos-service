@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
+import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
 
 
@@ -41,8 +42,8 @@ class ServiceAccountRepositoryTest {
 
 	@Autowired ServiceAccountRepository serviceAccountRepository;
 	
-	private ServiceAccount sa1, sa2;
-	private KeyPair kp1, kp2, kp3;
+	private ServiceAccount sa1, sa2, sa1NoKey, sa2NoKey;
+	private KeyPair kp1, kp2, kp3, kp1NoKey, kp2NoKey;
 	private UUID projectId;
 
 	@BeforeEach
@@ -53,6 +54,12 @@ class ServiceAccountRepositoryTest {
 		projectId = UUID.randomUUID(); 
 		sa1 = ServiceAccount.builder().name("sa1").activeKeyPair(kp1).projectId(projectId).providerSubject("subject1").build();
 		sa2 = ServiceAccount.builder().name("sa2").activeKeyPair(kp2).projectId(projectId).providerSubject("subject2").build();
+		
+		kp1NoKey = new KeyPair(kp1.getKeyId(),kp1.getPublicKey(), null);
+		kp2NoKey = new KeyPair(kp2.getKeyId(),kp2.getPublicKey(), null);
+		sa1NoKey = ServiceAccount.builder().id(sa1.getId()).name("sa1").activeKeyPair(kp1NoKey).projectId(projectId).providerSubject("subject1").build();
+		sa2NoKey = ServiceAccount.builder().id(sa2.getId()).name("sa2").activeKeyPair(kp2NoKey).projectId(projectId).providerSubject("subject2").build();
+		
 		
 		serviceAccountRepository.deleteAll();
 		
@@ -73,8 +80,8 @@ class ServiceAccountRepositoryTest {
 	
 	@Test
 	void testFindByActiveKeyId() {
-		assertThat(serviceAccountRepository.findFirstByActiveKeyId(kp1.getKeyId()).get(), is(sa1));
-		assertThat(serviceAccountRepository.findFirstByActiveKeyId(kp2.getKeyId()).get(), is(sa2));
+		assertThat(serviceAccountRepository.findFirstByActiveKeyId(kp1.getKeyId()).get(), is(sa1NoKey));
+		assertThat(serviceAccountRepository.findFirstByActiveKeyId(kp2.getKeyId()).get(), is(sa2NoKey));
 
 		assertTrue(serviceAccountRepository.findFirstByActiveKeyId(kp3.getKeyId()).isEmpty());
 		
