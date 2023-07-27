@@ -1,6 +1,7 @@
 [
   {
   "stepName": "build",
+  "supplyChainId":"#(__arg.supplyChainId)",
     "artifactCollectorSpecifications": [
     {
       "name": "xldeploy",

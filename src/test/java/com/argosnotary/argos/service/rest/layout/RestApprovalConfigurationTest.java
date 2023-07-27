@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.contains;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,9 +43,9 @@ class RestApprovalConfigurationTest {
     }
 
     @Test
-    void incorrectStepName() throws URISyntaxException {
+    void incorrectStepNameAndSupplyChainId() throws URISyntaxException {
         assertThat(validate(new RestApprovalConfiguration()
-                .stepName("name%")
+        		.stepName("name%")
                 .artifactCollectorSpecifications(singletonList(new RestArtifactCollectorSpecification()
                                 .name("xldeploy").type(RestArtifactCollectorSpecification.TypeEnum.XLDEPLOY)
                                 .uri(new URI("http://xldeploy.nl"))))

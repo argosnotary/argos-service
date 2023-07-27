@@ -1,6 +1,7 @@
 [
   {
     "stepName": "stepname2",
+    "supplyChainId": "#(supplyChainId)",
     "artifactCollectorSpecifications": [
       {
         "name": "xldeploy1",
@@ -22,6 +23,7 @@
   },
   {
     "stepName": "build",
+    "supplyChainId": "#(supplyChainId)",
     "artifactCollectorSpecifications": [
       {
         "name": "git1",

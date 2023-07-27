@@ -228,7 +228,7 @@ Feature: Layout
     When method GET
     Then status 404
     Given path layoutPath+'/releaseconfig'
-    * def releaseConfig = { artifactCollectorSpecifications: [{name: "xldeploy", type: "XLDEPLOY", uri: "https://localhost:8888", context: {applicationName: "appname"}}]}
+    * def releaseConfig = { supplyChainId: "#(supplyChainId)", artifactCollectorSpecifications: [{name: "xldeploy", type: "XLDEPLOY", uri: "https://localhost:8888", context: {applicationName: "appname"}}]}
     And request releaseConfig
     When method POST
     Then status 200
