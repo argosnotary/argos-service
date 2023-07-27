@@ -1970,6 +1970,8 @@ components:
       required:
         - artifactCollectorSpecifications
       properties:
+        supplyChainId:
+          $ref: "#/components/schemas/UUID"
         artifactCollectorSpecifications:
           type: array
           maxItems: 20
@@ -1982,6 +1984,8 @@ components:
         - stepName
         - artifactCollectorSpecifications
       properties:
+        supplyChainId:
+          $ref: "#/components/schemas/UUID"
         stepName:
           $ref: "#/components/schemas/NameString"
         artifactCollectorSpecifications:

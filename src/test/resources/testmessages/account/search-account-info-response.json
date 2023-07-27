@@ -1,8 +1,0 @@
-[
-  {
-    "accountId": "#uuid",
-    "userName": "default-sa1",
-    "path": "default-root-label",
-    "accountType": "SERVICE_ACCOUNT"
-  }
-]

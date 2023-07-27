@@ -1,0 +1,70 @@
+#
+# Argos Notary - A new way to secure the Software Supply Chain
+#
+# Copyright (C) 2019 - 2020 Rabobank Nederland
+# Copyright (C) 2019 - 2023 Gerard Borst <gerard.borst@argosnotary.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+spring.data.mongodb.auto-index-creation: true
+spring.data.mongodb.database: argos
+spring.security:
+    oauth2:
+      client:
+        registration:
+          master:
+            clientId: master-client
+            clientSecret: BsUGw8rGU0Z95v7gru7ldCO9ixHSXKjk
+            scope:
+              - openid
+              - email
+              - profile
+          saprovider:
+            clientId: saprovider-client
+            clientSecret: 644TyDbo7pTeyqDLM7kj4LWMwjRcUcBr
+            scope:
+              - openid
+              - email
+              - profile
+          oauth-stub:
+            clientId: oauth-stub-client
+            clientSecret: rVyeNlXQBBb4o5EZZ2S0twuvsJU2OP4x
+            scope:
+              - openid
+              - email
+              - profile
+        provider:
+          master:
+            issuer-uri: http://localhost:9080/realms/master
+          saprovider:
+            issuer-uri: http://localhost:9080/realms/saprovider
+          oauth-stub:
+            issuer-uri: http://localhost:9080/realms/oauth-stub
+
+spring.jackson.serialization.write-dates-as-timestamps: false
+
+management.endpoints.enabled-by-default: true
+management.endpoints.web.exposure.include: "*"
+
+keycloak.admin-client.realm: saprovider
+keycloak.admin-client.client-id: samanager
+keycloak.admin-client.client-secret: 0weeMaHVQ3GqriognQg8QkEwBmoVC7LB
+keycloak.admin-client.grant-type: client_credentials
+
+
+logging:
+  level:
+    root: INFO
+    org.mongodb.driver: INFO
