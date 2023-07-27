@@ -144,7 +144,7 @@
             <groupId>io.quarkus</groupId>
             <artifactId>
                 quarkus-keycloak-admin-client</artifactId>
-            <version>3.0.3.Final</version>
+            <version>3.2.2.Final</version>
         </dependency>
 
         <dependency>
