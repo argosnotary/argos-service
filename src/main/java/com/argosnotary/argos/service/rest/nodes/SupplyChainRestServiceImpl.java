@@ -23,7 +23,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.nodes.Project;
@@ -77,7 +76,7 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
 		SupplyChain node = supplyChainService
 				.create(supplyChainMapper.convertFromRestSupplyChain(restSupplyChain));
 
-        URI location = ServletUriComponentsBuilder
+        URI location = UriComponentsBuilder
         		.fromPath("/supplychains")
                 .path("/{supplyChainId}")
                 .buildAndExpand(node.getId())
@@ -112,7 +111,7 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
 		}
 		return ResponseEntity.ok(supplyChainService.find(optNode.get())
-				.stream().map(supplyChainMapper::convertToRestSupplyChain).collect(Collectors.toList()));
+				.stream().map(supplyChainMapper::convertToRestSupplyChain).toList());
 	}
 
 	@Override
@@ -136,7 +135,7 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
 		SupplyChain node = supplyChainService
 				.update(supplyChainMapper.convertFromRestSupplyChain(restSupplyChain));
 
-        URI location = ServletUriComponentsBuilder
+        URI location = UriComponentsBuilder
         		.fromPath("/supplychains")
                 .path("/{supplyChainId}")
                 .buildAndExpand(node.getId())

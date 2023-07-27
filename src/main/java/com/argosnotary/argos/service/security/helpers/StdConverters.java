@@ -19,21 +19,6 @@
  */
 package com.argosnotary.argos.service.security.helpers;
 
-/*
- * Copyright 2002-2022 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.util.StdConverter;
@@ -50,12 +35,15 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
  * @since 5.3
  */
 public abstract class StdConverters {
+	private StdConverters() {}
+	
+	private static final String KEY_VALUE = "value";
 
 	static final class AccessTokenTypeConverter extends StdConverter<JsonNode, OAuth2AccessToken.TokenType> {
 
 		@Override
 		public OAuth2AccessToken.TokenType convert(JsonNode jsonNode) {
-			String value = JsonNodeUtils.findStringValue(jsonNode, "value");
+			String value = JsonNodeUtils.findStringValue(jsonNode, KEY_VALUE);
 			if (OAuth2AccessToken.TokenType.BEARER.getValue().equalsIgnoreCase(value)) {
 				return OAuth2AccessToken.TokenType.BEARER;
 			}
@@ -68,7 +56,7 @@ public abstract class StdConverters {
 
 		@Override
 		public ClientAuthenticationMethod convert(JsonNode jsonNode) {
-			String value = JsonNodeUtils.findStringValue(jsonNode, "value");
+			String value = JsonNodeUtils.findStringValue(jsonNode, KEY_VALUE);
 			if (ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue().equalsIgnoreCase(value)) {
 				return ClientAuthenticationMethod.CLIENT_SECRET_BASIC;
 			}
@@ -87,15 +75,12 @@ public abstract class StdConverters {
 
 		@Override
 		public AuthorizationGrantType convert(JsonNode jsonNode) {
-			String value = JsonNodeUtils.findStringValue(jsonNode, "value");
+			String value = JsonNodeUtils.findStringValue(jsonNode, KEY_VALUE);
 			if (AuthorizationGrantType.AUTHORIZATION_CODE.getValue().equalsIgnoreCase(value)) {
 				return AuthorizationGrantType.AUTHORIZATION_CODE;
 			}
 			if (AuthorizationGrantType.CLIENT_CREDENTIALS.getValue().equalsIgnoreCase(value)) {
 				return AuthorizationGrantType.CLIENT_CREDENTIALS;
-			}
-			if (AuthorizationGrantType.PASSWORD.getValue().equalsIgnoreCase(value)) {
-				return AuthorizationGrantType.PASSWORD;
 			}
 			return new AuthorizationGrantType(value);
 		}
@@ -106,7 +91,7 @@ public abstract class StdConverters {
 
 		@Override
 		public AuthenticationMethod convert(JsonNode jsonNode) {
-			String value = JsonNodeUtils.findStringValue(jsonNode, "value");
+			String value = JsonNodeUtils.findStringValue(jsonNode, KEY_VALUE);
 			if (AuthenticationMethod.HEADER.getValue().equalsIgnoreCase(value)) {
 				return AuthenticationMethod.HEADER;
 			}

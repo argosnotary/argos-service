@@ -44,6 +44,11 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
+	public boolean exists(UUID projectId) {
+		return nodeService.exists(Project.class, projectId);
+	}
+
+	@Override
 	public Project create(Project project) {
 		return (Project) nodeService.create(project);
 	}

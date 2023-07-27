@@ -78,8 +78,6 @@ public class Organization implements Node {
 
 	@Override
 	public void setParent(Node node) {
-		if (node.getClass() == this.getClass()) {
-			
-		}
+		throw new UnsupportedOperationException();
 	}
 }

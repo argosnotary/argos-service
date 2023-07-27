@@ -23,7 +23,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Node;
@@ -77,8 +76,8 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
 		ManagementNode node = managementNodeService
 				.create(managementNodeMapper.convertFromRestManagementNode(restManagementNode));
 
-        URI location = ServletUriComponentsBuilder
-        		.fromPath("/managementnodes")
+        URI location = UriComponentsBuilder
+        		.fromPath("/api/managementnodes")
                 .path("/{managementNodeId}")
                 .buildAndExpand(node.getId())
                 .toUri();
@@ -90,8 +89,7 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
     @AuditLog
     @Transactional
 	public ResponseEntity<Void> deleteManagementNodeById(UUID managementNodeId) {
-		managementNodeService.findById(managementNodeId).orElseThrow(this::managementNodeNotFound);
-		managementNodeService.delete(managementNodeId);
+		managementNodeService.delete(managementNodeService.findById(managementNodeId).orElseThrow(this::managementNodeNotFound).getId());
 		return ResponseEntity.noContent().build();
 	}
 
@@ -112,7 +110,7 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
 		return ResponseEntity.ok(managementNodeService.find(optNode.get())
 				.stream()
 				.map(managementNodeMapper::convertToRestManagementNode)
-				.collect(Collectors.toList()));
+				.toList());
 	}
 	
 	private ResponseStatusException managementNodeNotFound() {

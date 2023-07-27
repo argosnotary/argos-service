@@ -27,31 +27,28 @@ import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.NotNull;
 
 
 @Document(collection="nodes")
-@CompoundIndexes({
-    @CompoundIndex(name = "parentId_name", def = "{'parentId' : 1, 'name': 1}", unique=true)
-})
+@CompoundIndex(name = "parentId_name", def = "{'parentId' : 1, 'name': 1}", unique=true)
 public interface Node {
 
-	default public void visit(NodeVisitor<?> treeNodeVisitor) {
+	public default void visit(NodeVisitor<?> treeNodeVisitor) {
 		treeNodeVisitor.visitEnter(this);
 		getChildren().forEach(child -> child.visit(treeNodeVisitor));
 		treeNodeVisitor.visitExit(this);
 	}
     
-    default public void visitDown(NodeVisitor<?> treeNodeVisitor) {
+    public default void visitDown(NodeVisitor<?> treeNodeVisitor) {
         if (isRoot()) {
             treeNodeVisitor.visitEndPoint(this);
         } else {
         	treeNodeVisitor.visitEnter(this);
-        	getParent().get().visitDown(treeNodeVisitor);
-            treeNodeVisitor.visitExit(this);
+        	this.getParent().ifPresent(p -> p.visitDown(treeNodeVisitor));
+        	treeNodeVisitor.visitExit(this);
         }
     }
     
@@ -77,11 +74,11 @@ public interface Node {
     
     public void setPathToRoot(List<UUID> path);
     
-    default public boolean isLeaf() {
+    public default boolean isLeaf() {
 		return this.getChildren().isEmpty();
 	}
 
-	default public boolean isRoot() {
+	public default boolean isRoot() {
 		return this.getParent().isEmpty();
 	}
     

@@ -51,7 +51,7 @@ Feature: Organization
     Given path '/api/roles/'+result.response.id
     When method GET
     Then status 404
-    Then match response.message == 'Resource with id ['+result.response.id+'] not found'
+    Then match response.messages[0].message == 'Resource with id ['+result.response.id+'] not found'
     
   Scenario: get all authorized organizations
     * def extraAccount = paLogin('user6')

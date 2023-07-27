@@ -61,7 +61,7 @@ public class PersonalAccountRestServiceImpl implements PersonalAccountRestServic
 		KeyPair keyPair = keyPairMapper.convertFromRestKeyPair(restKeyPair);
 		validateKeyId(keyPair);
 		PersonalAccount personalAccount = accountSecurityContext.getAuthenticatedAccount()
-				.map(account -> (PersonalAccount) account)
+				.map(PersonalAccount.class::cast)
 				.orElseThrow(this::accountNotFound);
 		personalAccountService.activateNewKey(personalAccount, keyPair);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -102,13 +102,8 @@ public class PersonalAccountRestServiceImpl implements PersonalAccountRestServic
 	@Override
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<RestPersonalAccount> whoAmI() {
-		ResponseEntity<RestPersonalAccount> acc = accountSecurityContext.getAuthenticatedAccount()
-				.map(account -> (PersonalAccount) account)
-				.map(personalAccountMapper::convertToRestPersonalAccount)
-				.map(ResponseEntity::ok)
-				.orElseThrow(this::accountNotFound);
 		return accountSecurityContext.getAuthenticatedAccount()
-				.map(account -> (PersonalAccount) account)
+				.map(PersonalAccount.class::cast)
 				.map(personalAccountMapper::convertToRestPersonalAccount)
 				.map(ResponseEntity::ok)
 				.orElseThrow(this::accountNotFound);

@@ -19,7 +19,7 @@
  */
 package com.argosnotary.argos.service.rest.layout;
 
-import static com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage.TypeEnum.DATA_INPUT;
+import static com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage.TypeEnum.DATA_INPUT;
 import static com.argosnotary.argos.service.rest.layout.ValidationHelper.throwLayoutValidationException;
 
 import java.util.Set;

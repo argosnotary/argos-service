@@ -35,15 +35,6 @@ public interface NodeRepository extends MongoRepository<Node, UUID> {
 	@Query("{_id: {$in: ?0}}")
 	public List<Node> findWithIds(Set<UUID> ids);
 	
-//	@Aggregation(pipeline = {
-//			"{$match: {_id: {$in: ?0 }}}",
-//		    "{$group: {_id: null, pathIds: {$push: '$pathToRoot'}}}",
-//		    "{$project: {'result': {$reduce:{input: '$pathIds',initialValue: [],in:{ $concatArrays: [ '$$value', '$$this' ] }}}, _id: 0}}",
-//		    "{$lookup:{from: 'nodes', localField: 'result', foreignField: '_id', as: 'children'}}",
-//		    "{$unset: 'result'}"
-//    })
-//	public NodeList findClassInTree(Set<UUID> resourceIds);
-	
 	@Query("{ 'pathToRoot' : {$in: ?0}}")
 	public List<Node> findWithResourceIdsUpTree(Set<UUID> resourceIds);
 	

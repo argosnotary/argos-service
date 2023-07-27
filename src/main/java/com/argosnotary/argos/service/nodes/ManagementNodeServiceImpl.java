@@ -46,8 +46,8 @@ public class ManagementNodeServiceImpl implements ManagementNodeService {
 	@Override
 	public Optional<ManagementNode> findById(UUID managementNodeId) {
 		Optional<Node> node = nodeService.findById(managementNodeId);
-		if (node.isPresent() && (node.get() instanceof ManagementNode)) {
-			return Optional.of((ManagementNode) node.get());
+		if (node.isPresent() && (node.get() instanceof ManagementNode managementNode)) {
+			return Optional.of(managementNode);
 		}
 		return Optional.empty();
 	}

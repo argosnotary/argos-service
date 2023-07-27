@@ -24,7 +24,6 @@ import static java.util.Collections.emptyList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -35,6 +34,7 @@ import com.argosnotary.argos.domain.layout.ApprovalConfiguration;
 import com.argosnotary.argos.domain.layout.Layout;
 import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 import com.argosnotary.argos.domain.layout.ReleaseConfiguration;
+import com.argosnotary.argos.domain.layout.Step;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.mongodb.layout.ApprovalConfigurationRepository;
 import com.argosnotary.argos.service.mongodb.layout.LayoutMetaBlockRepository;
@@ -91,13 +91,9 @@ public class LayoutMetaBlockServiceImpl implements LayoutMetaBlockService {
         if (optionalKeyPair.isPresent() && optionalLayoutMetaBlock.isPresent()) {
             String activeAccountKeyId = optionalKeyPair.get().getKeyId();
             Layout layout = optionalLayoutMetaBlock.get().getLayout();
-            List<ApprovalConfiguration> ff = approvalConfigurationRepository.findBySupplyChainId(supplyChainId);
-            List<ApprovalConfiguration> ff2 = approvalConfigurationRepository.findBySupplyChainId(supplyChainId).stream()
-            		.filter(approvalConf -> canApprove(approvalConf, activeAccountKeyId, layout))
-            		.collect(Collectors.toList());
             return approvalConfigurationRepository.findBySupplyChainId(supplyChainId).stream()
             		.filter(approvalConf -> canApprove(approvalConf, activeAccountKeyId, layout))
-            		.collect(Collectors.toList());
+            		.toList();
         } else {
             return emptyList();
         }
@@ -112,7 +108,7 @@ public class LayoutMetaBlockServiceImpl implements LayoutMetaBlockService {
 
 	@Override
 	public boolean stepNameExistInLayout(Layout layout, String stepName) {
-		return layout.getSteps().stream().map(s -> s.getName()).filter(n -> n.equals(stepName)).findFirst().isPresent();
+		return layout.getSteps().stream().map(Step::getName).anyMatch(n -> n.equals(stepName));
 	}
 
 	@Override

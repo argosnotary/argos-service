@@ -53,7 +53,7 @@ public class KnownStepVerification implements Verification {
                 .getLinkMetaBlocks()
                 .stream()
                 .filter(linkMetaBlock -> !knownStepNames.contains(linkMetaBlock.getLink().getStepName()))
-                .collect(Collectors.toList());
+                .toList();
 
         if (!failedStepNameVerifications.isEmpty()) {
         	failedStepNameVerifications

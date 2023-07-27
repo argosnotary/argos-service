@@ -66,7 +66,7 @@ public class VerificationRestServiceImpl implements VerificationRestService {
         log.info("Verification request for paths [{}] and hashes [{}].", paths, artifactHashes);
         boolean isvalid = verificationService.getVerification(artifactHashes, paths);
         log.info("Verify result [{}] for paths [{}] and hashes [{}].", isvalid, paths, artifactHashes);
-        return ResponseEntity.ok(new RestVerificationResult().runIsValid(isvalid));
+        return ResponseEntity.ok(new RestVerificationResult(isvalid));
     }
 
     @Override

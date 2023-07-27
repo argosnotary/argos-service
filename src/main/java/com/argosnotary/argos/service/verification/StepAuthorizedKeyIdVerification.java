@@ -53,7 +53,7 @@ public class StepAuthorizedKeyIdVerification implements Verification {
                 .getLinkMetaBlocks()
                 .stream()
                 .filter(linkMetaBlock -> linkIsNotSignedByAuthorizedFunctionary(stepAndKeyIds, linkMetaBlock))
-                .collect(Collectors.toList());
+                .toList();
 
         if (!failedLinkAuthorizedKeyIdVerifications.isEmpty()) {
             failedLinkAuthorizedKeyIdVerifications

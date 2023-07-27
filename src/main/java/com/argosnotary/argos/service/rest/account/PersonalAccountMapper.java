@@ -35,7 +35,7 @@ public interface PersonalAccountMapper {
 
     public RestPersonalAccount convertToRestPersonalAccount(PersonalAccount personalAccount);
     
-    default public RestProfile convertToRestProfile(Optional<Profile> profile) {
+    public default RestProfile convertToRestProfile(Optional<Profile> profile) {
     	if (profile.isEmpty()) {
     		return null;
     	}

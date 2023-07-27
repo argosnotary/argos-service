@@ -52,13 +52,13 @@ public class VerificationProvider {
     }
 
     public VerificationRunResult verifyRun(LayoutMetaBlock layoutMetaBlock, Set<Artifact> productsToVerify) {
+    	
+    	if (!expectedProductsComplete(layoutMetaBlock, productsToVerify)) {
+    		return VerificationRunResult.valid(false);
+    	}
         
         List<VerificationContext> possibleVerificationContexts = verificationContextsProvider
                 .createPossibleVerificationContexts(layoutMetaBlock, productsToVerify);
-        
-        for (VerificationContext context : possibleVerificationContexts) {
-        	
-        }
 
         List<VerificationRunResult> verificationRunResults = possibleVerificationContexts
                 .stream()
@@ -71,7 +71,7 @@ public class VerificationProvider {
                                 .runIsValid(true)
                                 .validLinkMetaBlocks(context.getOriginalLinkMetaBlocks())
                                 .build())
-                ).collect(Collectors.toList());
+                ).toList();
 
         return verificationRunResults
                 .stream()
@@ -84,13 +84,13 @@ public class VerificationProvider {
     }
     
     /* Check if all expected end products Match Rules are used */
-    private VerificationRunResult expectedProductsComplete(LayoutMetaBlock layoutMetaBlock, Set<Artifact> productsToVerify) {
+    private boolean expectedProductsComplete(LayoutMetaBlock layoutMetaBlock, Set<Artifact> productsToVerify) {
         List<MatchRule> rules = layoutMetaBlock.getLayout().getExpectedEndProducts();
         for (MatchRule rule: rules) {
             if (ArtifactsVerificationContext.filterArtifacts(new HashSet<>(productsToVerify), rule.getPattern(), rule.getSourcePathPrefix()).isEmpty()) {
-                return VerificationRunResult.valid(false);
+                return false;
             }
         }
-        return VerificationRunResult.valid(true);
+        return true;
     }
 }

@@ -54,6 +54,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class ReleaseServiceImpl implements ReleaseService {
+	
+	private static final String ARTIFACTS_INVALID_STRING = "Artifacts release invalid [{}] for supply chain [{}].";
 
     private final VerificationProvider verificationProvider;
     private final LayoutMetaBlockService layoutMetaBlockService;
@@ -93,21 +95,21 @@ public class ReleaseServiceImpl implements ReleaseService {
 
             VerificationRunResult verificationRunResult = verificationProvider.verifyRun(optionalLayoutMetaBlock.get(), allArtifacts);
             if (!verificationRunResult.isRunIsValid()) {
-            	log.info("Artifacts release invalid [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
+            	log.info(ARTIFACTS_INVALID_STRING, releaseArtifacts, supplyChainId);
             	return ReleaseResult.builder().releaseIsValid(false).build();
             }
             releaseBuilder.releaseIsValid(verificationRunResult.isRunIsValid());
             
             Optional<Organization> orgOpt = supplyChainService.getOrganization(supplyChainId);
             if (orgOpt.isEmpty()) {
-            	log.info("Artifacts release invalid [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
+            	log.info(ARTIFACTS_INVALID_STRING, releaseArtifacts, supplyChainId);
             	log.info("Organization for supply chain [{}] not found.", supplyChainId);
                 return ReleaseResult.builder().releaseIsValid(false).build();
             }
             
             Optional<String> qualifiedNameOpt = supplyChainService.getQualifiedName(supplyChainId);
             if (qualifiedNameOpt.isEmpty()) {
-            	log.info("Artifacts release invalid [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
+            	log.info(ARTIFACTS_INVALID_STRING, releaseArtifacts, supplyChainId);
                 return ReleaseResult.builder().releaseIsValid(false).build();
             }
             
@@ -139,7 +141,7 @@ public class ReleaseServiceImpl implements ReleaseService {
             log.info("Artifacts released [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
             return releaseBuilder.build();
         }
-        log.info("Artifacts release invalid [{}] for supply chain [{}].", releaseArtifacts, supplyChainId);
+        log.info(ARTIFACTS_INVALID_STRING, releaseArtifacts, supplyChainId);
         return ReleaseResult.builder().releaseIsValid(false).build();
     }
 

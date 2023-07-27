@@ -24,14 +24,16 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 import com.argosnotary.argos.domain.account.Account;
 
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
-public class ArgosUserDetails extends org.springframework.security.core.userdetails.User {
-    private final Account account;
+public class ArgosUserDetails extends User {
+	
+	private final Account account;
 
     public ArgosUserDetails(Account account) {
         super(account.getName(), "", List.of(new SimpleGrantedAuthority("ROLE_USER")));

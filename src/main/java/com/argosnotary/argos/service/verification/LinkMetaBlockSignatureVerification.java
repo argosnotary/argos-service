@@ -50,7 +50,7 @@ public class LinkMetaBlockSignatureVerification implements Verification {
     @Override
     public VerificationRunResult verify(VerificationContext context) {
         context.removeLinkMetaBlocks(context.getLinkMetaBlocks().stream()
-                .filter(linkMetaBlock -> !okay(context.getLayoutMetaBlock(), linkMetaBlock)).collect(toList()));
+                .filter(linkMetaBlock -> !okay(context.getLayoutMetaBlock(), linkMetaBlock)).toList());
         return VerificationRunResult.okay();
     }
 

@@ -48,9 +48,6 @@ public class LinkMetaBlockServiceImpl implements LinkMetaBlockService {
 
 	@Override
 	public List<LinkMetaBlock> find(UUID supplyChainId, Optional<String> optionalHash) {
-		if (optionalHash.isPresent()) {
-			List<LinkMetaBlock> ff = linkMetaBlockRepository.findBySupplyChainIdAndHash(supplyChainId, optionalHash.get());
-		}
 		return optionalHash
 				.map(hash -> linkMetaBlockRepository.findBySupplyChainIdAndHash(supplyChainId, hash))
                 .orElseGet(() -> linkMetaBlockRepository.findBySupplyChainId(supplyChainId));

@@ -19,6 +19,7 @@
  */
 package com.argosnotary.argos.domain.account;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -38,10 +39,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
 @ToString(callSuper=true)
-@CompoundIndexes({
-    @CompoundIndex(name = "providerSubject_providerName", def = "{'providerSubject' : 1, 'providerName': 1}", unique=true)
-})
-public abstract class Account extends Identity {
+@CompoundIndex(name = "providerSubject_providerName", def = "{'providerSubject' : 1, 'providerName': 1}", unique=true)
+public abstract class Account extends Identity implements Serializable {
 	private String providerName;
 	
     private String providerSubject;
@@ -63,10 +62,10 @@ public abstract class Account extends Identity {
 	
     public void deactivateKeyPair(KeyPair newKeyPair) {
         Optional.ofNullable(this.getActiveKeyPair()).ifPresent(keyPair -> {
-            Set<KeyPair> inactiveKeyPairs = Optional.ofNullable(this.getInactiveKeyPairs()).orElse(new HashSet<>());
-            inactiveKeyPairs.add(keyPair);
+            Set<KeyPair> inactivePairs = Optional.ofNullable(this.getInactiveKeyPairs()).orElse(new HashSet<>());
+            inactivePairs.add(keyPair);
             this.setActiveKeyPair(null);
-            this.setInactiveKeyPairs(inactiveKeyPairs);
+            this.setInactiveKeyPairs(inactivePairs);
         });
         this.setActiveKeyPair(newKeyPair);
     }

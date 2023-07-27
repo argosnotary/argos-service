@@ -32,7 +32,6 @@ import com.argosnotary.argos.domain.release.Release;
 import com.argosnotary.argos.domain.release.ReleaseResult;
 import com.argosnotary.argos.service.openapi.rest.model.RestRelease;
 import com.argosnotary.argos.service.openapi.rest.model.RestReleaseResult;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
@@ -45,7 +44,7 @@ public abstract class ReleaseResultMapper {
     
     public abstract RestRelease maptoRestRelease(Release release);
     
-    public String offsetDateTimeIntoString(OffsetDateTime time) throws JsonProcessingException {
+    public String offsetDateTimeIntoString(OffsetDateTime time) {
     	return time.toString();
     } 
     

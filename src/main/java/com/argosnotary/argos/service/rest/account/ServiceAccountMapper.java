@@ -28,7 +28,7 @@ import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccount;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ServiceAccountMapper {
 
-    public RestServiceAccount convertToRestServiceAccount(ServiceAccount ServiceAccount);
+    public RestServiceAccount convertToRestServiceAccount(ServiceAccount serviceAccount);
     
     public ServiceAccount convertFromRestServiceAccount(RestServiceAccount restServiceAccount);
 

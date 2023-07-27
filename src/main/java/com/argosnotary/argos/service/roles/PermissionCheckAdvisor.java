@@ -68,7 +68,7 @@ public class PermissionCheckAdvisor {
 		Authentication optionalAuthentication = securityContext.getAuthentication();
         Set<Permission> permissions = Set.of(permissionCheck.permissions());
         
-        if (permissions.size() == 0 || args == null || args.length == 0 || optionalAuthentication == null) {
+        if (permissions.isEmpty() || args == null || args.length == 0 || optionalAuthentication == null) {
         	throw new AccessDeniedException("Access denied");
         }
         
@@ -94,6 +94,6 @@ public class PermissionCheckAdvisor {
     	}
     	return permissions
     			.stream()
-    			.anyMatch(permission -> permissionsToCheck.contains(permission));
+    			.anyMatch(permissionsToCheck::contains);
     }
 }

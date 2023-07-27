@@ -22,7 +22,6 @@ package com.argosnotary.argos.service.rest.roles;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,7 +71,7 @@ public class RoleAssignmentRestServiceImpl implements RoleAssignmentRestService 
 	public ResponseEntity<List<RestRoleAssignment>> getRoleAssignments(UUID resourceId) {
 		return ResponseEntity.ok(roleAssignmentService.findByResourceId(resourceId).stream()
 				.map(roleAssignmentMapper::convertToRestRoleAssignment)
-				.collect(Collectors.toList()));
+				.toList());
 	}
 
 }

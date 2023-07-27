@@ -19,7 +19,7 @@
  */
 package com.argosnotary.argos.service.rest.layout;
 
-import static com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage.TypeEnum.MODEL_CONSISTENCY;
+import static com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage.TypeEnum.MODEL_CONSISTENCY;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;

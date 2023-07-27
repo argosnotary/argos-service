@@ -89,7 +89,7 @@ public class VerificationContextsProvider {
                         .layoutMetaBlock(layoutMetaBlock)
                         .linkMetaBlocks(new ArrayList<>(linkSet))
                         .productsToVerify(artifactsToRelease).build())
-                .collect(Collectors.toList());
+                .toList();
     }
     
     static Set<Set<LinkMetaBlock>> permutateOnSteps(Set<LinkMetaBlock> linkMetaBlocks) {

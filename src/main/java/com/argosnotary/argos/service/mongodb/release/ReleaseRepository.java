@@ -31,12 +31,6 @@ import com.argosnotary.argos.domain.release.Release;
 
 public interface ReleaseRepository extends MongoRepository<Release, UUID> {
 
-//    @Aggregation(pipeline = {
-//    		"{$match: {'organization.domain.domain': {$in: ?0}}}",
-//    		"{$group: {_id: null,items: {$push: '$releasedProductsHashes'}}}",
-//    		"{$project: {'results': {$reduce: {input: '$items',initialValue: [],in: { $concatArrays: [ '$$value', '$$this' ] }}}, _id: 0}}",
-//    		"{$project: {releasedProductsHashes: {$setDifference: [ ?1, '$results']}}}"
-//    })
 	@Query(value="{'domain.domain': {$in: ?0}, 'releasedProductsHashes': {$in: ?1}}", exists=true)
     boolean existsByDomainNamesAndHashes(List<String> domainNames, Set<String> releasedArtifacts);
 	

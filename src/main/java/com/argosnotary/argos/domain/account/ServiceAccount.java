@@ -26,11 +26,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.argosnotary.argos.domain.crypto.KeyPair;
-import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.domain.roles.RoleAssignment;
 
@@ -43,9 +41,7 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @Document(collection="serviceaccounts")
-@CompoundIndexes({
-    @CompoundIndex(name = "projectId_name", def = "{'projectId' : 1, 'name': 1}", unique=true)
-})
+@CompoundIndex(name = "projectId_name", def = "{'projectId' : 1, 'name': 1}", unique=true)
 public class ServiceAccount extends Account {
 
 	public static final String SA_PROVIDER_NAME = "saprovider";

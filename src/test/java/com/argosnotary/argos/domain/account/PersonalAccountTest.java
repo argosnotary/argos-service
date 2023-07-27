@@ -23,8 +23,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -137,7 +137,7 @@ class PersonalAccountTest {
         account2.setProviderName(PROVIDER_NAME);
         account2.setProviderSubject(PROVIDER_SUBJECT);
         
-        assertTrue(account.getProfile().equals(account2.getProfile()));
+        assertEquals(account.getProfile(), account2.getProfile());
     }
     
     @Test
@@ -169,6 +169,6 @@ class PersonalAccountTest {
         account2.setProviderName(PROVIDER_NAME);
         account2.setProviderSubject(PROVIDER_SUBJECT);
         
-        assertFalse(account.getProfile().equals(account2.getProfile()));
+        assertNotEquals(account.getProfile(), account2.getProfile());
     }
 }

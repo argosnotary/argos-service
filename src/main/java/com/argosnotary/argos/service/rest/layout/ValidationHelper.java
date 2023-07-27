@@ -21,8 +21,8 @@ package com.argosnotary.argos.service.rest.layout;
 
 import java.util.List;
 
-import com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage;
-import com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage.TypeEnum;
+import com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage;
+import com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage.TypeEnum;
 
 public class ValidationHelper {
     private ValidationHelper() {
@@ -32,10 +32,8 @@ public class ValidationHelper {
         throw LayoutValidationException
                 .builder()
                 .validationMessages(List
-                        .of(new RestValidationMessage()
-                                .type(type)
+                        .of(new RestErrorMessage(type, message)
                                 .field(field)
-                                .message(message)
                         ))
                 .build();
     }

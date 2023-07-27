@@ -173,10 +173,6 @@
             <artifactId>jackson-databind-nullable</artifactId>
             <version>0.2.6</version>
         </dependency>
-        <!--<dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>-->
 
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -257,7 +253,6 @@
         <dependency>
     <groupId>net.sourceforge.htmlunit</groupId>
     <artifactId>htmlunit</artifactId>
-    <version>2.70.0</version>
     <scope>test</scope>
 </dependency>
 
@@ -275,15 +270,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-        
-<!--        <dependency>-->
-<!--                <groupId>-->
-<!--                    io.github.openfeign</groupId>-->
-<!--                <artifactId>feign-bom</artifactId>-->
-<!--                <version>11.</version>-->
-<!--                <type>pom</type>-->
-<!--                <scope>import</scope>-->
-<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 

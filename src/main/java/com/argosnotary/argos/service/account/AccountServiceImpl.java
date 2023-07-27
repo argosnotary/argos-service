@@ -58,7 +58,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Optional<KeyPair> findKeyPairByKeyId(String keyId) {
         return serviceAccountRepository
-                .findFirstByActiveKeyId(keyId).map(serviceAccount -> (Account) serviceAccount)
+                .findFirstByActiveKeyId(keyId).map(Account.class::cast)
                 .or(() -> personalAccountRepository.findFirstByActiveKeyId(keyId)).map(Account::getActiveKeyPair);
     }
 

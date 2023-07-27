@@ -77,7 +77,7 @@ Feature: Non Personal Account
     And request { name: 'sa1', projectId: '940935f6-22bc-4d65-8c5b-a0599dedb510'}
     When method POST
     Then status 404
-    Then match response.message == 'Resource with id [940935f6-22bc-4d65-8c5b-a0599dedb510] not found'
+    Then match response.messages[0].message == 'Resource with id [940935f6-22bc-4d65-8c5b-a0599dedb510] not found'
 
   Scenario: store two service accounts with the same name should return a 400
     * call read('create-service-account.feature') {projectId: #(defaultProjectId), sa: { name: 'sa1', projectId: #(defaultProjectId)}}

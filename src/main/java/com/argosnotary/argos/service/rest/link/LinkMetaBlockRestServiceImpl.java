@@ -20,8 +20,6 @@
 package com.argosnotary.argos.service.rest.link;
 
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -86,7 +84,7 @@ public class LinkMetaBlockRestServiceImpl implements LinkMetaBlockRestService {
         }
 
         return new ResponseEntity<>(linkMetaBlockService.find(supplyChainId, Optional.ofNullable(hash))
-                .stream().map(linkMetaBlockMapper::convertToRestLinkMetaBlock).collect(toList()), HttpStatus.OK);
+                .stream().map(linkMetaBlockMapper::convertToRestLinkMetaBlock).toList(), HttpStatus.OK);
     }
 
 }

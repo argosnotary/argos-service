@@ -48,9 +48,6 @@ import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.nodes.NodeService;
 import com.argosnotary.argos.service.nodes.OrganizationService;
 import com.argosnotary.argos.service.openapi.rest.model.RestOrganization;
-import com.argosnotary.argos.service.rest.nodes.OrganizationMapper;
-import com.argosnotary.argos.service.rest.nodes.OrganizationRestService;
-import com.argosnotary.argos.service.rest.nodes.OrganizationRestServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -125,11 +122,11 @@ class OrganizationRestServiceTest {
 
 		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
-        when(organizationService.existsById(org2.getId())).thenReturn(true);
+        when(organizationService.exists(org2.getId())).thenReturn(true);
         ResponseEntity<Void> response = organizationRestService.deleteOrganizationById(org2.getId());
 
         assertThat(response.getStatusCode(), is(HttpStatusCode.valueOf(204)));
-		verify(organizationService).existsById(org2.getId());
+		verify(organizationService).exists(org2.getId());
 		verify(organizationService).delete(org2.getId());;
 		
 	}
@@ -138,7 +135,7 @@ class OrganizationRestServiceTest {
 	void testDeleteOrganizationByIdNotFound() {
 		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
-        when(organizationService.existsById(org2.getId())).thenReturn(false);
+        when(organizationService.exists(org2.getId())).thenReturn(false);
         
         Throwable exception = assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
         	organizationRestService.deleteOrganizationById(org2.getId());

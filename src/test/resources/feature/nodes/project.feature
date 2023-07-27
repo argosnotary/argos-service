@@ -78,7 +78,7 @@ Feature: Project
     Given path '/api/projects/'+projectId
     When method GET
     Then status 404
-    Then match response.message == 'Resource with id ['+projectId+'] not found'
+    Then match response.messages[0].message == 'Resource with id ['+projectId+'] not found'
     
     
  

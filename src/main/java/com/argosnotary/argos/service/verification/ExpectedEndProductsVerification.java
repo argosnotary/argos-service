@@ -22,7 +22,6 @@ package com.argosnotary.argos.service.verification;
 import static com.argosnotary.argos.service.verification.Verification.Priority.EXPECTED_END_PRODUCTS;
 
 import java.nio.file.Paths;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,15 +33,12 @@ import org.springframework.util.StringUtils;
 
 import com.argosnotary.argos.domain.layout.ArtifactType;
 import com.argosnotary.argos.domain.layout.rule.MatchRule;
-import com.argosnotary.argos.domain.layout.rule.RuleType;
 import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.link.Link;
-import com.argosnotary.argos.service.verification.rules.RuleVerification;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor

@@ -21,7 +21,7 @@ package com.argosnotary.argos.service.rest.layout;
 
 import java.util.List;
 
-import com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage;
+import com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -29,5 +29,5 @@ import lombok.Getter;
 @Builder
 @Getter
 public class LayoutValidationException extends RuntimeException {
-    private final transient List<RestValidationMessage> validationMessages;
+    private final transient List<RestErrorMessage> validationMessages;
 }

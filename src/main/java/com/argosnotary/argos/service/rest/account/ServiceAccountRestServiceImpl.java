@@ -34,7 +34,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.account.ServiceAccount;
-import com.argosnotary.argos.domain.crypto.KeyPair;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.account.ServiceAccountService;
@@ -104,7 +103,7 @@ public class ServiceAccountRestServiceImpl implements ServiceAccountRestService 
                 .buildAndExpand(serviceAccountId)
                 .toUri();
         return ResponseEntity.created(location)
-        		.body(keyPairMapper.convertToRestKeyPair(((KeyPair) updatedAccount.getActiveKeyPair())));
+        		.body(keyPairMapper.convertToRestKeyPair(updatedAccount.getActiveKeyPair()));
 	}
 
 	@Override
@@ -131,7 +130,6 @@ public class ServiceAccountRestServiceImpl implements ServiceAccountRestService 
 	public ResponseEntity<RestKeyPair> getServiceAccountKey() {
         return accountSecurityContext.getAuthenticatedAccount()
                 .map(Account::getActiveKeyPair).filter(Objects::nonNull)
-                .map(keyPair -> (KeyPair) keyPair)
                 .map(keyPairMapper::convertToRestKeyPair)
                 .map(ResponseEntity::ok).orElseThrow(this::keyNotFound);
 	}
