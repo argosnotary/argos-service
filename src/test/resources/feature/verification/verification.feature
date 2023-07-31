@@ -127,7 +127,7 @@ Feature: Verification
     * def resp = call read('classpath:feature/verification/verification-template.feature') { projectId: #(defaultProjectId), expectedProducts:#(defaultExpectedProducts),testDir: 'multiple-verification-contexts',steps:#(steps), layoutSigner:#(pa1), account2: #(sa2), account3: #(sa3) }
     And match resp.response == {"runIsValid":true}
    
-  Scenario: verification without authorization should return a 401 error
+  Scenario: verification without authorization should return a 403 error
     * url karate.properties['server.baseurl']
     Given path '/api/nodes/'+defaultProjectId+'/supplychains'
     And request { name: 'name', parentId: #(defaultProjectId)}
@@ -139,7 +139,7 @@ Feature: Verification
     Given path supplyChainPath + '/verification'
     And request defaultExpectedProducts
     When method POST
-    Then status 401
+    Then status 403
 
   Scenario: verification without permission READ should return a 403 error
     * url karate.properties['server.baseurl']

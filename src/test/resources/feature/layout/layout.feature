@@ -54,13 +54,13 @@ Feature: Layout
     Then status 400
     And match response contains read('classpath:testmessages/layout/invalid-layout-response.json')
 
-  Scenario: store layout without authorization should return a 401 error
+  Scenario: store layout without authorization should return a 403 error
     * configure headers = null
     Given path layoutPath
     And header Content-Type = 'application/json'
     And request validLayout
     When method POST
-    Then status 401
+    Then status 403
 
   Scenario: store layout without TREE_EDIT permission should return a 403 error
     * def layout2BSigned = validLayout
@@ -116,7 +116,7 @@ Feature: Layout
     When method POST
     Then status 403
 
-  Scenario: update a layout without authorization should return a 401 error
+  Scenario: update a layout without authorization should return a 403 error
     * def layoutResponse = call read('create-layout.feature') {supplyChainId:#(supplyChainId), layoutToBeSigned:#(validLayout), layoutSigner:#(pa1)}
     * def layoutToBeSigned = read('classpath:testmessages/layout/valid-update-layout.json')
     * def signedLayout = call signLayout { passphrase: #(pa1.passphrase), keyPair: #(pa1.personalAccount.activeKeyPair), layoutMetaBlock: #(layoutToBeSigned)}
@@ -125,7 +125,7 @@ Feature: Layout
     And request signedLayout
     And header Content-Type = 'application/json'
     When method POST
-    Then status 401
+    Then status 403
 
   Scenario: validate layout with invalid model specifications should return a 400 error
     Given path layoutPath+'/validate'

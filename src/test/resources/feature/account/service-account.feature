@@ -65,12 +65,12 @@ Feature: Non Personal Account
     When method POST
     Then status 403
 
-  Scenario: store a service account without authentication should return a 401 error
+  Scenario: store a service account without authentication should return a 403 error
     * configure headers = null
     Given path '/api/projects/'+defaultProjectId+'/serviceaccounts'
     And request { name: 'sa1', projectId: #(defaultProjectId)}
     When method POST
-    Then status 401
+    Then status 403
 
   Scenario: store a service account with a non existing parent label id should return a 403
     Given path '/api/projects/940935f6-22bc-4d65-8c5b-a0599dedb510/serviceaccounts'
@@ -126,14 +126,14 @@ Feature: Non Personal Account
     When method POST
     Then status 403
 
-  Scenario: create a service account key without authentication should return a 401 error
+  Scenario: create a service account key without authentication should return a 403 error
     * def result = call read('create-service-account.feature') {projectId: #(defaultProjectId), sa: { name: 'sa1', projectId: #(defaultProjectId)}}
     * def keyPair = read('classpath:testmessages/key/sa-keypair1.json')
     * configure headers = null
     Given path '/api/projects/'+defaultProjectId+'/serviceaccounts/'+result.response.id+'/key'
     And request keyPair
     When method POST
-    Then status 401
+    Then status 403
 
   Scenario: get a active service account key should return a 200
     * def result = call read('create-service-account.feature') {projectId: #(defaultProjectId), sa: { name: 'sa1', projectId: #(defaultProjectId)}}

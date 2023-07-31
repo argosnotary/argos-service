@@ -119,8 +119,6 @@ public class SecurityConfig {
 	public SecurityFilterChain apiFilterChain(HttpSecurity http, AccountUserDetailsFilter accountUserDetailsFilter, ClientRegistrationService clientRegistrationService) throws Exception {
 		http.securityMatcher("/api/**");
 		
-		http.csrf(csrf -> csrf.disable());
-		
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		
 		http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
