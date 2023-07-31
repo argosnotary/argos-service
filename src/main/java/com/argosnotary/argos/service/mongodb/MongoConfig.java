@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bson.UuidRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +34,9 @@ import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 
 import com.argosnotary.argos.service.mongodb.release.OffSetDateTimeWriteConverter;
@@ -46,8 +49,7 @@ import com.mongodb.client.MongoClients;
 @Configuration
 public class MongoConfig extends AbstractMongoClientConfiguration {
     
-    private final List<Converter<?, ?>> converterList = new ArrayList<>();
-    
+    private final List<Converter<?, ?>> converterList = new ArrayList<>();    
     @Bean
     @Override
     public MongoCustomConversions customConversions() {
@@ -63,9 +65,9 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     private String mongoDatabaseName;
     
     @Bean
-    public GridFsTemplate gridFsTemplate() {
+    public GridFsTemplate gridFsTemplate(MongoMappingContext mappingContext) {
     	return new GridFsTemplate(mongoDbFactory(), mappingMongoConverter(mongoDbFactory(),
-                customConversions(), null));
+                customConversions(), mappingContext));
     }
     
     @Bean
