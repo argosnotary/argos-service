@@ -68,7 +68,7 @@ Feature: Organization
     Given path '/api/roles/'+defaultProjectId
     When method GET
     Then status 403
-    And match response.message == 'Access denied'
+    And match response.messages[0].message == 'Access denied'
     
     * configure headers = call read('classpath:headers.js') { token: #(pa2.token)}
     Given path '/api/projects/'+defaultProjectId
@@ -129,5 +129,5 @@ Feature: Organization
     Given path '/api/roles/'+nodeId
     When method GET
     Then status 404
-    Then match response.message == 'Resource with id ['+nodeId+'] not found'
+    Then match response.messages[0].message == 'Resource with id ['+nodeId+'] not found'
     

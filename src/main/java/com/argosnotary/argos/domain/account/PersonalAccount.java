@@ -19,6 +19,7 @@
  */
 package com.argosnotary.argos.domain.account;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Set;
 import java.util.UUID;
@@ -64,7 +65,7 @@ public class PersonalAccount extends Account {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Profile {
+    public static class Profile implements Serializable {
         private String fullName;
         private String givenName;
         private String familyName;

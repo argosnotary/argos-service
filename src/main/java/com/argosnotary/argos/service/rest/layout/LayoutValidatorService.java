@@ -19,8 +19,7 @@
  */
 package com.argosnotary.argos.service.rest.layout;
 
-import static com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage.TypeEnum.MODEL_CONSISTENCY;
-import static java.util.stream.Collectors.toList;
+import static com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage.TypeEnum.MODEL_CONSISTENCY;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 import com.argosnotary.argos.domain.layout.Step;
 import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
-import com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage;
+import com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage;
 import com.argosnotary.argos.service.rest.SignatureValidatorService;
 
 import lombok.Getter;
@@ -89,7 +88,7 @@ public class LayoutValidatorService {
 
     private void validateStepNamesUnique(LayoutValidationReport report, Layout layout) {
         Set<String> stepNameSet = layout.getSteps().stream().map(Step::getName).collect(toSet());
-        List<String> stepNameList = layout.getSteps().stream().map(Step::getName).collect(toList());
+        List<String> stepNameList = layout.getSteps().stream().map(Step::getName).toList();
         if (stepNameSet.size() != stepNameList.size()) {
             report.addValidationMessage("steps",
                     "step names are not unique");
@@ -154,11 +153,10 @@ public class LayoutValidatorService {
 
     @Getter
     public static class LayoutValidationReport {
-        private List<RestValidationMessage> validationMessages = new ArrayList<>();
+        private List<RestErrorMessage> validationMessages = new ArrayList<>();
         private void addValidationMessage(String field, String message) {
-            validationMessages.add(new RestValidationMessage()
-                    .type(MODEL_CONSISTENCY)
-                    .field(field).message(message));
+            validationMessages.add(new RestErrorMessage(MODEL_CONSISTENCY, message)
+                    .field(field));
         }
 
         private boolean isValid() {

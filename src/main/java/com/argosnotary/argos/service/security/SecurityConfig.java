@@ -19,7 +19,6 @@
  */
 package com.argosnotary.argos.service.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,15 +65,6 @@ public class SecurityConfig {
 	//++++++++++++++++++++++++++++++
 	// Open Id Connect filter chain
 	//++++++++++++++++++++++++++++++
-	
-	@Autowired
-	private OidcAuthenticationSuccessHandler oidcAuthenticationSuccessHandler;
-
-	@Autowired
-	private OidcAuthenticationFailureHandler oidcAuthenticationFailureHandler;
-	
-	@Autowired
-	private ObjectMapper mapper;
 
 	/*
 	 * By default, Spring OAuth2 uses
@@ -83,13 +73,16 @@ public class SecurityConfig {
 	 * session. We'll save the request in a Base64 encoded cookie instead.
 	 */
 	@Bean
-	public CustomStatelessAuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+	public CustomStatelessAuthorizationRequestRepository cookieAuthorizationRequestRepository(ObjectMapper mapper) {
 		return new CustomStatelessAuthorizationRequestRepository(mapper);
 	}
 	
 	@Bean(name = "oidcFilterChain")
 	@Order(SecurityProperties.BASIC_AUTH_ORDER - 90)
-	public SecurityFilterChain oidcFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain oidcFilterChain(HttpSecurity http, 
+			OidcAuthenticationSuccessHandler oidcAuthenticationSuccessHandler,
+			OidcAuthenticationFailureHandler oidcAuthenticationFailureHandler,
+			ObjectMapper mapper) throws Exception {
 		http.securityMatcher(
 				"/login/oauth2/**",
 				"/oauth2/**");
@@ -100,7 +93,7 @@ public class SecurityConfig {
 		
 		http.oauth2Login(oauth -> oauth
 					.authorizationEndpoint(authorization -> authorization
-					.authorizationRequestRepository(cookieAuthorizationRequestRepository()))
+					.authorizationRequestRepository(cookieAuthorizationRequestRepository(mapper)))
 					.successHandler(oidcAuthenticationSuccessHandler)
 					.failureHandler(oidcAuthenticationFailureHandler)
 				);
@@ -115,31 +108,23 @@ public class SecurityConfig {
 	// JWT Authentication
 	//++++++++++++++++++++++++++++++
 	
-	@Autowired
-	public ClientRegistrationService clientRegistrationService;
-	
 	@Bean
-	JwtIssuerAuthenticationManagerResolver authenticationManagerResolver() {
+	JwtIssuerAuthenticationManagerResolver authenticationManagerResolver(ClientRegistrationService clientRegistrationService) {
 
 		return new JwtIssuerAuthenticationManagerResolver(clientRegistrationService.getAllOauthIssuers());
 	}
-
-	@Autowired
-	private AccountUserDetailsFilter accountUserDetailsFilter;
 	
 	@Bean(name = "apiFilterChain")
 	@Order(SecurityProperties.BASIC_AUTH_ORDER - 80)
-	public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain apiFilterChain(HttpSecurity http, AccountUserDetailsFilter accountUserDetailsFilter, ClientRegistrationService clientRegistrationService) throws Exception {
 		http.securityMatcher("/api/**");
-		
-		http.csrf((csrf) -> csrf.disable());
 		
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		
 		http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
 		
 		http.oauth2ResourceServer(oauth2 -> oauth2
-					.authenticationManagerResolver(authenticationManagerResolver()));
+					.authenticationManagerResolver(authenticationManagerResolver(clientRegistrationService)));
 		
 		http.addFilterAfter(accountUserDetailsFilter, SwitchUserFilter.class);
 

@@ -39,13 +39,11 @@ public class JsonMapperConfig {
     @Primary
     @Bean
     public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = JsonMapper.builder()
+        return JsonMapper.builder()
         		.addModule(new JavaTimeModule())
         		.addModule(oAuth2AuthorizationRequestModule())
         		.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         		.serializationInclusion(NON_NULL).build();
-
-        return objectMapper;
     }
     
     @Bean

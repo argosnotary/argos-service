@@ -19,7 +19,8 @@
  */
 package com.argosnotary.argos.service.rest;
 
-import static com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage.TypeEnum.DATA_INPUT;
+import static com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage.TypeEnum.DATA_INPUT;
+import static com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage.TypeEnum.OTHER;
 import static java.util.Collections.singletonList;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -30,7 +31,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -44,8 +44,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.service.openapi.rest.model.RestError;
-import com.argosnotary.argos.service.openapi.rest.model.RestValidationError;
-import com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage;
+import com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage;
 import com.argosnotary.argos.service.rest.layout.LayoutValidationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -57,56 +56,54 @@ import lombok.extern.slf4j.Slf4j;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
 public class RestServiceExceptionHandler {
+	private Comparator<RestErrorMessage> comparator = Comparator
+            .comparing(RestErrorMessage::getField)
+            .thenComparing(RestErrorMessage::getMessage);
 
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
-    public ResponseEntity<RestValidationError> handleMethodArgumentNotValidException(
+    public ResponseEntity<RestError> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException ex) {
 
-        List<RestValidationMessage> validationMessages = ex.getBindingResult().getAllErrors()
+        List<RestErrorMessage> validationMessages = ex.getBindingResult().getAllErrors()
                 .stream()
                 .filter(FieldError.class::isInstance)
-                .map(error -> new RestValidationMessage()
+                .map(error -> new RestErrorMessage(DATA_INPUT, error.getDefaultMessage())
                         .field(((FieldError) error).getField())
-                        .message(error.getDefaultMessage())
-                        .type(DATA_INPUT)
                 )
-                .collect(Collectors.toList());
+                .sorted(comparator)
+                .toList();
 
-        sortValidationMessages(validationMessages);
-
-        RestValidationError restValidationError = new RestValidationError().messages(validationMessages);
+        RestError restValidationError = new RestError(validationMessages);
         return ResponseEntity.badRequest().contentType(APPLICATION_JSON).body(restValidationError);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<RestValidationError> handleConstraintViolationException(
+    public ResponseEntity<RestError> handleConstraintViolationException(
             ConstraintViolationException ex) {
-        List<RestValidationMessage> validationMessages = ex.getConstraintViolations()
+        List<RestErrorMessage> validationMessages = ex.getConstraintViolations()
                 .stream()
-                .map(error -> new RestValidationMessage()
+                .map(error ->new RestErrorMessage(DATA_INPUT, error.getMessage())
                         .field(error.getPropertyPath().toString())
-                        .message(error.getMessage())
-                        .type(DATA_INPUT)
                 )
-                .collect(Collectors.toList());
-        sortValidationMessages(validationMessages);
-        RestValidationError restValidationError = new RestValidationError().messages(validationMessages);
+                .sorted(comparator)
+                .toList();
+        RestError restValidationError = new RestError(validationMessages);
         return ResponseEntity.badRequest().contentType(APPLICATION_JSON).body(restValidationError);
     }
 
     @ExceptionHandler(value = {JsonMappingException.class})
-    public ResponseEntity<RestValidationError> handleJsonMappingException(JsonMappingException ex) {
+    public ResponseEntity<RestError> handleJsonMappingException(JsonMappingException ex) {
         return ResponseEntity.badRequest().contentType(APPLICATION_JSON).body(createValidationError(String.format("invalid json: %s", ex.getMessage())));
     }
 
     @ExceptionHandler(value = {LayoutValidationException.class})
-    public ResponseEntity<RestValidationError> handleLayoutValidationException(LayoutValidationException ex) {
+    public ResponseEntity<RestError> handleLayoutValidationException(LayoutValidationException ex) {
         return ResponseEntity.badRequest().contentType(APPLICATION_JSON).body(createValidationError(ex));
     }
 
 
     @ExceptionHandler(value = {ResponseStatusException.class})
-    public ResponseEntity handleResponseStatusException(ResponseStatusException ex) {
+    public ResponseEntity<RestError> handleResponseStatusException(ResponseStatusException ex) {
         if (BAD_REQUEST == ex.getStatusCode()) {
             return ResponseEntity.status(ex.getStatusCode()).contentType(APPLICATION_JSON).body(createValidationError(ex.getReason()));
         } else {
@@ -115,7 +112,7 @@ public class RestServiceExceptionHandler {
     }
 
     @ExceptionHandler(value = {ArgosError.class})
-    public ResponseEntity handleArgosError(ArgosError ex) {
+    public ResponseEntity<RestError> handleArgosError(ArgosError ex) {
         if (ex.getLevel() == ArgosError.Level.WARNING) {
             log.debug("{}", ex.getMessage(), ex);
             return ResponseEntity.badRequest().contentType(APPLICATION_JSON).body(createValidationError(ex.getMessage()));
@@ -135,32 +132,21 @@ public class RestServiceExceptionHandler {
         return ResponseEntity.status(NOT_FOUND).contentType(APPLICATION_JSON).body(createRestErrorMessage(ex.getMessage()));
     }
 
-    private RestValidationError createValidationError(LayoutValidationException ex) {
-        RestValidationError restValidationError = new RestValidationError();
-        List<RestValidationMessage> validationMessages = new ArrayList<>(ex.getValidationMessages());
-        sortValidationMessages(validationMessages);
+    private RestError createValidationError(LayoutValidationException ex) {
+        List<RestErrorMessage> validationMessages = new ArrayList<>(ex.getValidationMessages());
+        validationMessages.sort(comparator);
         validationMessages.forEach(message -> log.error("Rest Validation Error: [{}]", message));
-        restValidationError.setMessages(validationMessages);
-        return restValidationError;
+        return new RestError(validationMessages);
     }
 
-    private void sortValidationMessages(List<RestValidationMessage> validationMessages) {
-        validationMessages.sort(Comparator
-                .comparing(RestValidationMessage::getField)
-                .thenComparing(RestValidationMessage::getMessage));
-    }
-
-    private RestValidationError createValidationError(String reason) {
+    private RestError createValidationError(String reason) {
         log.error("Rest Validation Error: [{}]", reason);
-        return new RestValidationError()
-                .messages(singletonList(new RestValidationMessage()
-                        .message(reason)
-                        .type(DATA_INPUT)));
+        return new RestError(singletonList(new RestErrorMessage(DATA_INPUT,reason)));
     }
 
     private RestError createRestErrorMessage(String message) {
         log.error("Rest Error: [{}]", message);
-        return new RestError().message(message);
+        return new RestError(singletonList(new RestErrorMessage(OTHER, message)));
     }
 
 }

@@ -133,7 +133,7 @@ Feature: Verification
     And match resp.response == defaultValidResponse
 
 
-  Scenario: verification without authorization should return a 401 error
+  Scenario: verification without authorization should return a 403 error
     Given path '/api/nodes/'+defaultProjectId+'/supplychains'
     And request { name: 'name', parentId: #(defaultProjectId)}
     When method POST
@@ -144,7 +144,7 @@ Feature: Verification
     Given path supplyChainPath + '/verification'
     And request defaultReleaseArtifacts
     When method POST
-    Then status 401
+    Then status 403
 
   Scenario: verification without permission RELEASE should return a 403 error
     Given path '/api/nodes/'+defaultProjectId+'/supplychains'

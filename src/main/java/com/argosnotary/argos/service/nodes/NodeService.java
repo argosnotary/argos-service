@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.argosnotary.argos.domain.nodes.Node;
-import com.argosnotary.argos.domain.roles.Permission;
 
 public interface NodeService {
 	
@@ -47,9 +46,9 @@ public interface NodeService {
 	 */
 	public Set<Node> find(String clazz, Optional<Node> node);
 	
-	public boolean exists(Class clazz, UUID resourceId);
+	public boolean exists(Class<? extends Node> clazz, UUID resourceId);
 	
-	public boolean exists(Class clazz, String name);
+	public boolean exists(Class<? extends Node> clazz, String name);
 	
 	public boolean existsByParentIdAndName(UUID parentId, String name);
 	

@@ -63,7 +63,7 @@ public class NodeServiceImpl implements NodeService {
 		List<UUID> path = new ArrayList<>();
 		path.add(node.getId());
 		if (!(node instanceof Organization)) {
-			path.addAll(nodeRepository.findById(node.getParentId()).get().getPathToRoot());
+			nodeRepository.findById(node.getParentId()).ifPresent(p -> path.addAll(p.getPathToRoot()));
 		}
 		node.setPathToRoot(path);
 		return node;
@@ -108,7 +108,7 @@ public class NodeServiceImpl implements NodeService {
 	public Set<Node> find(String clazz, Optional<Node> nodeOpt) {
 		Set<UUID> ids = new HashSet<>();
 		if (nodeOpt.isPresent() && roleAssignmentService.findAllPermissionDownTree(nodeOpt.get()).stream()
-				.anyMatch(p -> Permission.READ.equals(p))) {
+				.anyMatch(Permission.READ::equals)) {
 			ids.add(nodeOpt.get().getId());
 		} else {
 			// read authorization is needed
@@ -123,7 +123,7 @@ public class NodeServiceImpl implements NodeService {
 		Set<Node> nodes = nodeRepository.findWithClassAndResourceIdsUpTree(clazz, ids).stream().collect(Collectors.toSet());
 		
 		Set<UUID> pathUuids = nodeRepository.findWithIds(ids).stream()
-				.map(n -> n.getPathToRoot()).flatMap(List::stream).collect(Collectors.toSet());
+				.map(Node::getPathToRoot).flatMap(List::stream).collect(Collectors.toSet());
 		
 		nodes.addAll(nodeRepository.findWithClassAndResourceIds(clazz, pathUuids));
 		return nodes;
@@ -151,8 +151,8 @@ public class NodeServiceImpl implements NodeService {
 	
 	private List<String> getQualifiedName(Node node) {
 		List<String> labels = new ArrayList<>();
-		if (node instanceof Organization) {
-			labels.addAll(((Organization) node).getDomain().reverseLabels());
+		if (node instanceof Organization org) {
+			labels.addAll((org).getDomain().reverseLabels());
 		} else {
 			labels.add(node.getName());
 		}

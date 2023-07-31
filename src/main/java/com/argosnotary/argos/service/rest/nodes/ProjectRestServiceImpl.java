@@ -23,7 +23,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Node;
@@ -78,8 +77,8 @@ public class ProjectRestServiceImpl implements ProjectRestService {
 		Project node = projectService
 				.create(projectMapper.convertFromRestProject(restProject));
 
-        URI location = ServletUriComponentsBuilder
-        		.fromPath("/projects")
+        URI location = UriComponentsBuilder
+        		.fromPath("/api/projects")
                 .path("/{projectId}")
                 .buildAndExpand(node.getId())
                 .toUri();
@@ -91,7 +90,9 @@ public class ProjectRestServiceImpl implements ProjectRestService {
     @Transactional
     @AuditLog
 	public ResponseEntity<Void> deleteProjectById(UUID projectId) {
-		projectService.findById(projectId).orElseThrow(this::projectNotFound);
+		if (!projectService.exists(projectId)) {
+			throw projectNotFound();
+		}
 		projectService.delete(projectId);
 		return ResponseEntity.noContent().build();
 	}
@@ -111,7 +112,7 @@ public class ProjectRestServiceImpl implements ProjectRestService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
 		}
 		return ResponseEntity.ok(projectService.find(optNode.get())
-				.stream().map(projectMapper::convertToRestProject).collect(Collectors.toList()));
+				.stream().map(projectMapper::convertToRestProject).toList());
 	}
 	
 	private ResponseStatusException projectNotFound() {

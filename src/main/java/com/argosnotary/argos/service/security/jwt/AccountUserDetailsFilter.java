@@ -55,8 +55,7 @@ public class AccountUserDetailsFilter  extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		SecurityContext context = SecurityContextHolder.getContext();
-    	if(context.getAuthentication() != null && context.getAuthentication().getPrincipal() instanceof Jwt) {
-    		Jwt jwtUser = (Jwt) context.getAuthentication().getPrincipal();
+    	if(context.getAuthentication() != null && context.getAuthentication().getPrincipal() instanceof Jwt jwtUser) {
     		ArgosUserDetails userDetails = (ArgosUserDetails) loadUserByToken(jwtUser);
     		Authentication authenticatedPersonalAccount = new AccountAuthenticationToken(jwtUser, userDetails);
             authenticatedPersonalAccount.setAuthenticated(true);
@@ -74,7 +73,7 @@ public class AccountUserDetailsFilter  extends OncePerRequestFilter {
     		throw new InternalAuthenticationServiceException("unknown account");
     	}
 		if (optionalAccount.get() instanceof ServiceAccount) {
-			return new ArgosUserDetails((ServiceAccount) optionalAccount.get());
+			return new ArgosUserDetails(optionalAccount.get());
 		}
 		PersonalAccount personalAccount = (PersonalAccount) optionalAccount.get();
 	    return new ArgosUserDetails(personalAccount);

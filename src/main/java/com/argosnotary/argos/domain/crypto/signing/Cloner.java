@@ -51,8 +51,8 @@ public interface Cloner {
     List<Rule> clone(List<Rule> rules);
 
     default Rule clone(Rule rule) {
-        if (rule instanceof MatchRule) {
-            return clone((MatchRule) rule);
+        if (rule instanceof MatchRule matchRule) {
+            return clone(matchRule);
         } else {
             return new Rule(rule.getRuleType(), rule.getPattern());
         }

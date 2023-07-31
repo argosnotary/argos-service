@@ -22,12 +22,16 @@ package com.argosnotary.argos.domain.nodes;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.argosnotary.argos.domain.crypto.HashAlgorithm;
+import com.argosnotary.argos.domain.crypto.KeyAlgorithm;
+import com.argosnotary.argos.domain.crypto.signing.SignatureAlgorithm;
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.Project;
@@ -87,8 +91,8 @@ class OrganizationTest {
 	
 	@Test
 	void testLeafNode() {
-		assertThat(org1.isLeaf()).isEqualTo(true);
-		assertThat(org2.isLeaf()).isEqualTo(false);
+		assertThat(org1.isLeaf()).isTrue();
+		assertThat(org2.isLeaf()).isFalse();
 	}
 	
 	@Test
@@ -109,7 +113,9 @@ class OrganizationTest {
 		Organization org1 = new Organization();
 		Organization org2 = new Organization();
 		org2.setId(org1.getId());
-		org1.setParent(node1);
+		assertThrows(UnsupportedOperationException.class, () -> {
+			org1.setParent(node1);
+          });
 		assertEquals(org2, org1);
 		assertNull(org1.getParentId());
 	}

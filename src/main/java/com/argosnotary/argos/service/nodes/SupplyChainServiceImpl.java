@@ -85,7 +85,7 @@ public class SupplyChainServiceImpl implements SupplyChainService {
 	@Override
 	public Optional<Organization> getOrganization(UUID supplyChainId) {
 		return nodeService.findRootNodeInPath(supplyChainId)
-				.filter(node -> node instanceof Organization)
+				.filter(Organization.class::isInstance)
 				.map(n -> Optional.of((Organization)n))
 				.orElse(Optional.empty());
 	}

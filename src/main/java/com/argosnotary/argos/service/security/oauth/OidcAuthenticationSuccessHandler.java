@@ -88,7 +88,7 @@ public class OidcAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
         		.fullName(oidcUser.getFullName())
         		.givenName(oidcUser.getGivenName())
         		.build();
-    	if (oidcUser.getEmailVerified()) {
+    	if (Boolean.TRUE.equals(oidcUser.getEmailVerified())) {
     		profile.setEmail(oidcUser.getEmail());
     	}
     	
@@ -113,7 +113,7 @@ public class OidcAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
         	// new Personal Account
             PersonalAccount oidcAccount = PersonalAccount.builder()
         			.name(oidcUser.getPreferredUsername())
-    				.providerName(clientRegistrationService.getClientRegistrationName(oidcUser.getIssuer().toString()).get())
+    				.providerName(clientRegistrationService.getClientRegistrationName(oidcUser.getIssuer().toString()).orElseThrow())
     				.providerSubject(oidcUser.getSubject())
     				.profile(profile)
     				.build();

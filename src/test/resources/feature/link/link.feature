@@ -108,13 +108,13 @@ Feature: Link
     Then status 400
     And match response contains read('classpath:testmessages/link/invalid-link-response.json')
 
-  Scenario: store link without authorization should return a 401 error
+  Scenario: store link without authorization should return a 403 error
     * configure headers = null
     Given path linkPath
     And request validLink
     And header Content-Type = 'application/json'
     When method POST
-    Then status 401
+    Then status 403
 
   Scenario: find link with valid supplychainid should return a 200
     * call read('create-link.feature') {supplyChainId:#(scId), linkFile:#(validLink), signingAccount:#(sa1)}

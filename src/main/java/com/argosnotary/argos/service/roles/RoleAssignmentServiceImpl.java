@@ -70,13 +70,6 @@ public class RoleAssignmentServiceImpl implements RoleAssignmentService {
 		return roleAssignmentRepository.findByResourceId(resourceId);
 	}
 
-//	@Override
-//	public Set<RoleAssignment> findByResourceIdsAndAccountId(List<UUID> resourceIds, UUID accountId) {
-//		return roleAssignmentRepository.findByIdentityIdAnd(accountId).stream()
-//				.filter(ra -> resourceIds.contains(ra.getResourceId()))
-//				.collect(Collectors.toSet());
-//	}
-
 	@Override
 	public RoleAssignment create(UUID resourceId, UUID accountId, Role role) {
 		RoleAssignment ra = RoleAssignment.builder()
@@ -105,10 +98,10 @@ public class RoleAssignmentServiceImpl implements RoleAssignmentService {
 		}
 		List<UUID> pathResourceIds = node.getPathToRoot();
 
-		if (optAccount.get() instanceof ServiceAccount) {
-			return ((ServiceAccount)optAccount.get()).getRoleAssignments().stream()
+		if (optAccount.get() instanceof ServiceAccount sa) {
+			return (sa.getRoleAssignments().stream()
 					.filter(ra -> pathResourceIds.contains(ra.getResourceId()))
-					.map(rs -> rs.getRole().getPermissions())
+					.map(rs -> rs.getRole().getPermissions()))
 					.flatMap(Set::stream)
 					.collect(Collectors.toSet());
 		}

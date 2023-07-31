@@ -42,7 +42,7 @@ public interface OrganizationService {
 	
 	public boolean existsByName(String name);
 	
-	boolean existsById(UUID organizationId);
+	boolean exists(UUID organizationId);
 	
 	/**
 	 * Create an Organization

@@ -74,7 +74,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Organization"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     get:
@@ -118,7 +118,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Organization"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     delete:
@@ -137,7 +137,7 @@ paths:
         '204':
           description: organization deleted
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
 
@@ -173,7 +173,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ManagementNode"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     get:
@@ -223,7 +223,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ManagementNode"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     delete:
@@ -242,7 +242,7 @@ paths:
         '204':
           description: management node deleted
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
           
@@ -278,7 +278,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Project"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     get:
@@ -329,7 +329,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Project"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     delete:
@@ -348,7 +348,7 @@ paths:
         '204':
           description: project deleted
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
           
@@ -383,7 +383,7 @@ paths:
                 format: uri
               description: location where the created service account can be found
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     get:
@@ -445,7 +445,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/KeyPair"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '404':
           description: no active key exists
         '500':
@@ -476,7 +476,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServiceAccount"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '404':
           description: the service account is not found
         '500':
@@ -512,7 +512,7 @@ paths:
         '404':
           description: the service account is not found
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     delete:
@@ -535,7 +535,7 @@ paths:
         '204':
           description: deleted service account
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '404':
           description: the service account is not found
         '500':
@@ -579,7 +579,7 @@ paths:
         '404':
           description: the service account is not found
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     get:
@@ -606,7 +606,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/KeyPair"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '404':
           description: no active key exists
         '500':
@@ -644,7 +644,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/SupplyChain"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     get:
@@ -693,7 +693,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/SupplyChain"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     put:
@@ -722,7 +722,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SupplyChain'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     delete:
@@ -741,7 +741,7 @@ paths:
         '204':
           description: supply chain deleted
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
   
@@ -780,7 +780,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/AccountKeyInfo"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
   
@@ -813,7 +813,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/LinkMetaBlock"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     post:
@@ -844,7 +844,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/LinkMetaBlock"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
   
@@ -869,7 +869,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/LayoutMetaBlock"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
         '404':
@@ -906,7 +906,7 @@ paths:
                 format: uri
               description: location where the created layout metablock can be found
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
   
@@ -933,7 +933,7 @@ paths:
         '204':
           description: layout is correct
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
   
@@ -960,7 +960,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ReleaseConfiguration"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     post:
@@ -991,7 +991,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ReleaseConfiguration"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
 
@@ -1020,7 +1020,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/ApprovalConfiguration"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     post:
@@ -1056,7 +1056,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/ApprovalConfiguration"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
   
@@ -1085,7 +1085,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/ApprovalConfiguration"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
            
@@ -1120,7 +1120,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/VerificationResult'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
   
@@ -1151,7 +1151,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReleaseResult'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
 
@@ -1188,7 +1188,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/VerificationResult'
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
 
@@ -1224,7 +1224,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/RoleAssignment"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
     get:
@@ -1276,7 +1276,7 @@ paths:
         '204':
           description: role assignment deleted
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'  
   
@@ -1316,7 +1316,7 @@ paths:
         '404':
           description: personal account not found
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
 
@@ -1335,7 +1335,7 @@ paths:
         '404':
           description: personal account not found
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
 
@@ -1392,7 +1392,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/PersonalAccount"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
                   
   /personalaccounts/{accountId}:
     get:
@@ -1414,7 +1414,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/PersonalAccount"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
   
@@ -1438,7 +1438,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/PublicKey"
         '400':
-          $ref: '#/components/responses/ValidationError'
+          $ref: '#/components/responses/Error'
         '404':
           description: no active key exists
         '500':
@@ -1454,14 +1454,8 @@ components:
       type: http
       scheme: basic
   responses:
-    ValidationError:
-      description: validation error
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ValidationError"
     Error:
-      description: server error
+      description: validation error
       content:
         application/json:
           schema:
@@ -2024,22 +2018,14 @@ components:
     Error:
       type: object
       required:
-        - message
-      properties:
-        message:
-          type: string
-    
-    ValidationError:
-      type: object
-      required:
         - messages
       properties:
         messages:
           type: array
           items:
-            $ref: "#/components/schemas/ValidationMessage"
+            $ref: "#/components/schemas/ErrorMessage"
     
-    ValidationMessage:
+    ErrorMessage:
       type: object
       required:
         - message
@@ -2051,6 +2037,7 @@ components:
           enum:
             - DATA_INPUT
             - MODEL_CONSISTENCY
+            - OTHER
         message:
           type: string
 

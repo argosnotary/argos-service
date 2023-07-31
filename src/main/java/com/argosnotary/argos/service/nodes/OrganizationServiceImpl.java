@@ -21,17 +21,13 @@ package com.argosnotary.argos.service.nodes;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.nodes.Organization;
-import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.roles.RoleAssignmentService;
@@ -51,7 +47,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 	@Override
 	public List<Organization> find() {
 		return nodeService.find(Organization.class.getCanonicalName(), Optional.empty())
-				.stream().map(n -> (Organization) n).collect(Collectors.toList());
+				.stream().map(n -> (Organization) n).toList();
 	}
 
 	@Override
@@ -67,7 +63,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 	public Organization create(Organization organization) {
 		// user is authenticated with PersonalAccount
 		// validated in Rest Service
-		PersonalAccount account = (PersonalAccount)accountSecurityContext.getAuthenticatedAccount().get();
+		PersonalAccount account = (PersonalAccount)accountSecurityContext.getAuthenticatedAccount().orElseThrow();
 		Organization newOrg = (Organization) nodeService.create(organization);
 		// creator becomes Owner
 		roleAssignmentService.create(newOrg.getId(), account.getId(), new Role.Owner());
@@ -80,13 +76,12 @@ public class OrganizationServiceImpl implements OrganizationService {
 	}
 
 	@Override
-	public boolean existsById(UUID organizationId) {
+	public boolean exists(UUID organizationId) {
 		return nodeService.exists(Organization.class, organizationId);
 	}
 
 	@Override
 	public boolean existsByName(String name) {
-		// TODO Auto-generated method stub
 		return nodeService.exists(Organization.class, name);
 	}
 

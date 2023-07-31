@@ -19,6 +19,8 @@
  */
 package com.argosnotary.argos.service.rest;
 
+import java.lang.reflect.Method;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -36,9 +38,14 @@ public class MethodArgumentTypeMismatchExceptionHandler extends ResponseEntityEx
     }
 	
 	private String getMessages(MethodArgumentTypeMismatchException ex) {
-		String field = String.format("%s.%s", ex.getParameter().getMethod().getName(), ex.getName());
+		String methodName = "";
+		Method method = ex.getParameter().getMethod();
+		if (method != null) {
+			methodName = method.getName();
+		}
+		String field = String.format("%s.%s", methodName, ex.getName());
 		return String.format("{\"messages\":[{\"field\":\"%s\",\"type\":\"DATA_INPUT\",\"message\":\"%s\"}]}",
-        		field, ex.getMostSpecificCause().getMessage(), ex.getValue());
+        		field, ex.getMostSpecificCause().getMessage());
 	}
 
 }

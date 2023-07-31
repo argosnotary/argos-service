@@ -30,7 +30,5 @@ import com.argosnotary.argos.domain.release.ReleaseResult;
 public interface ReleaseService {
     ReleaseResult createRelease(UUID supplyChainId, List<Set<Artifact>> releaseArtifacts);
 
-    //Optional<String> getRawReleaseFileById(String id);
-
     boolean artifactsAreTrusted(Set<String> releasedArtifacts, List<String> paths);
 }

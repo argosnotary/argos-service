@@ -71,10 +71,10 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
     @PostConstruct
     public void initKeycloak() {
 		if (!clientRegistrationService.exists(ServiceAccount.SA_PROVIDER_NAME)) {
-			throw new ArgosError(String.format("OIDC provider definition of [%] doesn't exist", ServiceAccount.SA_PROVIDER_NAME));
+			throw new ArgosError(String.format("OIDC provider definition of [%s] doesn't exist", ServiceAccount.SA_PROVIDER_NAME));
 		}
 		keycloak = KeycloakBuilder.builder()
-	            .serverUrl(clientRegistrationService.getClientRegistrationProviderUrl(ServiceAccount.SA_PROVIDER_NAME).get())
+	            .serverUrl(clientRegistrationService.getClientRegistrationProviderUrl(ServiceAccount.SA_PROVIDER_NAME).orElseThrow())
 	            .clientId(clientId)
 	            .clientSecret(clientSecret)
 	            .realm(realm)
@@ -133,7 +133,7 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
 	@Override
 	public URL getProviderIssuer() {
 		try {
-			return new URL(clientRegistrationService.getClientRegistration(ServiceAccount.SA_PROVIDER_NAME).get().getProviderDetails().getIssuerUri());
+			return new URL(clientRegistrationService.getClientRegistration(ServiceAccount.SA_PROVIDER_NAME).orElseThrow().getProviderDetails().getIssuerUri());
 		} catch (MalformedURLException e) {
 			throw new ArgosError(e.getMessage());
 		}
@@ -142,10 +142,7 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
 	@Override
 	public boolean exists(ServiceAccount sa) {
 		Optional<UserRepresentation> optUser = getUser(sa.getId());
-		if (optUser.isEmpty()) {
-			return false;
-		}
-		return true;
+		return optUser.isEmpty();
 	}
 	
 

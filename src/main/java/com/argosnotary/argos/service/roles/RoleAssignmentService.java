@@ -30,7 +30,7 @@ import com.argosnotary.argos.domain.roles.RoleAssignment;
 
 public interface RoleAssignmentService {
 	
-	public RoleAssignment save(RoleAssignment RoleAssignment);
+	public RoleAssignment save(RoleAssignment roleAssignment);
 	
 	public RoleAssignment create(UUID resourceId, UUID accountId, Role role);
 	

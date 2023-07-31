@@ -34,7 +34,7 @@ public class AccountSecurityContextImpl implements AccountSecurityContext {
     public Optional<Account> getAuthenticatedAccount() {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getPrincipal)
-                .map(authentication -> (ArgosUserDetails) authentication)
+                .map(ArgosUserDetails.class::cast)
                 .map(ArgosUserDetails::getAccount);
     }
 }

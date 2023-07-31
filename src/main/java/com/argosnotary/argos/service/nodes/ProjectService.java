@@ -39,6 +39,8 @@ public interface ProjectService {
 	
 	void delete(UUID projectId);
 	
+	boolean exists(UUID projectId);
+	
 	Optional<Project> findById(UUID projectId);
 
 }

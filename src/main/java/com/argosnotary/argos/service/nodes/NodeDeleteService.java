@@ -56,14 +56,14 @@ public class NodeDeleteService implements NodeVisitor<Optional<Node>>{
     public void deleteSupplyChain(SupplyChain supplyChain) {
         layoutMetaBlockRepository.deleteBySupplyChainId(supplyChain.getId());
         linkMetaBlockRepository.deleteBySupplyChainId(supplyChain.getId());
-        //approvalConfigurationRepository.deleteBySupplyChainId(supplyChainId);
-        //releaseConfigurationRepository.deleteBySupplyChainId(supplyChainId);
+        approvalConfigurationRepository.deleteBySupplyChainId(supplyChain.getId());
+        releaseConfigurationRepository.deleteBySupplyChainId(supplyChain.getId());
     }
 
     @Override
     public void visitEnter(Node node) {
-		if (node instanceof SupplyChain) {
-			deleteSupplyChain((SupplyChain)node);
+		if (node instanceof SupplyChain supplyChainNode) {
+			deleteSupplyChain(supplyChainNode);
 		}
 		if (node instanceof Project) {
 			serviceAccountRepository.deleteByProjectId(node.getId());
@@ -78,6 +78,7 @@ public class NodeDeleteService implements NodeVisitor<Optional<Node>>{
 
 	@Override
 	public void visitEndPoint(Node node) {
+		throw new UnsupportedOperationException("visitEndPoint method not implemented");
 		
 	}
 	

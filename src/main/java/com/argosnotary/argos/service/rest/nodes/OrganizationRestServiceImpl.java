@@ -22,9 +22,7 @@ package com.argosnotary.argos.service.rest.nodes;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -100,7 +98,7 @@ public class OrganizationRestServiceImpl implements OrganizationRestService {
 	public ResponseEntity<Void> deleteOrganizationById(
 	        @Parameter(name = "organizationId", description = "organization id", required = true, in = ParameterIn.PATH) @PathVariable("organizationId") UUID organizationId
 		    ) {
-		if (!organizationService.existsById(organizationId)) {
+		if (!organizationService.exists(organizationId)) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found");
 		}
 		organizationService.delete(organizationId);
@@ -124,7 +122,7 @@ public class OrganizationRestServiceImpl implements OrganizationRestService {
 		return ResponseEntity.ok(organizationService.find()
 				.stream()
 				.map(organizationMapper::convertToRestOrganization)
-				.collect(Collectors.toList()));
+				.toList());
 	}
 
 }

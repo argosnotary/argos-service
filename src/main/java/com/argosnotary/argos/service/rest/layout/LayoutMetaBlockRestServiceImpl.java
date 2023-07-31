@@ -19,14 +19,13 @@
  */
 package com.argosnotary.argos.service.rest.layout;
 
-import static com.argosnotary.argos.service.openapi.rest.model.RestValidationMessage.TypeEnum.MODEL_CONSISTENCY;
+import static com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage.TypeEnum.MODEL_CONSISTENCY;
 import static com.argosnotary.argos.service.rest.layout.ValidationHelper.throwLayoutValidationException;
 import static org.springframework.http.ResponseEntity.ok;
 
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -101,11 +100,11 @@ public class LayoutMetaBlockRestServiceImpl implements LayoutMetaBlockRestServic
             List<RestApprovalConfiguration> restApprovalConfigurations) {
         List<ApprovalConfiguration> approvalConfigurations = restApprovalConfigurations.stream()
                 .map(restApprovalConfiguration -> convertAndValidate(supplyChainId, restApprovalConfiguration))
-                .collect(Collectors.toList());
+                .toList();
         approvalConfigurations = layoutMetaBlockService.createApprovalConfigurations(approvalConfigurations);
         return ResponseEntity.ok(approvalConfigurations.stream()
                 .map(approvalConfigurationMapper::convertToRestApprovalConfiguration)
-                .collect(Collectors.toList()));
+                .toList());
 
     }
 
@@ -115,13 +114,13 @@ public class LayoutMetaBlockRestServiceImpl implements LayoutMetaBlockRestServic
         return ResponseEntity.ok(layoutMetaBlockService.getApprovalConfigurations(supplyChainId)
                 .stream()
                 .map(approvalConfigurationMapper::convertToRestApprovalConfiguration)
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     @Override
     @PermissionCheck(permissions = Permission.LINK_ADD)
     public ResponseEntity<List<RestApprovalConfiguration>> getApprovalsForAccount(UUID supplyChainId) {
-        return ok(layoutMetaBlockService.getApprovalsForAccount(supplyChainId).stream().map(approvalConfigurationMapper::convertToRestApprovalConfiguration).collect(Collectors.toList()));
+        return ok(layoutMetaBlockService.getApprovalsForAccount(supplyChainId).stream().map(approvalConfigurationMapper::convertToRestApprovalConfiguration).toList());
     }
 
     @Override

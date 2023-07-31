@@ -36,10 +36,7 @@ import org.springframework.stereotype.Service;
 
 import com.argosnotary.argos.domain.ArgosError;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-//@RequiredArgsConstructor
 public class ClientRegistrationServiceImpl implements ClientRegistrationService {
 	
 	public ClientRegistrationServiceImpl(@Autowired ClientRegistrationRepository clientRegistrationRepository) {
@@ -50,11 +47,11 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
 				.collect(Collectors.toSet());
 		this.externalProviders =  clientRegistrationsNameMap.keySet().stream()
 				.filter(reg -> !internalProviders.contains(reg))
-				.map(p -> new OAuthProvider(p))
-				.collect(Collectors.toList());
+				.map(OAuthProvider::new)
+				.toList();
 	}
 	
-	private final static Set<String> internalProviders = Set.of("master", "saprovider");
+	private static final Set<String> internalProviders = Set.of("master", "saprovider");
 	
 	private final Map<String, ClientRegistration> clientRegistrationsNameMap;
 	

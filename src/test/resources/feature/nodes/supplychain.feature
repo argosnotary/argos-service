@@ -54,7 +54,7 @@ Feature: Project
     Given path '/api/supplychains/'+scId
     When method GET
     Then status 404
-    Then match response.message == 'Resource with id ['+scId+'] not found'
+    Then match response.messages[0].message == 'Resource with id ['+scId+'] not found'
     
   Scenario: store supplychain with non unique name for the parent should return a 400
     Given path '/api/nodes/'+defaultProjectId+'/supplychains'
@@ -99,7 +99,7 @@ Feature: Project
     Given path '/api/supplychains/'+scId
     When method GET
     Then status 404
-    Then match response.message == 'Resource with id ['+scId+'] not found'
+    Then match response.messages[0].message == 'Resource with id ['+scId+'] not found'
     
     
  

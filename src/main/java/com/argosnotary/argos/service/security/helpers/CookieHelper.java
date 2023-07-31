@@ -30,8 +30,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 
 public class CookieHelper {
+	private CookieHelper() {}
 
-//    private static final String COOKIE_DOMAIN = "localhost";
     private static final Boolean HTTP_ONLY = Boolean.TRUE;
     private static final Boolean SECURE = Boolean.TRUE;
     
@@ -52,9 +52,6 @@ public class CookieHelper {
     public static Cookie generate(@NonNull String name, @NonNull String value, @NonNull Duration maxAge) {
         // Build cookie instance
         Cookie cookie = new Cookie(name, value);
-//        if (!"localhost".equals(COOKIE_DOMAIN)) { // https://stackoverflow.com/a/1188145
-//            cookie.setDomain(COOKIE_DOMAIN);
-//        }
         cookie.setHttpOnly(HTTP_ONLY);
         cookie.setSecure(SECURE);
         cookie.setMaxAge((int) maxAge.toSeconds());

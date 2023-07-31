@@ -62,14 +62,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
     
-//    @Autowired
-//    private MappingMongoConverter mongoConverter;
-    
-//    @PostConstruct
-//    public void setUpMongoEscapeCharacterConversion() {
-//        mongoConverter.setCustomConversions(customConversions());
-//    }
-
     @Bean
     public GridFsTemplate gridFsTemplate() {
     	return new GridFsTemplate(mongoDbFactory(), mappingMongoConverter(mongoDbFactory(),

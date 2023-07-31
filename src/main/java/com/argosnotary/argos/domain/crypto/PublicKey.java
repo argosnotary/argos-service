@@ -20,6 +20,7 @@
 package com.argosnotary.argos.domain.crypto;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.Security;
@@ -33,7 +34,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import lombok.Data;
 
 @Data
-public class PublicKey {
+public class PublicKey  implements Serializable {
 
     @Indexed
     private final String keyId;

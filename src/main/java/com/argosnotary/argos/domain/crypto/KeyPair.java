@@ -19,6 +19,8 @@
  */
 package com.argosnotary.argos.domain.crypto;
 
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -26,7 +28,7 @@ import lombok.ToString;
 @Data
 @ToString(callSuper=true)
 @EqualsAndHashCode(callSuper=true)
-public class KeyPair extends PublicKey {
+public class KeyPair extends PublicKey implements Serializable {
     private final byte[] encryptedPrivateKey;
     
     public KeyPair(String keyId, byte[] publicKey, byte[] encryptedPrivateKey) {

@@ -32,7 +32,6 @@ import java.util.UUID;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -44,9 +43,7 @@ import lombok.Data;
 @Builder
 @Data
 @Document(collection="releases")
-@CompoundIndexes({
-    @CompoundIndex(def = "{'organization.domain.domain' : 1}")
-})
+@CompoundIndex(def = "{'organization.domain.domain' : 1}")
 public class Release {
 	@Id
 	private UUID id;

@@ -37,7 +37,6 @@ public abstract class RuleMapper {
     @Autowired
     private MatchRuleMapper matchRuleMapper;
 
-
     @ObjectFactory
     public Rule createRule(RestRule restRule) {
         if (restRule.getRuleType() == RestRule.RuleTypeEnum.MATCH) {
@@ -48,15 +47,15 @@ public abstract class RuleMapper {
 
     @ObjectFactory
     public RestRule createRestRule(Rule rule) {
-        if (rule instanceof MatchRule) {
-            return matchRuleMapper.mapToRestRule((MatchRule) rule);
+        if (rule instanceof MatchRule matchRule) {
+            return matchRuleMapper.mapToRestRule(matchRule);
         }
-        return new RestRule();
+        return new RestRule(null, null);
     }
 
     public abstract Rule mapFromRestRule(RestRule restRule);
 
-    public abstract RestRule mapFromtRule(Rule rule);
+    public abstract RestRule mapFromRule(Rule rule);
 
 
 }
