@@ -29,6 +29,8 @@ public interface ServiceAccountService {
 
     Optional<ServiceAccount> findById(UUID accountId);
 
+    Optional<ServiceAccount> findByProviderSubject(String subject);
+
     void delete(ServiceAccount account);
     
     public boolean exists(UUID accountId);

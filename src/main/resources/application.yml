@@ -52,6 +52,11 @@ keycloak.admin-client.client-id: samanager
 keycloak.admin-client.client-secret: 0weeMaHVQ3GqriognQg8QkEwBmoVC7LB
 keycloak.admin-client.grant-type: client_credentials
 
+keycloak.token-client.realm: saprovider
+keycloak.token-client.client-id: saprovider-client
+keycloak.token-client.client-secret: 644TyDbo7pTeyqDLM7kj4LWMwjRcUcBr
+keycloak.token-client.grant-type: password
+
 
 logging:
   level:

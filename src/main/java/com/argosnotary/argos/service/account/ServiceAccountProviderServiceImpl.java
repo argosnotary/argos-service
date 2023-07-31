@@ -25,63 +25,58 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.domain.account.ServiceAccount;
-import com.argosnotary.argos.service.mongodb.account.ServiceAccountRepository;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class ServiceAccountProviderServiceImpl implements ServiceAccountProviderService {
 	
-	@Value("${keycloak.admin-client.realm}")
-	private String realm;
+	private String tokenClientId;
 	
-	@Value("${keycloak.admin-client.client-id}")
-	private String clientId;
-	
-	@Value("${keycloak.admin-client.client-secret}")
-	private String clientSecret;
-	
-	@Value("${keycloak.admin-client.grant-type}")
-	private String grantType;
+	private String tokenClientSecret;
 	
 	private RealmResource realmResource;	
 	
-	private final ClientRegistrationService clientRegistrationService;
+	private ClientRegistrationService clientRegistrationService;
 	
 	private Keycloak keycloak;
 
-    @PostConstruct
-    public void initKeycloak() {
-		if (!clientRegistrationService.exists(ServiceAccount.SA_PROVIDER_NAME)) {
+    public ServiceAccountProviderServiceImpl(
+    		ClientRegistrationService clientRegistrationService,
+    		@Value("${keycloak.admin-client.client-id}") String clientId, 
+    		@Value("${keycloak.admin-client.client-secret}") String clientSecret,
+    		@Value("${keycloak.token-client.client-id}") String tokenClientId, 
+    		@Value("${keycloak.token-client.client-secret}") String tokenClientSecret) {
+    	if (!clientRegistrationService.exists(ServiceAccount.SA_PROVIDER_NAME)) {
 			throw new ArgosError(String.format("OIDC provider definition of [%s] doesn't exist", ServiceAccount.SA_PROVIDER_NAME));
 		}
+    	this.clientRegistrationService = clientRegistrationService;
+    	this.tokenClientId = tokenClientId;
+    	this.tokenClientSecret = tokenClientSecret;
 		keycloak = KeycloakBuilder.builder()
 	            .serverUrl(clientRegistrationService.getClientRegistrationProviderUrl(ServiceAccount.SA_PROVIDER_NAME).orElseThrow())
 	            .clientId(clientId)
 	            .clientSecret(clientSecret)
-	            .realm(realm)
-	            .grantType(grantType)
+	            .realm(ServiceAccount.SA_PROVIDER_NAME)
+	            .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
 	            .build();
 	    realmResource = keycloak.realm(ServiceAccount.SA_PROVIDER_NAME);
-        
     }
 
 	@Override
@@ -92,10 +87,10 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
         user.setFirstName(sa.getName());
 
         // Get realm
-        UsersResource userRessource = realmResource.users();
+        UsersResource userResource = realmResource.users();
 
         // Create user (requires manage-users role)
-        Response response = userRessource.create(user);
+        Response response = userResource.create(user);
         if (response.getStatus() == 201) {
         	String[] parts = response.getLocation().getPath().split("/");
         	String subject = parts[parts.length-1];            
@@ -110,7 +105,10 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
 	public void unRegisterServiceAccount(ServiceAccount sa) {
 		Optional<UserRepresentation> optUser = getUser(sa.getId());
 		if (optUser.isPresent()) {
-			getUser(optUser.get()).remove();
+			Response response = realmResource.users().delete(optUser.get().getId());
+	        if (response.getStatus() != 204) {
+	        	log.info("User unregister with name: [{}], accountId: [{}] and subject: [{}]  failed", optUser.get().getUsername(), optUser.get().getFirstName(), sa.getProviderSubject());	        	
+	        }
 		}
 	}
 
@@ -131,29 +129,28 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
 	}
 
 	@Override
-	public URL getProviderIssuer() {
-		try {
-			return new URL(clientRegistrationService.getClientRegistration(ServiceAccount.SA_PROVIDER_NAME).orElseThrow().getProviderDetails().getIssuerUri());
-		} catch (MalformedURLException e) {
-			throw new ArgosError(e.getMessage());
-		}
+	public boolean exists(UUID id) {
+		Optional<UserRepresentation> optUser = getUser(id);
+		return optUser.isPresent();
 	}
 
 	@Override
-	public boolean exists(ServiceAccount sa) {
-		Optional<UserRepresentation> optUser = getUser(sa.getId());
-		return optUser.isEmpty();
-	}
-	
-
-
-	@Override
-	public boolean isProviderIssuer(String issuer) {
-		return getProviderIssuer().toString().equals(issuer);
+	public String getIdToken(UUID id, char[] password) {
+		return KeycloakBuilder.builder()
+				.serverUrl(clientRegistrationService.getClientRegistrationProviderUrl(ServiceAccount.SA_PROVIDER_NAME).orElseThrow())
+		        .clientId(tokenClientId)
+		        .clientSecret(tokenClientSecret)
+		        .realm(ServiceAccount.SA_PROVIDER_NAME)
+		        .username(id.toString())
+		        .password(String.valueOf(password))
+		        .grantType(OAuth2Constants.PASSWORD)
+		        .scope("openid")
+		        .build()
+		        .tokenManager().getAccessToken().getIdToken();
 	}
 	
 	private Optional<UserRepresentation> getUser(UUID accountId) {
-		List<UserRepresentation> users = realmResource.users().search(accountId.toString());
+		List<UserRepresentation> users = realmResource.users().searchByUsername(accountId.toString(), true);
 		if (users.isEmpty()) {
 			return Optional.empty();
 		}

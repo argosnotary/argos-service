@@ -41,6 +41,11 @@ public class PersonalAccountServiceImpl implements PersonalAccountService {
         return personalAccountRepository.findById(accountId);
     }
 
+	@Override
+	public Optional<PersonalAccount> findByProviderNameAndProviderSubject(String providerName, String providerSubject) {
+		return personalAccountRepository.findFirstByProviderNameAndProviderSubject(providerName, providerSubject);
+	}
+
     @Override
     public void save(PersonalAccount personalAccount) {
     	personalAccountRepository.save(personalAccount);

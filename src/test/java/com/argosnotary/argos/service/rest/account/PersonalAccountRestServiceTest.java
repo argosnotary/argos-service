@@ -50,7 +50,7 @@ import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.account.PersonalAccount.Profile;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
-import com.argosnotary.argos.service.account.AccountSearchParams;
+// import com.argosnotary.argos.service.account.AccountSearchParams;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.account.PersonalAccountService;
 import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
@@ -96,8 +96,8 @@ class PersonalAccountRestServiceTest {
     @Mock
     private PersonalAccountService accountService;
 
-    @Captor
-    private ArgumentCaptor<AccountSearchParams> searchParamsArgumentCaptor;
+//    @Captor
+//    private ArgumentCaptor<AccountSearchParams> searchParamsArgumentCaptor;
 
     @BeforeEach
     void setUp() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, OperatorCreationException, PemGenerationException {
@@ -105,9 +105,7 @@ class PersonalAccountRestServiceTest {
     	keyPairMapper = Mappers.getMapper(KeyPairMapper.class);
         keyPair = CryptoHelper.createKeyPair(PRIVAT_KEY_PASSPHRASE);
         restKeyPair = keyPairMapper.convertToRestKeyPair(keyPair);
-        restPublicKey = new RestPublicKey();
-        restPublicKey.setPublicKey(restKeyPair.getPublicKey());
-        restPublicKey.setKeyId(restKeyPair.getKeyId());
+        restPublicKey = new RestPublicKey(restKeyPair.getKeyId(), restKeyPair.getPublicKey());
         personalAccount = PersonalAccount.builder()
         		.name(USER_NAME)
         		.id(ACCOUNT_ID)
@@ -136,16 +134,15 @@ class PersonalAccountRestServiceTest {
     @Test
     void whoAmI() {
         when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(personalAccount));
-        //when(accountService.getPersonalAccountById(personalAccount.getId())).thenReturn(Optional.of(personalAccount));
         ResponseEntity<RestPersonalAccount> responseEntity = service.whoAmI();
-        assertThat(responseEntity.getStatusCodeValue(), Matchers.is(200));
+        assertThat(responseEntity.getStatusCode().value(), Matchers.is(200));
         RestPersonalAccount restPersonalAccount = responseEntity.getBody();
     }
 
     @Test
     void storeKeyShouldReturnSuccess() {
         when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(personalAccount));
-        assertThat(service.createKey(restKeyPair).getStatusCodeValue(), is(204));
+        assertThat(service.createKey(restKeyPair).getStatusCode().value(), is(204));
         verify(accountService).activateNewKey(personalAccount, keyPair);
     }
 
@@ -173,7 +170,7 @@ class PersonalAccountRestServiceTest {
         when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(personalAccount));
         personalAccount.setActiveKeyPair(keyPair);
         ResponseEntity<RestKeyPair> responseEntity = service.getKeyPair();
-        assertThat(responseEntity.getStatusCodeValue(), Matchers.is(200));
+        assertThat(responseEntity.getStatusCode().value(), Matchers.is(200));
         assertThat(responseEntity.getBody(), is(restKeyPair));
     }
 
@@ -191,7 +188,7 @@ class PersonalAccountRestServiceTest {
         when(accountService.getPersonalAccountById(ACCOUNT_ID)).thenReturn(Optional.of(personalAccount));
         ResponseEntity<RestPersonalAccount> response = service.getPersonalAccountById(ACCOUNT_ID);
         assertThat(response.getBody(), is(restPAOnlyIdentity));
-        assertThat(response.getStatusCodeValue(), Matchers.is(200));
+        assertThat(response.getStatusCode().value(), Matchers.is(200));
     }
 
     @Test
@@ -221,7 +218,7 @@ class PersonalAccountRestServiceTest {
     void getPersonalAccountKeyById() {
         when(accountService.getPersonalAccountById(ACCOUNT_ID)).thenReturn(Optional.of(personalAccount));
         ResponseEntity<RestPublicKey> response = service.getPersonalAccountKeyById(ACCOUNT_ID);
-        assertThat(response.getStatusCodeValue(), is(200));
+        assertThat(response.getStatusCode().value(), is(200));
         assertThat(response.getBody(), is(restPublicKey));
     }
 

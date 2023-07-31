@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 
 import com.argosnotary.argos.domain.crypto.KeyPair;
 
