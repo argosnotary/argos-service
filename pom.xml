@@ -422,6 +422,7 @@
                     <excludes>
                         <exclude>com/argosnotary/argos/service/openapi/**/*</exclude>
                         <exclude>com/argosnotary/argos/service/itest/**/*</exclude>
+                        <exclude>**/*MapperImpl.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>

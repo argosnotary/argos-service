@@ -19,15 +19,18 @@
  */
 package com.argosnotary.argos.service.account;
 
-import java.net.URL;
+import java.util.UUID;
 
 import com.argosnotary.argos.domain.account.ServiceAccount;
 
 public interface ServiceAccountProviderService {
 	ServiceAccount registerServiceAccount(ServiceAccount sa);
-    void unRegisterServiceAccount(ServiceAccount sa);
-    void setServiceAccountPassword(ServiceAccount sa, char[] passphrase);
-    URL getProviderIssuer();
-    boolean isProviderIssuer(String issuer);
-    boolean exists(ServiceAccount sa);
+    
+	void unRegisterServiceAccount(ServiceAccount sa);
+    
+	void setServiceAccountPassword(ServiceAccount sa, char[] passphrase);
+    
+	boolean exists(UUID id);
+    
+	String getIdToken(UUID id, char[] password);
 }

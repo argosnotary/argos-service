@@ -65,12 +65,17 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
 
 	@Override
 	public boolean exists(UUID accountId) {
-		return serviceAccountRepository.existsById(accountId);
+		return serviceAccountProviderService.exists(accountId) && serviceAccountRepository.existsById(accountId);
 	}
 
 	@Override
 	public boolean exists(UUID projectId, String name) {
 		return serviceAccountRepository.existsByProjectIdAndName(projectId, name);
+	}
+
+	@Override
+	public Optional<ServiceAccount> findByProviderSubject(String providerSubject) {
+		return serviceAccountRepository.findFirstByProviderSubject(providerSubject);
 	}
 
 }

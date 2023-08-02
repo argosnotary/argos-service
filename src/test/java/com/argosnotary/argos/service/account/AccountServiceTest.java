@@ -38,10 +38,6 @@ import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
-import com.argosnotary.argos.service.account.AccountService;
-import com.argosnotary.argos.service.account.AccountServiceImpl;
-import com.argosnotary.argos.service.account.ClientRegistrationService;
-import com.argosnotary.argos.service.account.ServiceAccountProviderService;
 import com.argosnotary.argos.service.mongodb.account.PersonalAccountRepository;
 import com.argosnotary.argos.service.mongodb.account.ServiceAccountRepository;
 
@@ -60,11 +56,13 @@ class AccountServiceTest {
     @Mock
     private ClientRegistrationService clientRegistrationService;
     @Mock
-    private ServiceAccountProviderService serviceAccountProviderService;
+    private ServiceAccountService serviceAccountService;
+    @Mock
+    private PersonalAccountService personalAccountService;
 
 	@BeforeEach
 	void setUp() throws Exception {
-		accountService = new AccountServiceImpl(serviceAccountRepository,personalAccountRepository,clientRegistrationService,serviceAccountProviderService);
+		accountService = new AccountServiceImpl(serviceAccountRepository,personalAccountRepository,clientRegistrationService,serviceAccountService, personalAccountService);
 		kp1 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		kp2 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		pa1 = PersonalAccount.builder().name("pa1").activeKeyPair(kp1).providerName("provider1").providerSubject("subject1").build();
@@ -93,8 +91,7 @@ class AccountServiceTest {
 	void testLoadAuthenticatedUser() {
 		Optional<String> optProviderName = Optional.of("optProviderName");
 		when(clientRegistrationService.getClientRegistrationName("provider1")).thenReturn(optProviderName);
-		when(serviceAccountProviderService.isProviderIssuer("provider1")).thenReturn(false);
-		when(personalAccountRepository.findFirstByProviderNameAndProviderSubject(optProviderName.get(), "subject1")).thenReturn(Optional.of(pa1));
+		when(personalAccountService.findByProviderNameAndProviderSubject(optProviderName.get(), "subject1")).thenReturn(Optional.of(pa1));
 		
 		Optional<Account> acc = accountService.loadAuthenticatedUser("provider1","subject1");
 		assertEquals(pa1, acc.get());

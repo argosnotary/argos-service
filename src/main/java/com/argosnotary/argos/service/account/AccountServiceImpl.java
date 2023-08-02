@@ -22,9 +22,7 @@ package com.argosnotary.argos.service.account;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.stereotype.Service;
 
 import com.argosnotary.argos.domain.account.Account;
@@ -47,7 +45,9 @@ public class AccountServiceImpl implements AccountService {
     
     private final ClientRegistrationService clientRegistrationService;
     
-    private final ServiceAccountProviderService serviceAccountProviderService;
+    private final ServiceAccountService serviceAccountService;
+    
+    private final PersonalAccountService personalAccountService;
 
     @Override
     public boolean keyPairExists(String keyId) {
@@ -63,37 +63,34 @@ public class AccountServiceImpl implements AccountService {
     }
 
 	@Override
+	public List<Account> findByKeyIds(Set<String> keyIds) {
+		List<Account> accounts = personalAccountRepository.findByKeyIds(keyIds);
+		accounts.addAll(serviceAccountRepository.findByKeyIds(keyIds));
+		return accounts;
+	}
+
+	@Override
 	public Optional<Account> loadAuthenticatedUser(String providerIssuer, String providerSubject) {
 		Optional<String> optProviderName = clientRegistrationService.getClientRegistrationName(providerIssuer);
 		if (optProviderName.isEmpty()) {
 			log.warn("Unknown provider used, issuer: [%s], subject: [%s]", providerIssuer, providerSubject);
 			return Optional.empty();
 		}
-		if (serviceAccountProviderService.isProviderIssuer(providerIssuer)) {
-			Optional<ServiceAccount> serviceAccount = serviceAccountRepository.findFirstByProviderSubject(providerSubject);
+		if (ServiceAccount.SA_PROVIDER_NAME.equals(providerIssuer)) {
+			Optional<ServiceAccount> serviceAccount = serviceAccountService.findByProviderSubject(providerSubject);
 			if (serviceAccount.isEmpty()) {
-				log.warn("Login attempt with unknown service account, issuer: [%s], subject: [%s]", providerIssuer,
-						providerSubject);
-				throw new InternalAuthenticationServiceException("unknown service account");
+				return Optional.empty();
 			} else {
-				serviceAccountProviderService.exists(serviceAccount.get());
 				return Optional.of(serviceAccount.get());
 			}
 		}
 
-		Optional<PersonalAccount> optPersonalAccount = personalAccountRepository
-				.findFirstByProviderNameAndProviderSubject(optProviderName.get(), providerSubject);
+		Optional<PersonalAccount> optPersonalAccount = personalAccountService
+				.findByProviderNameAndProviderSubject(optProviderName.get(), providerSubject);
 		if (optPersonalAccount.isEmpty()) {
 			return Optional.empty();
 		}
 		return Optional.of(optPersonalAccount.get());
-	}
-
-	@Override
-	public List<Account> findByKeyIds(Set<String> keyIds) {
-		List<Account> accounts = personalAccountRepository.findByKeyIds(keyIds);
-		accounts.addAll(serviceAccountRepository.findByKeyIds(keyIds));
-		return accounts;
 	}
 
 }
