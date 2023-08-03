@@ -19,10 +19,12 @@
  */
 package com.argosnotary.argos.service.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -44,6 +46,9 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 public class SecurityConfig {
 	
+	@Value("${spring.websecurity.debug:true}")
+    boolean webSecurityDebug;
+	
 	//++++++++++++++++++++++++++++++
 	// Anonymous filter chain
 	//++++++++++++++++++++++++++++++
@@ -52,12 +57,13 @@ public class SecurityConfig {
 	@Order(SecurityProperties.BASIC_AUTH_ORDER - 100)
 	public SecurityFilterChain anonFilterChain(HttpSecurity http) throws Exception {
 		http.securityMatcher(
-				"/swagger/**"
-				, "/actuator/**"
-				, "/api/supplychains/verification/**"
-				, "/api/oauthprovider/**");
-		
-		http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+				"/swagger/**",
+				"/actuator/**",
+				"/api/supplychains/verification/**",
+				"/api/oauthprovider/**",
+				"/api/serviceaccounts/me/token")			
+			.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+		http.csrf().ignoringRequestMatchers("/api/**");
 
 		return http.build();
 	}

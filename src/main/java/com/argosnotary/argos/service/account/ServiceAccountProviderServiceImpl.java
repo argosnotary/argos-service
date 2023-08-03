@@ -136,6 +136,7 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
 
 	@Override
 	public String getIdToken(UUID id, char[] password) {
+		Optional<String> ff = clientRegistrationService.getClientRegistrationProviderUrl(ServiceAccount.SA_PROVIDER_NAME);
 		return KeycloakBuilder.builder()
 				.serverUrl(clientRegistrationService.getClientRegistrationProviderUrl(ServiceAccount.SA_PROVIDER_NAME).orElseThrow())
 		        .clientId(tokenClientId)

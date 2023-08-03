@@ -57,8 +57,11 @@ import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
 class NodeRepositoryTest {
 	private final UUID ORGANIZATION_ID = UUID.randomUUID();
 
-	@Container //
-	private static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
+	static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
+    
+    static {
+        mongoDBContainer.start();
+    }
 
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {

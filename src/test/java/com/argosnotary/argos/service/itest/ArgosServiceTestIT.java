@@ -56,7 +56,7 @@ class ArgosServiceTestIT {
     private static Properties properties = Properties.getInstance();
     private static MongoDbClient mongoClient;
 	
-	private static String getKeycloakUrl(String realm) {
+	public static String getKeycloakUrl(String realm) {
 		String url = String.format("http://%s:%s/realms/%s", 
 				keycloakContainer.getHost(), 
 				keycloakContainer.getFirstMappedPort(),
@@ -64,12 +64,22 @@ class ArgosServiceTestIT {
 		return url;
 	}
 	
+	public static String getKeycloakAuthUrl() {
+		String url = String.format("http://%s:%s",
+				keycloakContainer.getHost(), 
+				keycloakContainer.getFirstMappedPort());
+		return url;
+	}
+	
 	@Container //
 	private static GenericContainer keycloakContainer = ArgosTestContainers.getKeycloakContainer();
 
 	
-	@Container //
-	private static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
+	static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
+    
+    static {
+        mongoDBContainer.start();
+    }
 
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {

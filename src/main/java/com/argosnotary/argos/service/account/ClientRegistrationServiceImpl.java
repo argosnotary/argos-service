@@ -35,6 +35,7 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.stereotype.Service;
 
 import com.argosnotary.argos.domain.ArgosError;
+import com.argosnotary.argos.domain.account.ServiceAccount;
 
 @Service
 public class ClientRegistrationServiceImpl implements ClientRegistrationService {
@@ -49,6 +50,7 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
 				.filter(reg -> !internalProviders.contains(reg))
 				.map(OAuthProvider::new)
 				.toList();
+		this.serviceAccountIssuer = clientRegistrationsNameMap.get(ServiceAccount.SA_PROVIDER_NAME).getProviderDetails().getIssuerUri();
 	}
 	
 	private static final Set<String> internalProviders = Set.of("master", "saprovider");
@@ -60,6 +62,8 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
 	private final Set<String> issuers;
 	
 	private final List<OAuthProvider> externalProviders;
+	
+	private final String serviceAccountIssuer;
 	
 	@Override
 	public Optional<String> getClientRegistrationName(String issuer) {
@@ -105,6 +109,11 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
 	@Override
 	public List<OAuthProvider> getAllExternalProviderIds() {
 		return externalProviders;
+	}
+	
+	@Override
+	public String getServiceAccountIssuer() {
+		return this.serviceAccountIssuer;
 	}
 	
 	private Map<String, ClientRegistration> getclientRegistrationsNameMap(ClientRegistrationRepository clientRegistrationRepository) {

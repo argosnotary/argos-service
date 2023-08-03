@@ -36,8 +36,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
     private final ServiceAccountRepository serviceAccountRepository;
@@ -76,7 +76,7 @@ public class AccountServiceImpl implements AccountService {
 			log.warn("Unknown provider used, issuer: [%s], subject: [%s]", providerIssuer, providerSubject);
 			return Optional.empty();
 		}
-		if (ServiceAccount.SA_PROVIDER_NAME.equals(providerIssuer)) {
+		if (clientRegistrationService.getServiceAccountIssuer().equals(providerIssuer)) {
 			Optional<ServiceAccount> serviceAccount = serviceAccountService.findByProviderSubject(providerSubject);
 			if (serviceAccount.isEmpty()) {
 				return Optional.empty();

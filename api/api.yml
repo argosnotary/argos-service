@@ -451,6 +451,25 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
   
+  /serviceaccounts/me/token:
+    post:
+      summary: return an openid token
+      operationId: getIdToken
+      tags:
+        - service account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenRequest"
+      responses:
+        '200':
+          description: openid token
+          content:
+            application/json:                
+              schema:
+                $ref: "#/components/schemas/JwtToken"
+  
   /projects/{projectId}/serviceaccounts/{serviceAccountId}:
     get:
       summary: find service account by id
@@ -822,7 +841,6 @@ paths:
       tags:
         - link
       security:
-        - basicAuth: []
         - bearerAuth: []
       parameters:
         - name: supplyChainId
@@ -1096,7 +1114,6 @@ paths:
       tags:
         - verification
       security:
-        - basicAuth: []
         - bearerAuth: []
       parameters:
         - name: supplyChainId
@@ -1923,6 +1940,18 @@ components:
           maxItems: 20
           items:
             $ref: "#/components/schemas/KeyPair"
+            
+    TokenRequest:
+      type: object
+      required:
+      - accountId
+      - passphrase
+      properties:
+        accountId:
+          $ref: "#/components/schemas/UUID"
+        passphrase:
+          type: string
+          maxLength: 64
     
     Permission:
       enum:

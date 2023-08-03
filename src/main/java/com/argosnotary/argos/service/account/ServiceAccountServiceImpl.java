@@ -78,4 +78,9 @@ public class ServiceAccountServiceImpl implements ServiceAccountService {
 		return serviceAccountRepository.findFirstByProviderSubject(providerSubject);
 	}
 
+	@Override
+	public String getIdToken(ServiceAccount sa, char[] passphrase) {
+		return serviceAccountProviderService.getIdToken(sa.getId(), passphrase);
+	}
+
 }

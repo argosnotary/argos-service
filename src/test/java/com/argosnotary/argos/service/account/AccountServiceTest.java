@@ -36,6 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.account.PersonalAccount;
+import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
 import com.argosnotary.argos.service.mongodb.account.PersonalAccountRepository;
@@ -47,6 +48,7 @@ class AccountServiceTest {
 	private AccountService accountService; 
 	
 	private PersonalAccount pa1;
+	private ServiceAccount sa1;
 	private KeyPair kp1, kp2;
 
     @Mock
@@ -66,6 +68,7 @@ class AccountServiceTest {
 		kp1 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		kp2 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		pa1 = PersonalAccount.builder().name("pa1").activeKeyPair(kp1).providerName("provider1").providerSubject("subject1").build();
+		sa1 = ServiceAccount.builder().name("sa1").providerSubject("sa1Subject").build();
 	}
 
 	@Test
@@ -91,10 +94,17 @@ class AccountServiceTest {
 	void testLoadAuthenticatedUser() {
 		Optional<String> optProviderName = Optional.of("optProviderName");
 		when(clientRegistrationService.getClientRegistrationName("provider1")).thenReturn(optProviderName);
+		when(clientRegistrationService.getServiceAccountIssuer()).thenReturn("saProviderIssuer");
 		when(personalAccountService.findByProviderNameAndProviderSubject(optProviderName.get(), "subject1")).thenReturn(Optional.of(pa1));
 		
 		Optional<Account> acc = accountService.loadAuthenticatedUser("provider1","subject1");
 		assertEquals(pa1, acc.get());
+		
+		when(serviceAccountService.findByProviderSubject("sa1Subject")).thenReturn(Optional.of(sa1));
+		when(clientRegistrationService.getClientRegistrationName("saProviderIssuer")).thenReturn(Optional.of("saprovider"));
+		
+		acc = accountService.loadAuthenticatedUser("saProviderIssuer","sa1Subject");
+		assertEquals(sa1, acc.get());
 		
 	}
 

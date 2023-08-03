@@ -37,12 +37,15 @@ import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.account.ServiceAccountService;
+import com.argosnotary.argos.service.openapi.rest.model.RestJwtToken;
 import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccount;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccountKeyPair;
+import com.argosnotary.argos.service.openapi.rest.model.RestTokenRequest;
 import com.argosnotary.argos.service.roles.PermissionCheck;
 
 import jakarta.validation.Valid;
+import jakarta.ws.rs.NotAuthorizedException;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -132,6 +135,17 @@ public class ServiceAccountRestServiceImpl implements ServiceAccountRestService 
                 .map(Account::getActiveKeyPair).filter(Objects::nonNull)
                 .map(keyPairMapper::convertToRestKeyPair)
                 .map(ResponseEntity::ok).orElseThrow(this::keyNotFound);
+	}
+	
+	@Override
+	public ResponseEntity<RestJwtToken> getIdToken(RestTokenRequest restTokenRequest) {
+		try {
+		return ResponseEntity.ok(new RestJwtToken(serviceAccountService.getIdToken(
+				ServiceAccount.builder().id(restTokenRequest.getAccountId()).build(), 
+				restTokenRequest.getPassphrase().toCharArray())));
+		} catch (NotAuthorizedException ex) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Service Account [%s] is not authorized", restTokenRequest.getAccountId()));
+		}
 	}
 
 	@Override
