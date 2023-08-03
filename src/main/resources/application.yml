@@ -20,6 +20,7 @@
 
 spring.data.mongodb.auto-index-creation: true
 spring.data.mongodb.database: argos
+spring.data.mongodb.uri: mongodb://localhost:27017
 spring.security:
     oauth2:
       client:
