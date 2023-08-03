@@ -19,10 +19,11 @@
  */
 package com.argosnotary.argos.service.account;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,10 +34,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
-import com.argosnotary.argos.service.account.ServiceAccountProviderService;
-import com.argosnotary.argos.service.account.ServiceAccountService;
-import com.argosnotary.argos.service.account.ServiceAccountServiceImpl;
 import com.argosnotary.argos.service.mongodb.account.ServiceAccountRepository;
+
+import jakarta.ws.rs.NotAuthorizedException;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceAccountServiceTest {
@@ -74,6 +74,25 @@ class ServiceAccountServiceTest {
 		serviceAccountService.activateNewKey(sa1, kp2, "wachtwoord".toCharArray());
 		verify(serviceAccountRepository).save(expected);
 		verify(serviceAccountProviderService).setServiceAccountPassword(expected, "wachtwoord".toCharArray());
+	}
+	
+	@Test
+	void testGetIdTokenAuth() {
+		ServiceAccount sa = ServiceAccount.builder().name("sa1").id(sa1.getId()).providerSubject("subject1").activeKeyPair(kp1).build();
+		when(serviceAccountProviderService.getIdToken(sa.getId(), "wachtwoord".toCharArray())).thenReturn("token");
+		String token = serviceAccountService.getIdToken(sa, "wachtwoord".toCharArray());
+		assertEquals("token", token);
+	}
+	
+	@Test
+	void testGetIdTokenNotAuth() {
+		ServiceAccount sa = ServiceAccount.builder().name("sa1").id(sa1.getId()).providerSubject("subject1").activeKeyPair(kp1).build();
+		when(serviceAccountProviderService.getIdToken(sa.getId(), "wachtwoord".toCharArray())).thenThrow(NotAuthorizedException.class);
+		String token = null;
+		Throwable exception = assertThrows(NotAuthorizedException.class, () -> {
+			serviceAccountService.getIdToken(sa, "wachtwoord".toCharArray());
+        });
+		assertNull(token);
 	}
 	
 	@Test

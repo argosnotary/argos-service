@@ -18,9 +18,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-spring.data.mongodb.auto-index-creation: true
-spring.data.mongodb.database: argos
-spring.data.mongodb.uri: mongodb://localhost:27017
+spring:
+    data:
+        mongodb:
+            auto-index-creation: true
+            database: "argos"
+            uri: "mongodb://localhost:27017"
 spring.security:
     oauth2:
       client:
@@ -39,27 +42,32 @@ spring.security:
               - openid
               - email
               - profile
+          oauth-stub:
+            clientId: oauth-stub-client
+            clientSecret: rVyeNlXQBBb4o5EZZ2S0twuvsJU2OP4x
+            scope:
+              - openid
+              - email
+              - profile
         provider:
           master:
             issuer-uri: http://localhost:9080/realms/master
           saprovider:
             issuer-uri: http://localhost:9080/realms/saprovider
+          oauth-stub:
+            issuer-uri: http://localhost:9080/realms/oauth-stub
 
 management.endpoints.enabled-by-default: true
 management.endpoints.web.exposure.include: "*"
 
-keycloak.admin-client.realm: saprovider
+keycloak.realm: saprovider
 keycloak.admin-client.client-id: samanager
 keycloak.admin-client.client-secret: 0weeMaHVQ3GqriognQg8QkEwBmoVC7LB
-keycloak.admin-client.grant-type: client_credentials
 
-keycloak.token-client.realm: saprovider
 keycloak.token-client.client-id: saprovider-client
 keycloak.token-client.client-secret: 644TyDbo7pTeyqDLM7kj4LWMwjRcUcBr
-keycloak.token-client.grant-type: password
-
 
 logging:
   level:
-    root: INFO
-    org.mongodb.driver: INFO
+    org:
+      springframework.security: DEBUG

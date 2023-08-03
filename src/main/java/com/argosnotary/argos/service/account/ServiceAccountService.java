@@ -40,4 +40,6 @@ public interface ServiceAccountService {
     public ServiceAccount createServiceAccount(ServiceAccount serviceAccount);
     
     public ServiceAccount activateNewKey(ServiceAccount account, KeyPair newKeyPair, char[] passphrase);
+    
+    public String getIdToken(ServiceAccount account, char[] passphrase);
 }

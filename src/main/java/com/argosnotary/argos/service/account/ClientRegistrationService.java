@@ -38,4 +38,6 @@ public interface ClientRegistrationService {
 	public Optional<String> getClientRegistrationProviderUrl(String providerName);
 	
 	public boolean exists(String providerName);
+
+	public String getServiceAccountIssuer();
 }

@@ -1,8 +1,9 @@
+#!/bin/bash
 #
 # Argos Notary - A new way to secure the Software Supply Chain
 #
 # Copyright (C) 2019 - 2020 Rabobank Nederland
-# Copyright (C) 2019 - 2021 Gerard Borst <gerard.borst@argosnotary.com>
+# Copyright (C) 2019 - 2023 Gerard Borst <gerard.borst@argosnotary.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +19,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-argos-service {
-  rest-api {
-    base-url = "http://localhost:8080"
-    pa-authorization-uri = "/oauth2/authorization/oauth-stub"
-    sa-authorization-uri = "/oauth2/authorization/saprovider"
-  }
-}
+
+username=0895000d-1f79-4f1b-91e4-12c9061cdbd3
+
+curl -s -X POST -H "Content-Type: application/x-www-form-urlencoded" \
+   -d grant_type="password" \
+   -d username=$username \
+   -d password=test \
+   -d scope=openid \
+   -d client_id=saprovider-client \
+   -d client_secret=644TyDbo7pTeyqDLM7kj4LWMwjRcUcBr \
+   "http://localhost:9080/realms/saprovider/protocol/openid-connect/token?" | jq -r '.id_token'
+   

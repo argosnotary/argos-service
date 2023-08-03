@@ -19,14 +19,16 @@
  */
 package com.argosnotary.argos.service.rest.account;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +40,9 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.server.ResponseStatusException;
@@ -50,11 +55,16 @@ import com.argosnotary.argos.service.account.ServiceAccountService;
 import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccount;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccountKeyPair;
+import com.argosnotary.argos.service.openapi.rest.model.RestTokenRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceAccountRestServiceTest {
+	
+	private static final UUID accountId = UUID.fromString("9af61fef-a517-44fc-93a5-d5ae5fada255");
+	private static final String passphrase = "wachtwoord";
 	
 	private ServiceAccountRestService serviceAccountRestService;
 	
@@ -79,6 +89,8 @@ class ServiceAccountRestServiceTest {
 	
 	@Mock
     private HttpServletRequest httpServletRequest;
+    
+    private MockMvc mvc;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -87,11 +99,7 @@ class ServiceAccountRestServiceTest {
 		serviceAccountRestService = new ServiceAccountRestServiceImpl(accountMapper, keyPairMapper, serviceAccountService, accountSecurityContext);
 		kp = CryptoHelper.createKeyPair("test".toCharArray());
 		rkp = keyPairMapper.convertToRestKeyPair(kp);
-		rskp = new RestServiceAccountKeyPair()
-			.keyId(kp.getKeyId())
-	        .passphrase("test")
-	        .encryptedPrivateKey(kp.getEncryptedPrivateKey())
-	        .publicKey(kp.getPublicKey());
+		rskp = new RestServiceAccountKeyPair(kp.getEncryptedPrivateKey(), "test", kp.getKeyId(), kp.getPublicKey());
 		sa1 = ServiceAccount.builder().name("sa1").providerSubject("subject1").projectId(UUID.randomUUID()).build();
 		sa2 = ServiceAccount.builder().name("sa2").providerSubject("subject2").activeKeyPair(kp).projectId(UUID.randomUUID()).build();
 		rsa1 = accountMapper.convertToRestServiceAccount(sa1);
@@ -117,7 +125,7 @@ class ServiceAccountRestServiceTest {
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
         when(serviceAccountService.createServiceAccount(sa1)).thenReturn(sa1);
         ResponseEntity<RestServiceAccount> response = serviceAccountRestService.createServiceAccount(rsa1.getProjectId(), rsa1);
-        assertThat(response.getStatusCodeValue(), is(201));
+        assertThat(response.getStatusCode().value(), is(201));
         assertEquals(response.getBody(), rsa1);
         assertThat(response.getHeaders().getLocation(), notNullValue());
         verify(serviceAccountService).createServiceAccount(sa1);
@@ -133,7 +141,7 @@ class ServiceAccountRestServiceTest {
     void getServiceAccountKeyById() {
         when(serviceAccountService.findById(sa2.getId())).thenReturn(Optional.of(sa2));
         ResponseEntity<RestKeyPair> response = serviceAccountRestService.getServiceAccountKeyById(sa2.getProjectId(), sa2.getId());
-        assertThat(response.getStatusCodeValue(), is(200));
+        assertThat(response.getStatusCode().value(), is(200));
         assertEquals(response.getBody(), rkp);
     }
 
@@ -155,7 +163,7 @@ class ServiceAccountRestServiceTest {
     void getServiceAccountById() {
         when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
         ResponseEntity<RestServiceAccount> response = serviceAccountRestService.getServiceAccountById(sa1.getProjectId(), sa1.getId());
-        assertThat(response.getStatusCodeValue(), is(200));
+        assertThat(response.getStatusCode().value(), is(200));
         assertEquals(response.getBody(), rsa1);
     }
 
@@ -170,7 +178,7 @@ class ServiceAccountRestServiceTest {
     void deleteServiceAccount() {
     	when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
         ResponseEntity<Void> response = serviceAccountRestService.deleteServiceAccount(sa1.getProjectId(), sa1.getId());
-        assertThat(response.getStatusCodeValue(), is(204));
+        assertThat(response.getStatusCode().value(), is(204));
         verify(serviceAccountService).delete(sa1);
     }
 
@@ -186,7 +194,7 @@ class ServiceAccountRestServiceTest {
     void getServiceAccountKey() {
         when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(sa2));
         ResponseEntity<RestKeyPair> response = serviceAccountRestService.getServiceAccountKey();
-        assertThat(response.getStatusCodeValue(), is(200));
+        assertThat(response.getStatusCode().value(), is(200));
         assertEquals(response.getBody(), rkp);
     }
 
@@ -202,6 +210,23 @@ class ServiceAccountRestServiceTest {
         when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(sa1));
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountKey());
         assertThat(exception.getMessage(), is("404 NOT_FOUND \"no active service account key found\""));
+    }
+    
+    //@Test
+    //@WithMockUser(username = "9af61fef-a517-44fc-93a5-d5ae5fada255", password = "wachtwoord")
+    void getIdTokenAuth() throws Exception {
+    	ObjectMapper mapper = new ObjectMapper(); // Mappers.getMapper(RestTokenRequest.class);
+    	ServiceAccount sa = ServiceAccount.builder().id(accountId).build();
+    	RestTokenRequest req = new RestTokenRequest(sa.getId(),passphrase);
+    	this.mvc = MockMvcBuilders.standaloneSetup(serviceAccountRestService).build();
+    	
+    	when(serviceAccountService.getIdToken(sa, "wachtwoord".toCharArray())).thenReturn("token");
+    	mvc.perform(get("/api/serviceaccounts/me/token")
+              .accept("application/json")
+              .content(mapper.writeValueAsBytes(req)))
+    			.andExpect(status().isOk())
+    			.andExpect(MockMvcResultMatchers.content().string(containsString("token")));
+        
     }
 
 }

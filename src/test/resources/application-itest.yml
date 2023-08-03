@@ -58,14 +58,17 @@ spring.jackson.serialization.write-dates-as-timestamps: false
 management.endpoints.enabled-by-default: true
 management.endpoints.web.exposure.include: "*"
 
-keycloak.admin-client.realm: saprovider
+keycloak.realm: saprovider
 keycloak.admin-client.client-id: samanager
 keycloak.admin-client.client-secret: 0weeMaHVQ3GqriognQg8QkEwBmoVC7LB
-keycloak.admin-client.grant-type: client_credentials
-
+keycloak.token-client.client-id: saprovider-client
+keycloak.token-client.client-secret: 644TyDbo7pTeyqDLM7kj4LWMwjRcUcBr
 
 logging:
   level:
     root: INFO
     org.mongodb.driver: INFO
     com.intuit.karate: INFO
+    org.springframework.security: DEBUG
+    org.keycloak: INFO
+

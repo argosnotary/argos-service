@@ -26,9 +26,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.argosnotary.argos.service.openapi.rest.api.ServiceAccountApi;
+import com.argosnotary.argos.service.openapi.rest.model.RestJwtToken;
 import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccount;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccountKeyPair;
+import com.argosnotary.argos.service.openapi.rest.model.RestTokenRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -61,6 +63,10 @@ public interface ServiceAccountRestService extends ServiceAccountApi {
 	ResponseEntity<RestKeyPair> getServiceAccountKey(
 
 	);
+
+	@Override
+	ResponseEntity<RestJwtToken> getIdToken(
+			@Parameter(name = "RestTokenRequest", description = "") @Valid @RequestBody(required = false) RestTokenRequest restTokenRequest);
 
 	@Override
 	ResponseEntity<RestKeyPair> getServiceAccountKeyById(

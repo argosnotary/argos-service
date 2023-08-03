@@ -32,6 +32,7 @@ public class ArgosServiceApplication {
         SpringApplication.run(ArgosServiceApplication.class, args);
     	} catch (Exception e) {
         	log.error(String.format("Exception thrown on starting: [%s] [%s]", e.getMessage(), e.getStackTrace()));
+        	e.printStackTrace();
         }
     }
 }

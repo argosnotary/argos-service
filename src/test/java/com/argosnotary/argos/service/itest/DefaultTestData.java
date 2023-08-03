@@ -26,6 +26,7 @@ import static com.argosnotary.argos.service.itest.ServiceClient.getProjectApi;
 import static com.argosnotary.argos.service.itest.ServiceClient.getRoleAssignmentApi;
 import static com.argosnotary.argos.service.itest.ServiceClient.getServiceAccountApi;
 import static com.argosnotary.argos.service.itest.ServiceClient.getToken;
+import static com.argosnotary.argos.service.itest.ServiceClient.getServiceAccountToken;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -75,7 +76,7 @@ public class DefaultTestData {
     private static Properties properties = Properties.getInstance();
     
     public DefaultTestData() throws ClientProtocolException, IOException, NoSuchAlgorithmException, OperatorCreationException {
-    	this.ownerToken = getToken(OWNER_USER, PASSPHRASE, properties.getPaAuthorizationUri());
+    	this.ownerToken = getToken(OWNER_USER, PASSPHRASE);
     	this.defaultOrganization = createDefaultOrganization(ownerToken);
     	this.defaultProject = createDefaultProject(this.ownerToken, this.defaultOrganization.getId());
     	this.personalAccounts = createDefaultPersonalAccount(this.ownerToken, this.defaultOrganization);
@@ -158,7 +159,7 @@ public class DefaultTestData {
     }
     
     public static TestPersonalAccount createTestPersonalAccount(String userName) throws ClientProtocolException, IOException, NoSuchAlgorithmException, OperatorCreationException {
-    	String userToken = getToken(userName, PASSPHRASE, properties.getPaAuthorizationUri());
+    	String userToken = getToken(userName, PASSPHRASE);
     	PersonalAccountApi personalAccountApi = getPersonalAccountApi(userToken);
     	RestKeyPair kp = CryptoHelper.createKeyPair(KEY_PASSPHRASE.toCharArray());
     	TestKeyPair keyPair = new TestKeyPair(kp, KEY_PASSPHRASE);
@@ -199,7 +200,7 @@ public class DefaultTestData {
         sa.activeKeyPair(keyPair.getKeyPair());
         
 
-        String token = getToken(sa.getId().toString(), passphrase, properties.getSaAuthorizationUri());
+        String token = getServiceAccountToken(sa.getId(), passphrase);
         
         return TestServiceAccount.builder()
                 		.serviceAccount(sa)

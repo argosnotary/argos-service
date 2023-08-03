@@ -45,6 +45,7 @@ import com.argosnotary.argos.service.itest.rest.api.client.ProjectApi;
 import com.argosnotary.argos.service.itest.rest.api.client.RoleAssignmentApi;
 import com.argosnotary.argos.service.itest.rest.api.client.ServiceAccountApi;
 import com.argosnotary.argos.service.itest.rest.api.client.SupplyChainApi;
+import com.argosnotary.argos.service.itest.rest.api.model.RestTokenRequest;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -56,6 +57,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
 
 import lombok.extern.slf4j.Slf4j;
+import com.argosnotary.argos.service.itest.rest.api.model.RestTokenRequest;
 
 @Slf4j
 public class ServiceClient {
@@ -91,11 +93,11 @@ public class ServiceClient {
         return StringSubstitutor.replace(bodyTemplate, values, "${", "}");
     }
 
-    public static String getToken(String userName, String password, String authorizationUri) throws ClientProtocolException, IOException {
+    public static String getToken(String userName, String password) throws ClientProtocolException, IOException {
     	String tokenStr = null;
     	try (WebClient webClient = new WebClient()) {
 			webClient.getOptions().setRedirectEnabled(true);
-			HtmlPage keycloakLoginPage = webClient.getPage(properties.getApiBaseUrl() + authorizationUri);
+			HtmlPage keycloakLoginPage = webClient.getPage(properties.getApiBaseUrl() + properties.getPaAuthorizationUri());
 			// keycloak login form
 			HtmlForm form = keycloakLoginPage.getFirstByXPath("//form");
 			
@@ -113,6 +115,14 @@ public class ServiceClient {
 			throw e;
 		}
     	return tokenStr;
+    }
+    
+    public static String getServiceAccountToken(UUID accountId, String password) {
+    	ServiceAccountApi serviceAccountApi = new ServiceAccountApi(getUnAuthApiClient());
+    	RestTokenRequest req = new RestTokenRequest();
+    	req.setAccountId(accountId);
+    	req.setPassphrase(password);
+    	return serviceAccountApi.getIdToken(req).getToken();
     }
 
     public static OrganizationApi getOrganizationApi(String bearerToken) {
@@ -139,7 +149,16 @@ public class ServiceClient {
         return new ServiceAccountApi(getApiClient(bearerToken));
     }
     
-    
+    private static ApiClient getUnAuthApiClient() {
+        ApiClient apiClient = new ApiClient();
+        // scheme + "://" + host + (port == -1 ? "" : ":" + port) + basePath
+        apiClient.setScheme("http");
+        apiClient.setHost("localhost");
+        apiClient.setPort(8080);
+        apiClient.setBasePath("/api");
+        
+        return apiClient;
+    }
     
     private static ApiClient getApiClient(String bearerToken) {
         ApiClient apiClient = new ApiClient();
