@@ -68,3 +68,4 @@ logging:
   level:
     root: INFO
     org.mongodb.driver: INFO
+    com.intuit.karate: INFO

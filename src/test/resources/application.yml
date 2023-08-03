@@ -67,4 +67,4 @@ keycloak.admin-client.grant-type: client_credentials
 logging:
   level:
     root: INFO
-    org.mongodb.driver: INFO
+    org.mongodb.driver: DEBUG
