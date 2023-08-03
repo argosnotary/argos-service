@@ -61,10 +61,9 @@ public class SecurityConfig {
 				"/actuator/**",
 				"/api/supplychains/verification/**",
 				"/api/oauthprovider/**",
-				"/api/serviceaccounts/me/token")
-
-			.csrf().disable()
+				"/api/serviceaccounts/me/token")			
 			.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+		http.csrf().ignoringRequestMatchers("/api/**");
 
 		return http.build();
 	}

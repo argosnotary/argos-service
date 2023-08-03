@@ -49,8 +49,11 @@ import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
 @DataMongoTest(properties= {"spring.data.mongodb.auto-index-creation=true"})
 class ReleaseRepositoryTest {
 
-	@Container //
-	private static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
+	static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
+    
+    static {
+        mongoDBContainer.start();
+    }
 
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {

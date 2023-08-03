@@ -49,9 +49,12 @@ import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
 @DataMongoTest
 class LayoutRepositoryTest {
 	
-	@Container //
-	private static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
-
+	static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
+    
+    static {
+        mongoDBContainer.start();
+    }
+    
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {
 		registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
