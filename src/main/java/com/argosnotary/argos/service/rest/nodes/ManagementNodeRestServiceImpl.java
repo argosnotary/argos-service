@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,9 +63,10 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
 	public ResponseEntity<RestManagementNode> createManagementNode(UUID parentId,
 			@Valid RestManagementNode restManagementNode) {
 		Optional<Node> parent = nodeService.findById(parentId);
-		if (!(parent.isPresent() 
+		if (!(parentId.equals(restManagementNode.getParentId())
+				&& parent.isPresent() 
 				&& parent.get().getId().equals(restManagementNode.getParentId()) 
-				&& (parent.get() instanceof Organization || (parent.get() instanceof ManagementNode)))) {
+				&& ManagementNode.isValidParentType(parent.get()))) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent"); 
 		}
 		
@@ -89,7 +91,10 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
     @AuditLog
     @Transactional
 	public ResponseEntity<Void> deleteManagementNodeById(UUID managementNodeId) {
-		managementNodeService.delete(managementNodeService.findById(managementNodeId).orElseThrow(this::managementNodeNotFound).getId());
+		if (!managementNodeService.exists(managementNodeId)) {
+			throw managementNodeNotFound();
+		}
+		managementNodeService.delete(managementNodeId);
 		return ResponseEntity.noContent().build();
 	}
 
@@ -101,13 +106,16 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
 	}
 
 	@Override
-    @PermissionCheck(permissions = Permission.READ)
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<List<RestManagementNode>> getManagementNodes(UUID ancestorId) {
-		Optional<Node> optNode = nodeService.findById(ancestorId);
-		if (optNode.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
+		Optional<Node> optNode = Optional.empty();
+		if (ancestorId != null) {
+			optNode = nodeService.findById(ancestorId);
+			if (optNode.isEmpty()) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
+			}
 		}
-		return ResponseEntity.ok(managementNodeService.find(optNode.get())
+		return ResponseEntity.ok(managementNodeService.find(optNode)
 				.stream()
 				.map(managementNodeMapper::convertToRestManagementNode)
 				.toList());

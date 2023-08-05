@@ -43,6 +43,7 @@ import com.argosnotary.argos.service.layout.LayoutMetaBlockService;
 import com.argosnotary.argos.service.link.LinkMetaBlockService;
 import com.argosnotary.argos.service.mongodb.release.ReleaseDossierRepository;
 import com.argosnotary.argos.service.mongodb.release.ReleaseRepository;
+import com.argosnotary.argos.service.nodes.NodeService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
 import com.argosnotary.argos.service.verification.VerificationProvider;
 import com.argosnotary.argos.service.verification.VerificationRunResult;
@@ -62,6 +63,7 @@ public class ReleaseServiceImpl implements ReleaseService {
     private final ReleaseRepository releaseRepository;
     private final ReleaseDossierRepository releaseDossierRepository;
     private final AccountService accountService;
+    private final NodeService nodeService;
     private final SupplyChainService supplyChainService;
     private final LinkMetaBlockService linkMetaBlockService;
 
@@ -100,14 +102,9 @@ public class ReleaseServiceImpl implements ReleaseService {
             }
             releaseBuilder.releaseIsValid(verificationRunResult.isRunIsValid());
             
-            Optional<Organization> orgOpt = supplyChainService.getOrganization(supplyChainId);
-            if (orgOpt.isEmpty()) {
-            	log.info(ARTIFACTS_INVALID_STRING, releaseArtifacts, supplyChainId);
-            	log.info("Organization for supply chain [{}] not found.", supplyChainId);
-                return ReleaseResult.builder().releaseIsValid(false).build();
-            }
+            Organization org = nodeService.findOrganizationInPath(supplyChainId);
             
-            Optional<String> qualifiedNameOpt = supplyChainService.getQualifiedName(supplyChainId);
+            Optional<String> qualifiedNameOpt = nodeService.getQualifiedName(supplyChainId);
             if (qualifiedNameOpt.isEmpty()) {
             	log.info(ARTIFACTS_INVALID_STRING, releaseArtifacts, supplyChainId);
                 return ReleaseResult.builder().releaseIsValid(false).build();
@@ -126,7 +123,7 @@ public class ReleaseServiceImpl implements ReleaseService {
                 		.name(releaseName)
                 		.supplyChainId(supplyChainId)
                 		.qualifiedSupplyChainName(qualifiedNameOpt.get())
-                		.domain(orgOpt.get().getDomain())
+                		.domain(org.getDomain())
                 		.releaseDate(releaseDate)
                 		.releasedProductsHashes(convertToReleaseArtifactHashes(releaseArtifacts))
                 		.releasedProductsHashesHash(releaseArtifactHashesHash)

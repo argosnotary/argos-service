@@ -83,8 +83,9 @@ class KeyPairTest {
 	@Test
     void throwInDecryptTest() {
         KeyPair keyPair = new KeyPair("keyId", "publicKey".getBytes(), "encryptedPrivateKey".getBytes());
+        char[] a = "bla".toCharArray();
         Throwable exception = assertThrows(ArgosError.class, () -> {
-        	CryptoHelper.decryptPrivateKey(keyPair, "bla".toCharArray());
+        	CryptoHelper.decryptPrivateKey(keyPair, a);
           });
         
         assertEquals("corrupted stream - out of bounds length found: 101 >= 101", exception.getMessage());

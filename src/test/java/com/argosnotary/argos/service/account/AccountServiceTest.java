@@ -26,11 +26,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -71,13 +76,18 @@ class AccountServiceTest {
 		sa1 = ServiceAccount.builder().name("sa1").providerSubject("sa1Subject").build();
 	}
 
-	@Test
-	void testKeyPairExists() {
-		when(personalAccountRepository.existsByActiveKey(kp1.getKeyId())).thenReturn(true);
-		when(serviceAccountRepository.existsByActiveKey(kp1.getKeyId())).thenReturn(false);
-		assertTrue(accountService.keyPairExists(kp1.getKeyId()));
-		verify(personalAccountRepository).existsByActiveKey(kp1.getKeyId());
-		verify(serviceAccountRepository).existsByActiveKey(kp1.getKeyId());
+	@ParameterizedTest
+	@CsvSource({
+		"true, false, true",
+		"false, true, true",
+		"false, false, false"
+		})
+	void testKeyPairExists(boolean pa, boolean sa, boolean result) {
+		when(serviceAccountRepository.existsByActiveKey(kp1.getKeyId())).thenReturn(sa);
+		if (!sa) {
+			when(personalAccountRepository.existsByActiveKey(kp1.getKeyId())).thenReturn(pa);
+		}
+		assertThat(accountService.keyPairExists(kp1.getKeyId()), is(result));
 	}
 
 	@Test
@@ -89,22 +99,64 @@ class AccountServiceTest {
 		verify(serviceAccountRepository).findFirstByActiveKeyId(kp1.getKeyId());
 		
 	}
+	
+	@Test
+	void testFindByKeyIds() {
+		when(personalAccountRepository.findByKeyIds(Set.of(kp1.getKeyId()))).thenReturn(new ArrayList<>());
+		when(serviceAccountRepository.findByKeyIds(Set.of(kp1.getKeyId()))).thenReturn(List.of(sa1));
+		assertThat(accountService.findByKeyIds(Set.of(kp1.getKeyId())), is(List.of(sa1)));
+	}
+	
+	@Test
+	void testFindByKeyIdsReverse() {
+		when(personalAccountRepository.findByKeyIds(Set.of(kp1.getKeyId()))).thenReturn(new ArrayList<>(List.of(sa1)));
+		when(serviceAccountRepository.findByKeyIds(Set.of(kp1.getKeyId()))).thenReturn(List.of());
+		assertThat(accountService.findByKeyIds(Set.of(kp1.getKeyId())), is(List.of(sa1)));
+	}
 
 	@Test
 	void testLoadAuthenticatedUser() {
 		Optional<String> optProviderName = Optional.of("optProviderName");
-		when(clientRegistrationService.getClientRegistrationName("provider1")).thenReturn(optProviderName);
+		when(clientRegistrationService.getClientRegistrationNameWithIssuer("optProviderIssuer")).thenReturn(optProviderName);
 		when(clientRegistrationService.getServiceAccountIssuer()).thenReturn("saProviderIssuer");
 		when(personalAccountService.findByProviderNameAndProviderSubject(optProviderName.get(), "subject1")).thenReturn(Optional.of(pa1));
 		
-		Optional<Account> acc = accountService.loadAuthenticatedUser("provider1","subject1");
+		Optional<Account> acc = accountService.loadAuthenticatedUser("optProviderIssuer","subject1");
 		assertEquals(pa1, acc.get());
 		
 		when(serviceAccountService.findByProviderSubject("sa1Subject")).thenReturn(Optional.of(sa1));
-		when(clientRegistrationService.getClientRegistrationName("saProviderIssuer")).thenReturn(Optional.of("saprovider"));
+		when(clientRegistrationService.getClientRegistrationNameWithIssuer("saProviderIssuer")).thenReturn(Optional.of("saprovider"));
 		
 		acc = accountService.loadAuthenticatedUser("saProviderIssuer","sa1Subject");
 		assertEquals(sa1, acc.get());
+		
+	}
+
+	@Test
+	void testLoadAuthenticatedUserNoProvider() {
+
+		when(clientRegistrationService.getClientRegistrationNameWithIssuer("provider1")).thenReturn(Optional.empty());
+		
+		Optional<Account> acc = accountService.loadAuthenticatedUser("provider1","subject1");
+		assertTrue(acc.isEmpty());
+		
+	}
+
+	@Test
+	void testLoadAuthenticatedUserAccNotFound() {
+		Optional<String> optProviderName = Optional.of("optProviderName");
+		when(clientRegistrationService.getClientRegistrationNameWithIssuer("optProviderIssuer")).thenReturn(optProviderName);
+		when(clientRegistrationService.getServiceAccountIssuer()).thenReturn("saProviderIssuer");
+		when(personalAccountService.findByProviderNameAndProviderSubject(optProviderName.get(), "subject1")).thenReturn(Optional.empty());
+		
+		Optional<Account> acc = accountService.loadAuthenticatedUser("optProviderIssuer","subject1");
+		assertTrue(acc.isEmpty());
+		
+		when(serviceAccountService.findByProviderSubject("sa1Subject")).thenReturn(Optional.empty());
+		when(clientRegistrationService.getClientRegistrationNameWithIssuer("saProviderIssuer")).thenReturn(Optional.of("saprovider"));
+		
+		acc = accountService.loadAuthenticatedUser("saProviderIssuer","sa1Subject");
+		assertTrue(acc.isEmpty());
 		
 	}
 

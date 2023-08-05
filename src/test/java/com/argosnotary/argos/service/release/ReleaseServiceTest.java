@@ -53,6 +53,7 @@ import com.argosnotary.argos.service.layout.LayoutMetaBlockService;
 import com.argosnotary.argos.service.link.LinkMetaBlockService;
 import com.argosnotary.argos.service.mongodb.release.ReleaseDossierRepository;
 import com.argosnotary.argos.service.mongodb.release.ReleaseRepository;
+import com.argosnotary.argos.service.nodes.NodeService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
 import com.argosnotary.argos.service.verification.VerificationProvider;
 import com.argosnotary.argos.service.verification.VerificationRunResult;
@@ -98,13 +99,15 @@ class ReleaseServiceTest {
 	@Mock
     private SupplyChainService supplyChainService;
 	@Mock
+    private NodeService nodeService;
+	@Mock
     private LinkMetaBlockService linkMetaBlockService;
 	@Mock
     private PublicKey key;
 
 	@BeforeEach
 	void setUp() throws Exception {
-		releaseService = new ReleaseServiceImpl(verificationProvider,layoutMetaBlockService,releaseRepository,releaseDossierRepository,accountService,supplyChainService,linkMetaBlockService);
+		releaseService = new ReleaseServiceImpl(verificationProvider,layoutMetaBlockService,releaseRepository,releaseDossierRepository,accountService,nodeService, supplyChainService,linkMetaBlockService);
 		a11 = new Artifact("hash11", "uri11");
 		a12 = new Artifact("hash12", "uri12");
 		a21 = new Artifact("hash21", "uri21");
@@ -165,14 +168,14 @@ class ReleaseServiceTest {
 	
 	@Test
 	void testCreateReleaseCreate() {
-		when(supplyChainService.getQualifiedName(SUPPLYCHAIN_ID)).thenReturn(Optional.of(fullDomainName));
+		when(nodeService.getQualifiedName(SUPPLYCHAIN_ID)).thenReturn(Optional.of(fullDomainName));
 		when(releaseRepository.findByReleasedProductsHashesHashAndSupplyChainId(releaseArtifactHashesHash, SUPPLYCHAIN_ID)).thenReturn(Optional.empty());
 		when(layoutMetaBlockService.getLayout(SUPPLYCHAIN_ID)).thenReturn(Optional.of(layoutMetaBlock));
 		when(layoutMetaBlock.getLayout()).thenReturn(layout);
 		when(layout.getKeys()).thenReturn(List.of(key));
 		when(key.getKeyId()).thenReturn("keyId");
 		when(verificationProvider.verifyRun(layoutMetaBlock, allArtifacts)).thenReturn(validVerificationRunResult);
-		when(supplyChainService.getOrganization(SUPPLYCHAIN_ID)).thenReturn(Optional.of(org));
+		when(nodeService.findOrganizationInPath(SUPPLYCHAIN_ID)).thenReturn(org);
 		when(releaseRepository.save(any())).thenReturn(release);
 		ReleaseResult res = releaseService.createRelease(SUPPLYCHAIN_ID, releaseArtifacts);
 		assertTrue(res.isReleaseIsValid());

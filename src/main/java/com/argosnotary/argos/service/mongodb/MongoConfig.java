@@ -32,7 +32,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -66,11 +65,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     public GridFsTemplate gridFsTemplate(MongoMappingContext mappingContext) {
     	return new GridFsTemplate(mongoDbFactory(), mappingMongoConverter(mongoDbFactory(),
                 customConversions(), mappingContext));
-    }
-    
-    @Bean
-    public MongoTemplate mongoTemplate() {
-        return new MongoTemplate(mongoDbFactory());
     }
 
     @Bean

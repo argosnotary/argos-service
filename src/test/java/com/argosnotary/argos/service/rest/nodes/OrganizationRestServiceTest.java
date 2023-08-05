@@ -21,13 +21,16 @@ package com.argosnotary.argos.service.rest.nodes;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,13 +39,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.argosnotary.argos.domain.account.PersonalAccount;
-import com.argosnotary.argos.domain.nodes.ManagementNode;
+import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.nodes.NodeService;
@@ -56,7 +61,6 @@ class OrganizationRestServiceTest {
 	
     private Organization org2;
     private RestOrganization restOrg;
-    private ManagementNode node21, node22;
 	
 	private OrganizationRestService organizationRestService;
 	
@@ -75,25 +79,41 @@ class OrganizationRestServiceTest {
     private HttpServletRequest httpServletRequest;
 	
 	private PersonalAccount pa;
+	
+	@Mock
+	private ServiceAccount sa;
 
 	@BeforeEach
 	void setUp() throws Exception {
-		organizationRestService = new OrganizationRestServiceImpl(organizationService,organizationMapper,accountSecurityContext);
+		organizationRestService = new OrganizationRestServiceImpl(organizationService,nodeService, organizationMapper,accountSecurityContext);
 		organizationMapper = Mappers.getMapper(OrganizationMapper.class);
 		
 		org2 = new Organization(UUID.randomUUID(), "org2", null);
         
         pa = PersonalAccount.builder().name("pa").build();
         
-        node21 = new ManagementNode(UUID.randomUUID(), "node21", org2);
-        node22 = new ManagementNode(UUID.randomUUID(), "node22", org2);
         restOrg = organizationMapper.convertToRestOrganization(org2);
 	}
 	
 	@Test
-	void testCreateOrganizationBadReq() {
+	void testCreateOrganization() throws URISyntaxException {
 		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(pa));
+        when(organizationService.existsByName(org2.getName())).thenReturn(false);
+        when(organizationService.create(org2)).thenReturn(org2);
+        ResponseEntity<RestOrganization> response = organizationRestService.createOrganization(restOrg);
+        assertThat(response.getStatusCode(), is(HttpStatusCode.valueOf(201)));
+        assertEquals(new URI(String.format("/api/organizations/%s", org2.getId())),response.getHeaders().getLocation());
+        assertEquals(restOrg, response.getBody());
+		
+	}
+	
+	@Test
+	void testCreateOrganizationNotAuthenticated() {
+		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.empty());
         
         Throwable exception = assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
             organizationRestService.createOrganization(restOrg);
@@ -104,16 +124,30 @@ class OrganizationRestServiceTest {
 	}
 	
 	@Test
-	void testCreateOrganization() {
+	void testCreateOrganizationAuthenticatedServiceAccount() {
+		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(sa));
+        
+        Throwable exception = assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
+            organizationRestService.createOrganization(restOrg);
+          });
+        
+        assertEquals("400 BAD_REQUEST \"invalid account\"", exception.getMessage());
+		
+	}
+	
+	@Test
+	void testCreateOrganizationNameExists() throws URISyntaxException {
 		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
         when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(pa));
-        when(organizationService.create(org2)).thenReturn(org2);
-        ResponseEntity<RestOrganization> response = organizationRestService.createOrganization(restOrg);
-        assertThat(response.getStatusCode(), is(HttpStatusCode.valueOf(201)));
-        assertEquals(response.getBody(), restOrg);
-        assertThat(response.getHeaders().getLocation(), notNullValue());
-		verify(accountSecurityContext).getAuthenticatedAccount();
+        when(organizationService.existsByName(org2.getName())).thenReturn(true);
+        Throwable exception = assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
+            organizationRestService.createOrganization(restOrg);
+          });
+        
+        assertEquals(String.format("400 BAD_REQUEST \"Organization with name [%s] already exists\"", org2.getName()), exception.getMessage());
 		
 	}
 
@@ -147,12 +181,61 @@ class OrganizationRestServiceTest {
 
 	@Test
 	void testGetOrganization() {
-		
+		UUID id = org2.getId();
+        when(organizationService.findById(id)).thenReturn(Optional.of(org2));
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseEntity<RestOrganization> managementNodeItemResponse = organizationRestService.getOrganization(id);
+        assertThat(managementNodeItemResponse.getStatusCode().value(), is(HttpStatus.OK.value()));
+        assertThat(managementNodeItemResponse.getBody(), is(restOrg));
+	}
+
+	@Test
+	void testGetOrganizationNotFound() {
+		UUID id = org2.getId();
+        when(organizationService.findById(id)).thenReturn(Optional.empty());
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        	organizationRestService.getOrganization(id);
+        });
+        assertEquals("404 NOT_FOUND \"Organization not found\"", exception.getMessage());
+        assertThat(exception.getStatusCode().value(), is(404));
 	}
 
 	@Test
 	void testGetOrganizations() {
-		
+		UUID parentId = org2.getId();
+        when(nodeService.findById(parentId)).thenReturn(Optional.of(org2));
+        when(organizationService.find(Optional.of(org2))).thenReturn(Set.of(org2));
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseEntity<List<RestOrganization>> managementNodeItemResponse = organizationRestService.getOrganizations(parentId);
+        assertThat(managementNodeItemResponse.getStatusCode().value(), is(HttpStatus.OK.value()));
+        assertThat(managementNodeItemResponse.getBody(), is(List.of(restOrg)));
+	}
+
+	@Test
+	void testGetOrganizationsParentIdNull() {
+		when(organizationService.find(Optional.empty())).thenReturn(Set.of(org2));
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseEntity<List<RestOrganization>> managementNodeItemResponse = organizationRestService.getOrganizations(null);
+        assertThat(managementNodeItemResponse.getStatusCode().value(), is(HttpStatus.OK.value()));
+        assertThat(managementNodeItemResponse.getBody(), is(List.of(restOrg)));
+	}
+
+	@Test
+	void testGetOrganizationsParentNotFound() {
+		UUID parentId = org2.getId();
+        when(nodeService.findById(parentId)).thenReturn(Optional.empty());
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        	organizationRestService.getOrganizations(parentId);
+        });
+        assertEquals(String.format("404 NOT_FOUND \"Node with id [%s] not found\"", parentId), exception.getMessage());
+        assertThat(exception.getStatusCode().value(), is(404));
 	}
 
 }

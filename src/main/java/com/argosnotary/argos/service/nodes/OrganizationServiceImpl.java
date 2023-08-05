@@ -19,9 +19,10 @@
  */
 package com.argosnotary.argos.service.nodes;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -45,9 +46,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final AccountSecurityContext accountSecurityContext;
 
 	@Override
-	public List<Organization> find() {
-		return nodeService.find(Organization.class.getCanonicalName(), Optional.empty())
-				.stream().map(n -> (Organization) n).toList();
+	public Set<Organization> find(Optional<Node> optNode) {
+		return nodeService.find(Organization.class.getCanonicalName(), optNode)
+				.stream().map(Organization.class::cast).collect(Collectors.toSet());
 	}
 
 	@Override

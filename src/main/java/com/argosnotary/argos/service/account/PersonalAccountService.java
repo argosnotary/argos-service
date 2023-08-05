@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.argosnotary.argos.domain.account.PersonalAccount;
-import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.crypto.KeyPair;
 
 public interface PersonalAccountService {

@@ -32,7 +32,7 @@ public interface ManagementNodeService {
 	 * Find all management nodes where the account is authorized for
 	 * @return
 	 */
-	Set<ManagementNode> find(Node node);
+	Set<ManagementNode> find(Optional<Node> optNode);
 	
 	/**
 	 * 
@@ -40,6 +40,8 @@ public interface ManagementNodeService {
 	 * @return
 	 */
 	Optional<ManagementNode> findById(UUID managementNodeId);
+	
+	boolean exists(UUID id);
 	
 	/**
 	 * Create an ManagementNode

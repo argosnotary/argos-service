@@ -22,19 +22,12 @@ package com.argosnotary.argos.domain.nodes;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.argosnotary.argos.domain.crypto.HashAlgorithm;
-import com.argosnotary.argos.domain.crypto.KeyAlgorithm;
-import com.argosnotary.argos.domain.crypto.signing.SignatureAlgorithm;
-import com.argosnotary.argos.domain.nodes.ManagementNode;
-import com.argosnotary.argos.domain.nodes.Organization;
-import com.argosnotary.argos.domain.nodes.Project;
 
 class OrganizationTest {
     private Organization org1, org2;
@@ -47,28 +40,6 @@ class OrganizationTest {
 		org1 = new Organization(UUID.randomUUID(), "org1", null);
 
 		org2 = new Organization(UUID.randomUUID(), "org2", null);
-        
-        node1 = new ManagementNode(UUID.randomUUID(), "node1", org2);
-        node2 = new ManagementNode(UUID.randomUUID(), "node2", org2);
-        node3 = new ManagementNode(UUID.randomUUID(), "node3", node2);
-        node4 = new ManagementNode(UUID.randomUUID(), "node4", node2);
-        
-
-        project1 = new Project(UUID.randomUUID(), "project1", org2);
-        project2 = new Project(UUID.randomUUID(), "project2", node1);
-        project3 = new Project(UUID.randomUUID(), "project3", node1);
-        project4 = new Project(UUID.randomUUID(), "project4", node3);
-        project5 = new Project(UUID.randomUUID(), "project5", node2);
-        
-//        org2.getNodes().add(node1);
-//        org2.getNodes().add(node2);
-//        org2.getNodes().add(node3);
-//        org2.getNodes().add(node4);
-//        org2.getNodes().add(project1);
-//        org2.getNodes().add(project2);
-//        org2.getNodes().add(project3);
-//        org2.getNodes().add(project4);
-//        org2.getNodes().add(project5);
 		
 	}
 	
@@ -77,22 +48,6 @@ class OrganizationTest {
 		Organization expected = new Organization(org2.getId(), "org2", null);
 		assertEquals(expected, org2);
 		
-	}
-
-	@Test
-	void testGetChildrenNoChildren() {
-		assertThat(org1.getChildren()).isEmpty();
-	}
-	
-	@Test
-	void testGetChildrenWithChildren() {
-		assertThat(org2.getChildren()).size().isEqualTo(3);
-	}
-	
-	@Test
-	void testLeafNode() {
-		assertThat(org1.isLeaf()).isTrue();
-		assertThat(org2.isLeaf()).isFalse();
 	}
 	
 	@Test
@@ -104,20 +59,15 @@ class OrganizationTest {
 	
 	@Test
 	void testGetParentId() {
-		Organization org1 = new Organization();
-		assertThat(org1.getParent()).isEmpty();
+		assertNull(org1.getParentId());
 	}
 	
 	@Test
-	void testNoParent() {
-		Organization org1 = new Organization();
-		Organization org2 = new Organization();
-		org2.setId(org1.getId());
-		assertThrows(UnsupportedOperationException.class, () -> {
-			org1.setParent(node1);
-          });
-		assertEquals(org2, org1);
-		assertNull(org1.getParentId());
+	void testParentType() {
+		assertFalse(Organization.isValidParentType(new SupplyChain()));
+		assertFalse(Organization.isValidParentType(new Project()));
+		assertFalse(Organization.isValidParentType(new ManagementNode()));
+		assertFalse(Organization.isValidParentType(new Organization()));
 	}
 
 }

@@ -29,8 +29,6 @@ import com.argosnotary.argos.service.openapi.rest.model.RestOrganization;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OrganizationMapper {
 
-	@Mapping(target = "children", ignore = true)
-	@Mapping(target = "parent", ignore = true)
 	Organization convertFromRestOrganization(RestOrganization restOrganization);
 
     RestOrganization convertToRestOrganization(Organization organization);

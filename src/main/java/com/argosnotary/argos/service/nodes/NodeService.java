@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.argosnotary.argos.domain.nodes.Node;
+import com.argosnotary.argos.domain.nodes.Organization;
 
 public interface NodeService {
 	
@@ -32,8 +33,6 @@ public interface NodeService {
 	public Node update(Node node);
 	
 	void delete(UUID resourceId);
-	
-	public Optional<Node> getSubTree(UUID nodeId);
 	
 	public Optional<Node> findById(UUID nodeId);
 	
@@ -46,6 +45,8 @@ public interface NodeService {
 	 */
 	public Set<Node> find(String clazz, Optional<Node> node);
 	
+	Organization findOrganizationInPath(UUID resourceId);
+	
 	public boolean exists(Class<? extends Node> clazz, UUID resourceId);
 	
 	public boolean exists(Class<? extends Node> clazz, String name);
@@ -53,7 +54,5 @@ public interface NodeService {
 	public boolean existsByParentIdAndName(UUID parentId, String name);
 	
 	Optional<String> getQualifiedName(UUID resourceId);
-	
-	Optional<Node> findRootNodeInPath(UUID resourceId);
 
 }

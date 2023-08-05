@@ -117,6 +117,15 @@ class ServiceAccountProviderServiceTest {
 		
 		assertTrue(serviceAccountProviderService.exists(sa2.getId()));
 	}
+
+	@Test
+	void testRegisterServiceAccountErrorStauts() {
+		ServiceAccount sa2 = serviceAccountProviderService.registerServiceAccount(sa);
+		assertEquals(sa.getId(), sa2.getId());
+		assertNotNull(sa2.getProviderSubject());
+		
+		assertTrue(serviceAccountProviderService.exists(sa2.getId()));
+	}
 	
 	@Test
 	void testExists() {
@@ -133,6 +142,8 @@ class ServiceAccountProviderServiceTest {
 		serviceAccountProviderService.unRegisterServiceAccount(sa2);
 		
 		assertFalse(serviceAccountProviderService.exists(sa2.getId()));
+
+		serviceAccountProviderService.unRegisterServiceAccount(sa2);
 	}
 	
 	@Test
@@ -149,8 +160,9 @@ class ServiceAccountProviderServiceTest {
 		assertNotNull(token);
 		
 		ServiceAccount sa3 = ServiceAccount.builder().id(UUID.randomUUID()).build();
+		char[] a = "password2".toCharArray();
 		Throwable exception = assertThrows(ArgosError.class, () -> {
-			serviceAccountProviderService.setServiceAccountPassword(sa3, "password2".toCharArray());
+			serviceAccountProviderService.setServiceAccountPassword(sa3, a);
         });
 		assertEquals(String.format("Service Account [%s] not found in saprovider", sa3.getId().toString()), exception.getMessage());
 		
@@ -164,9 +176,10 @@ class ServiceAccountProviderServiceTest {
 		serviceAccountProviderService.setServiceAccountPassword(sa2, "password1".toCharArray());
 		String token = serviceAccountProviderService.getIdToken(sa2.getId(), "password1".toCharArray());
 		assertNotNull(token);
-		
+		char[] a = "other".toCharArray();
+		UUID id = sa2.getId();
 		Throwable exception = assertThrows(NotAuthorizedException.class, () -> {
-			serviceAccountProviderService.getIdToken(sa2.getId(), "other".toCharArray());
+			serviceAccountProviderService.getIdToken(id, a);
         });
 		assertEquals("HTTP 401 Unauthorized", exception.getMessage());
 	}

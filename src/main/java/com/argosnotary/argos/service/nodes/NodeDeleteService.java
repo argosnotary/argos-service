@@ -24,9 +24,10 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.argosnotary.argos.domain.nodes.Node;
-import com.argosnotary.argos.domain.nodes.NodeVisitor;
 import com.argosnotary.argos.domain.nodes.Project;
 import com.argosnotary.argos.domain.nodes.SupplyChain;
+import com.argosnotary.argos.domain.nodes.TreeNode;
+import com.argosnotary.argos.domain.nodes.TreeNodeVisitor;
 import com.argosnotary.argos.service.mongodb.account.ServiceAccountRepository;
 import com.argosnotary.argos.service.mongodb.layout.ApprovalConfigurationRepository;
 import com.argosnotary.argos.service.mongodb.layout.LayoutMetaBlockRepository;
@@ -35,12 +36,12 @@ import com.argosnotary.argos.service.mongodb.link.LinkMetaBlockRepository;
 import com.argosnotary.argos.service.mongodb.nodes.NodeRepository;
 import com.argosnotary.argos.service.roles.RoleAssignmentService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
-public class NodeDeleteService implements NodeVisitor<Optional<Node>>{
-
+@RequiredArgsConstructor
+public class NodeDeleteService implements TreeNodeVisitor<Optional<TreeNode>>{
+	
     private final NodeRepository nodeRepository;
     private final LayoutMetaBlockRepository layoutMetaBlockRepository;
     private final LinkMetaBlockRepository linkMetaBlockRepository;
@@ -49,38 +50,38 @@ public class NodeDeleteService implements NodeVisitor<Optional<Node>>{
     private final RoleAssignmentService roleAssignmentService;
     private final ReleaseConfigurationRepository releaseConfigurationRepository;
 
-    public void deleteNode(Node node) {
+    public void deleteNode(TreeNode node) {
     	node.visit(this);
     }
 
-    public void deleteSupplyChain(SupplyChain supplyChain) {
+    @Override
+    public void visitEnter(TreeNode node) {
+		if (node.getNode() instanceof SupplyChain supplyChainNode) {
+			deleteSupplyChain(supplyChainNode);
+		}
+		if (node.getNode() instanceof Project) {
+			serviceAccountRepository.deleteByProjectId(node.getNode().getId());
+		}
+    }
+
+    @Override
+    public void visitExit(TreeNode node) {
+    	removeRoleAssignments(node.getNode());
+    	nodeRepository.deleteById(node.getNode().getId());
+    }
+
+	@Override
+	public void visitEndPoint(TreeNode node) {
+		throw new UnsupportedOperationException("visitEndPoint method not implemented");
+		
+	}
+
+    private void deleteSupplyChain(SupplyChain supplyChain) {
         layoutMetaBlockRepository.deleteBySupplyChainId(supplyChain.getId());
         linkMetaBlockRepository.deleteBySupplyChainId(supplyChain.getId());
         approvalConfigurationRepository.deleteBySupplyChainId(supplyChain.getId());
         releaseConfigurationRepository.deleteBySupplyChainId(supplyChain.getId());
     }
-
-    @Override
-    public void visitEnter(Node node) {
-		if (node instanceof SupplyChain supplyChainNode) {
-			deleteSupplyChain(supplyChainNode);
-		}
-		if (node instanceof Project) {
-			serviceAccountRepository.deleteByProjectId(node.getId());
-		}
-    }
-
-    @Override
-    public void visitExit(Node node) {
-    	removeRoleAssignments(node);
-    	nodeRepository.deleteById(node.getId());
-    }
-
-	@Override
-	public void visitEndPoint(Node node) {
-		throw new UnsupportedOperationException("visitEndPoint method not implemented");
-		
-	}
 	
 	private void removeRoleAssignments(Node node) {
 		roleAssignmentService.deleteByResourceId(node.getId());

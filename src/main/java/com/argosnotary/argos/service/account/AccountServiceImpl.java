@@ -71,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Optional<Account> loadAuthenticatedUser(String providerIssuer, String providerSubject) {
-		Optional<String> optProviderName = clientRegistrationService.getClientRegistrationName(providerIssuer);
+		Optional<String> optProviderName = clientRegistrationService.getClientRegistrationNameWithIssuer(providerIssuer);
 		if (optProviderName.isEmpty()) {
 			log.warn("Unknown provider used, issuer: [%s], subject: [%s]", providerIssuer, providerSubject);
 			return Optional.empty();

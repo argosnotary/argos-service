@@ -133,7 +133,8 @@ class ServiceAccountRestServiceTest {
 
     @Test
     void createServiceAccountProjectIdNotEqual() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.createServiceAccount(UUID.randomUUID(), rsa1));
+        UUID id = UUID.randomUUID();
+    	ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.createServiceAccount(id, rsa1));
         assertThat(exception.getMessage(), is(String.format("400 BAD_REQUEST \"projectIds not equal\"")));
     }
 
@@ -148,14 +149,18 @@ class ServiceAccountRestServiceTest {
     @Test
     void getServiceAccountKeyByIdAccountNotFound() {
     	when(serviceAccountService.findById(sa2.getId())).thenReturn(Optional.empty());
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountKeyById(sa2.getProjectId(), sa2.getId()));
+    	UUID id = sa2.getId();
+    	UUID pId = sa2.getProjectId();
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountKeyById(pId, id));
         assertThat(exception.getMessage(), is(String.format("404 NOT_FOUND \"no active service account key with id : %s found\"", sa2.getId().toString())));
     }
 
     @Test
     void getServiceAccountKeyByIdNoActiveKey() {
         when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountKeyById(sa1.getProjectId(), sa1.getId()));
+    	UUID id = sa1.getId();
+    	UUID pId = sa1.getProjectId();
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountKeyById(pId, id));
         assertThat(exception.getMessage(), is(String.format("404 NOT_FOUND \"no active service account key with id : %s found\"", sa1.getId().toString())));
     }
 
@@ -170,7 +175,9 @@ class ServiceAccountRestServiceTest {
     @Test
     void getServiceAccountByIdAccountNotFound() {
         when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.empty());
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountById(sa1.getProjectId(), sa1.getId()));
+    	UUID id = sa1.getId();
+    	UUID pId = sa1.getProjectId();
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountById(pId, id));
         assertThat(exception.getMessage(), is(String.format("404 NOT_FOUND \"no service account with id : %s found\"", sa1.getId().toString())));
     }
 
@@ -185,7 +192,9 @@ class ServiceAccountRestServiceTest {
     @Test
     void deleteServiceAccountWithInvalidAccountIdShouldReturnNotFound() {
     	when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.empty());
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.deleteServiceAccount(sa1.getProjectId(), sa1.getId()));
+    	UUID id = sa1.getId();
+    	UUID pId = sa1.getProjectId();
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.deleteServiceAccount(pId, id));
         assertThat(exception.getStatusCode().value(), is(404));
         assertThat(exception.getMessage(), is(String.format("404 NOT_FOUND \"no service account with id : %s found\"", sa1.getId().toString())));
     }

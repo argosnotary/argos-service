@@ -19,21 +19,20 @@
  */
 package com.argosnotary.argos.service.rest.nodes;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
+import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.Project;
 import com.argosnotary.argos.domain.nodes.SupplyChain;
-import com.argosnotary.argos.service.rest.nodes.SupplyChainMapper;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -43,8 +42,9 @@ class SupplyChainMapperTest {
 	
 	private SupplyChainMapper supplyChainMapper;
 	
-    private Project project11;
-    private Organization org1;
+    private Project project211;
+    private Organization org2;
+    private ManagementNode node21;
     
     private SupplyChain sc;
 
@@ -54,19 +54,33 @@ class SupplyChainMapperTest {
     @BeforeEach
     void setUp() {
 
-        org1 = new Organization(UUID.randomUUID(), "org1", null);
-        project11 = new Project(UUID.randomUUID(), "project11", org1);
+        supplyChainMapper = Mappers.getMapper(SupplyChainMapper.class);
         
-		supplyChainMapper = Mappers.getMapper(SupplyChainMapper.class);
-        sc = new SupplyChain(UUID.randomUUID(), "sc", project11);
+		org2 = new Organization(UUID.randomUUID(), "org2", null);
+        
+        org2.setDomain(Domain.builder().build());
+        
+        node21 = new ManagementNode(UUID.randomUUID(), "node21", List.of(), org2.getId());
+        
+        node21.setPathToRoot(List.of(node21.getId(), org2.getId()));
+        
+
+        project211 = new Project(UUID.randomUUID(), "project211",List.of(),  node21.getId());
+        
+        project211.setPathToRoot(List.of(project211.getId(), node21.getId(), org2.getId()));
+        
+        sc = new SupplyChain(UUID.randomUUID(), "sc", List.of(), project211.getId());
+        sc.setPathToRoot(List.of(sc.getId(), project211.getId(), node21.getId(), org2.getId()));
+		
         
 	}
 
 	@Test
 	void testMapper() {
 		SupplyChain node = supplyChainMapper.convertFromRestSupplyChain(supplyChainMapper.convertToRestSupplyChain(sc));
-		assertThat(node.getChildren(), is(Set.of()));
-		assertThat(node.getParentId(), is(project11.getId()));
+
+		assertEquals(sc, node);
+		
 	}
 
 }

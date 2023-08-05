@@ -136,7 +136,7 @@ class OidcAuthenticationSuccessHandlerTest {
         when(oidcUser.getIdToken()).thenReturn(idToken);
         when(idToken.getTokenValue()).thenReturn("token");
         when(response.getOutputStream()).thenReturn(servletOutputStream);
-        when(clientRegistrationService.getClientRegistrationName("http://oidcIssuer")).thenReturn(Optional.of("providerName"));
+        when(clientRegistrationService.getClientRegistrationNameWithIssuer("http://oidcIssuer")).thenReturn(Optional.of("providerName"));
         successHandler.onAuthenticationSuccess(request, response, authentication);
         verify(customStatelessAuthorizationRequestRepository).removeAuthorizationRequestCookies(request, response);
         verify(servletOutputStream).print("token");
@@ -233,7 +233,7 @@ class OidcAuthenticationSuccessHandlerTest {
         when(idToken.getTokenValue()).thenReturn("token");
         when(response.getOutputStream()).thenReturn(servletOutputStream);
         when(accountService.loadAuthenticatedUser(oidcUser.getIssuer().toString(), oidcUser.getSubject())).thenReturn(Optional.empty());
-        when(clientRegistrationService.getClientRegistrationName("http://oidcIssuer")).thenReturn(Optional.of("providerName"));
+        when(clientRegistrationService.getClientRegistrationNameWithIssuer("http://oidcIssuer")).thenReturn(Optional.of("providerName"));
         when(response.getOutputStream()).thenReturn(servletOutputStream);
         successHandler.onAuthenticationSuccess(request, response, authentication);
         verify(customStatelessAuthorizationRequestRepository).removeAuthorizationRequestCookies(request, response);

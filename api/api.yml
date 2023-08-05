@@ -56,6 +56,7 @@ paths:
       tags:
         - organization
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -82,6 +83,13 @@ paths:
       operationId: getOrganizations
       tags:
         - organization
+      parameters:
+        - name: nodeId
+          in: query
+          required: false
+          description: this is be id of the node in tree
+          schema:
+            $ref: "#/components/schemas/UUID"
       responses:
         '200':
           description: list of organizations
@@ -155,6 +163,7 @@ paths:
           schema:
             $ref: "#/components/schemas/UUID"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -176,16 +185,18 @@ paths:
           $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
+  
+  /managementnodes:
     get:
       summary: get all management nodes for a parent
       operationId: getManagementNodes
       tags:
         - management node
       parameters:
-        - name: parentId
-          in: path
-          required: true
-          description: this is be the parent id
+        - name: nodeId
+          in: query
+          required: false
+          description: this is be id of the node in tree
           schema:
             $ref: "#/components/schemas/UUID"
       responses:
@@ -260,6 +271,7 @@ paths:
           schema:
             $ref: "#/components/schemas/UUID"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -281,15 +293,17 @@ paths:
           $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
+  
+  /projects:  
     get:
       summary: get all projects for an ancestor
       operationId: getProjects
       tags:
         - project
       parameters:
-        - name: parentId
-          in: path
-          required: true
+        - name: nodeId
+          in: query
+          required: false
           description: this will be the parent id
           schema:
             $ref: "#/components/schemas/UUID"
@@ -365,6 +379,7 @@ paths:
           schema:
             $ref: "#/components/schemas/UUID"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -458,6 +473,7 @@ paths:
       tags:
         - service account
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -517,6 +533,7 @@ paths:
           schema:
             $ref: "#/components/schemas/UUID"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -578,6 +595,7 @@ paths:
           schema:
             $ref: "#/components/schemas/UUID"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -645,6 +663,7 @@ paths:
           schema:
             $ref: "#/components/schemas/UUID"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -666,15 +685,17 @@ paths:
           $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
+    
+  /supplychaines:  
     get:
       summary: get supplychains for a parent
       operationId: getSupplyChains
       tags:
         - supply chain
       parameters:
-        - name: parentId
-          in: path
-          required: true
+        - name: nodeId
+          in: query
+          required: false
           schema:
             $ref: "#/components/schemas/UUID"
       responses:
@@ -850,6 +871,7 @@ paths:
           schema:
             $ref: "#/components/schemas/UUID"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -1223,6 +1245,7 @@ paths:
           schema:
             $ref: "#/components/schemas/UUID"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -1515,7 +1538,7 @@ components:
     HostnameString:
       type: string
       minLength: 1
-      maxLength: 1024
+      maxLength: 255
       pattern: '^(([a-z]|[a-z][a-z0-9\-]{0,61}[a-z0-9])\.)*([a-z]|[a-z][a-z0-9\-]{0,61}[a-z0-9])$'
 
     ArtifactArray:

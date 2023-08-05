@@ -216,8 +216,8 @@ class LayoutMetaBlockRestServiceTest {
     void createApprovalConfigurationsWithIncorrectArtifactSpecificationShouldThrowValidationError() {
     	ArtifactCollectorSpecification col = ArtifactCollectorSpecification.builder().context(Map.of()).name("bla").type(ArtifactCollectorSpecification.CollectorType.XLDEPLOY).build();
     	ApprovalConfiguration conf = ApprovalConfiguration.builder().artifactCollectorSpecifications(List.of(col)).build();
-        
-        LayoutValidationException layoutValidationException = assertThrows(LayoutValidationException.class, () -> service.createApprovalConfigurations(SUPPLY_CHAIN_ID, List.of(approvalConfigurationMapper.convertToRestApprovalConfiguration(conf))));
+        List<RestApprovalConfiguration> l = List.of(approvalConfigurationMapper.convertToRestApprovalConfiguration(conf));
+        LayoutValidationException layoutValidationException = assertThrows(LayoutValidationException.class, () -> service.createApprovalConfigurations(SUPPLY_CHAIN_ID, l));
         assertThat(layoutValidationException.getValidationMessages().isEmpty(), is(false));
         assertThat(layoutValidationException.getValidationMessages().get(0).getField(), is("context"));
         assertThat(layoutValidationException.getValidationMessages().get(0).getMessage(), is("required fields : [applicationName] not present for collector type: XLDEPLOY"));

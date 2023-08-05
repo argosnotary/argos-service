@@ -19,11 +19,9 @@
  */
 package com.argosnotary.argos.service.rest.nodes;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +31,6 @@ import org.mapstruct.factory.Mappers;
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.service.openapi.rest.model.RestManagementNode;
-import com.argosnotary.argos.service.rest.nodes.ManagementNodeMapper;
 
 class ManagementNodeMapperTest {
 	
@@ -48,16 +45,18 @@ class ManagementNodeMapperTest {
 		
 		org2 = new Organization(UUID.randomUUID(), "org2", null);
         
-        node21 = new ManagementNode(UUID.randomUUID(), "node21", org2);
-        node211 = new ManagementNode(UUID.randomUUID(), "node211", node21);
+        node21 = new ManagementNode(UUID.randomUUID(), "node21", List.of(), org2.getId());
+        node211 = new ManagementNode(UUID.randomUUID(), "node211", List.of(), node21.getId());
+        
+        node21.setPathToRoot(List.of(node21.getId(), org2.getId()));
+        node211.setPathToRoot(List.of(node211.getId(), node21.getId(), org2.getId()));
 	}
 
 	@Test
 	void testMapper() {
 		RestManagementNode restNode = managementNodeMapper.convertToRestManagementNode(node21);
 		ManagementNode node = managementNodeMapper.convertFromRestManagementNode(restNode);
-		assertThat(node.getChildren(), is(Set.of()));
-		assertThat(node.getParentId(), is(org2.getId()));
+		assertEquals(node21, node);
 	}
 
 }

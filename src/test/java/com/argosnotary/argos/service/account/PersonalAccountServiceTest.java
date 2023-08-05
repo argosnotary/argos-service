@@ -19,7 +19,12 @@
  */
 package com.argosnotary.argos.service.account;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,8 +35,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
-import com.argosnotary.argos.service.account.PersonalAccountService;
-import com.argosnotary.argos.service.account.PersonalAccountServiceImpl;
 import com.argosnotary.argos.service.mongodb.account.PersonalAccountRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,6 +61,40 @@ class PersonalAccountServiceTest {
 		pa1.deactivateKeyPair(kp2);
 		verify(personalAccountRepository).save(pa1);
 		
+	}
+	
+	@Test
+	void testGetPersonalAccountById() {
+		when(personalAccountRepository.findById(pa1.getId())).thenReturn(Optional.of(pa1));
+		Optional<PersonalAccount> pa = personalAccountService.getPersonalAccountById(pa1.getId());
+		assertEquals(pa.get(), pa1);
+	}
+	
+	@Test
+	void testGetPersonalAccountByIdEmpty() {
+		when(personalAccountRepository.findById(pa1.getId())).thenReturn(Optional.empty());
+		Optional<PersonalAccount> pa = personalAccountService.getPersonalAccountById(pa1.getId());
+		assertTrue(pa.isEmpty());
+	}
+
+	@Test
+	void testFindByProviderNameAndProviderSubject() {
+		when(personalAccountRepository.findFirstByProviderNameAndProviderSubject("providerName", "paSubject")).thenReturn(Optional.of(pa1));
+		Optional<PersonalAccount> pa = personalAccountService.findByProviderNameAndProviderSubject("providerName", "paSubject");
+		assertEquals(pa.get(), pa1);
+	}
+
+	@Test
+	void testFindByProviderNameAndProviderSubjectEmpty() {
+		when(personalAccountRepository.findFirstByProviderNameAndProviderSubject("providerName", "paSubject")).thenReturn(Optional.empty());
+		Optional<PersonalAccount> pa = personalAccountService.findByProviderNameAndProviderSubject("providerName", "paSubject");
+		assertTrue(pa.isEmpty());
+	}
+
+	@Test
+	void testSave() {
+		personalAccountService.save(pa1);
+		verify(personalAccountRepository).save(pa1);
 	}
 
 }

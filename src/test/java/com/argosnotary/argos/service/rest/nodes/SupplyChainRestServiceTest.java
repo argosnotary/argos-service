@@ -20,10 +20,8 @@
 package com.argosnotary.argos.service.rest.nodes;
 
 import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,8 +30,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -57,10 +58,6 @@ import com.argosnotary.argos.service.nodes.NodeDeleteService;
 import com.argosnotary.argos.service.nodes.NodeService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
 import com.argosnotary.argos.service.openapi.rest.model.RestSupplyChain;
-import com.argosnotary.argos.service.rest.nodes.SupplyChainMapper;
-import com.argosnotary.argos.service.rest.nodes.SupplyChainRestService;
-import com.argosnotary.argos.service.rest.nodes.SupplyChainRestServiceImpl;
-import com.fasterxml.jackson.core.TreeNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -70,7 +67,6 @@ class SupplyChainRestServiceTest {
     private static final UUID PARENT_ID = UUID.randomUUID();
     private static final UUID SUPPLY_CHAIN_ID = UUID.randomUUID();
     private static final String SUPPLY_CHAIN_NAME = "supplyChainName";
-    private static final String LABEL_NAME = "labelName";
     @Mock
     private SupplyChainService supplyChainService;
     
@@ -118,31 +114,93 @@ class SupplyChainRestServiceTest {
     	this.mvc = MockMvcBuilders.standaloneSetup(supplyChainRestService).build();
     	String input = "invaliduuid";
 
-    	mvc.perform(get("/api/supplychain/"+input)
+    	mvc.perform(get("/api/supplychains/"+input)
               .accept("application/json"))
-    			.andExpect(status().isNotFound());
+    			.andExpect(status().isBadRequest());
     }
 
     @Test
-    void createSupplyChain_With_UniqueName_Should_Return_201() {
+    void createSupplyChain_With_UniqueName_Should_Return_201() throws URISyntaxException {
         when(nodeService.findById(PARENT_ID)).thenReturn(Optional.of(project));
         when(supplyChainService.create(supplyChain)).thenReturn(supplyChain);
         ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
         ResponseEntity<RestSupplyChain> supplyChainItemResponse = supplyChainRestService.createSupplyChain(PARENT_ID, restSupplyChain);
         assertThat(supplyChainItemResponse.getStatusCode().value(), is(HttpStatus.CREATED.value()));
-        assertThat(supplyChainItemResponse.getHeaders().getLocation(), notNullValue());
+        assertEquals(new URI(String.format("/api/supplychains/%s", supplyChain.getId())),supplyChainItemResponse.getHeaders().getLocation());
         assertThat(supplyChainItemResponse.getBody(), is(restSupplyChain));
         verify(supplyChainService).create((supplyChain));
     }
+	
+	@Test
+	void testCreateSupplyChainInvalidParentId() {
+		UUID parentId = UUID.randomUUID();
+        when(nodeService.findById(parentId)).thenReturn(Optional.of(project));
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        	supplyChainRestService.createSupplyChain(parentId, restSupplyChain);
+          });
+        
+        assertEquals("400 BAD_REQUEST \"invalid parent\"", exception.getMessage());
+        assertThat(exception.getStatusCode().value(), is(400));
+	}
 
     @Test
-    void createSupplyChain_With_Not_Existing_Parent_Label_Should_Return_400() {
+    void createSupplyChain_With_Not_Existing_Parent_Should_Return_400() {
         when(nodeService.findById(PARENT_ID)).thenReturn(Optional.empty());
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> supplyChainRestService.createSupplyChain(PARENT_ID, restSupplyChain));
         assertThat(exception.getStatusCode(), is(HttpStatus.BAD_REQUEST));
         assertThat(exception.getMessage(), is("400 BAD_REQUEST \"invalid parent\""));
     }
+	
+	@Test
+	void testCreateSupplyChainNodeIdWrong() {
+		UUID parentId = project.getId();
+		project.setId(UUID.randomUUID());
+        when(nodeService.findById(parentId)).thenReturn(Optional.of(project));
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        	supplyChainRestService.createSupplyChain(parentId, restSupplyChain);
+          });
+        
+        assertEquals("400 BAD_REQUEST \"invalid parent\"", exception.getMessage());
+        assertThat(exception.getStatusCode().value(), is(400));
+	}
+	
+	@Test
+	void testCreateSupplyChainWrongParentClass() {
+		when(node.getId()).thenReturn(UUID.randomUUID());
+		UUID parentId = node.getId();
+		restSupplyChain.setParentId(parentId);
+        when(nodeService.findById(parentId)).thenReturn(Optional.of(node));
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        	supplyChainRestService.createSupplyChain(parentId, restSupplyChain);
+          });
+        
+        assertEquals("400 BAD_REQUEST \"invalid parent\"", exception.getMessage());
+        assertThat(exception.getStatusCode().value(), is(400));
+	}
+	
+
+	
+	@Test
+	void testCreateProjectNameUsed() {
+		UUID parentId = project.getId();
+        when(nodeService.findById(parentId)).thenReturn(Optional.of(project));
+        when(nodeService.existsByParentIdAndName(parentId, supplyChain.getName())).thenReturn(true);
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        	supplyChainRestService.createSupplyChain(parentId, restSupplyChain);
+          });
+        
+        assertEquals(String.format("400 BAD_REQUEST \"Supply Chain with name [%s] already exists on project [%s]\"", supplyChain.getName(), parentId), exception.getMessage());
+        assertThat(exception.getStatusCode().value(), is(400));
+	}
 
 
     @Test
@@ -179,6 +237,36 @@ class SupplyChainRestServiceTest {
         assertThat(exception.getStatusCode().value(), is(404));
         assertThat(exception.getMessage(), is("404 NOT_FOUND \"SupplyChain not found\""));
     }
+    
+    @Test
+    void updateRestSupplyChainIdNull() {
+    	restSupplyChain.setId(null);
+    	when(nodeService.exists(Project.class, PARENT_ID)).thenReturn(true);
+        when(supplyChainService.findById(supplyChain.getId())).thenReturn(Optional.of(supplyChain));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> supplyChainRestService.updateSupplyChain(SUPPLY_CHAIN_ID, restSupplyChain));
+        assertThat(exception.getStatusCode().value(), is(400));
+        assertThat(exception.getMessage(), is("400 BAD_REQUEST \"invalid supply chain\""));
+    }
+    
+    @Test
+    void updateIdsNotEqual() {
+    	restSupplyChain.setId(UUID.randomUUID());
+    	when(nodeService.exists(Project.class, PARENT_ID)).thenReturn(true);
+        when(supplyChainService.findById(supplyChain.getId())).thenReturn(Optional.of(supplyChain));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> supplyChainRestService.updateSupplyChain(SUPPLY_CHAIN_ID, restSupplyChain));
+        assertThat(exception.getStatusCode().value(), is(400));
+        assertThat(exception.getMessage(), is("400 BAD_REQUEST \"invalid supply chain\""));
+    }
+    
+    @Test
+    void updateWrgongType() {
+    	restSupplyChain.setId(UUID.randomUUID());
+    	when(nodeService.exists(Project.class, PARENT_ID)).thenReturn(true);
+        when(supplyChainService.findById(supplyChain.getId())).thenReturn(Optional.of(supplyChain));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> supplyChainRestService.updateSupplyChain(SUPPLY_CHAIN_ID, restSupplyChain));
+        assertThat(exception.getStatusCode().value(), is(400));
+        assertThat(exception.getMessage(), is("400 BAD_REQUEST \"invalid supply chain\""));
+    }
 
     @Test
     void updateProjectNotExits() {
@@ -203,4 +291,39 @@ class SupplyChainRestServiceTest {
         assertThat(exception.getMessage(), is(String.format("404 NOT_FOUND \"SupplyChain not found\"")));
 
     }
+
+	@Test
+	void testGetSupplyChains() {
+		UUID parentId = project.getId();
+        when(nodeService.findById(parentId)).thenReturn(Optional.of(project));
+        when(supplyChainService.find(Optional.of(project))).thenReturn(Set.of(supplyChain));
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseEntity<List<RestSupplyChain>> managementNodeItemResponse = supplyChainRestService.getSupplyChains(parentId);
+        assertThat(managementNodeItemResponse.getStatusCode().value(), is(HttpStatus.OK.value()));
+        assertThat(managementNodeItemResponse.getBody(), is(List.of(restSupplyChain)));
+	}
+
+	@Test
+	void testGetSupplyChainsParentIdNull() {
+		when(supplyChainService.find(Optional.empty())).thenReturn(Set.of(supplyChain));
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseEntity<List<RestSupplyChain>> managementNodeItemResponse = supplyChainRestService.getSupplyChains(null);
+        assertThat(managementNodeItemResponse.getStatusCode().value(), is(HttpStatus.OK.value()));
+        assertThat(managementNodeItemResponse.getBody(), is(List.of(restSupplyChain)));
+	}
+
+	@Test
+	void testGetSupplyChainsParentNotFound() {
+		UUID parentId = project.getId();
+        when(nodeService.findById(parentId)).thenReturn(Optional.empty());
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        	supplyChainRestService.getSupplyChains(parentId);
+        });
+        assertEquals(String.format("404 NOT_FOUND \"Node with id [%s] not found\"", parentId), exception.getMessage());
+        assertThat(exception.getStatusCode().value(), is(404));
+	}
 }
