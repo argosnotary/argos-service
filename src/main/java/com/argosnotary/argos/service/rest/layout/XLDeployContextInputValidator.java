@@ -33,7 +33,8 @@ public class XLDeployContextInputValidator extends ContextInputValidator {
 
     private static final String APPLICATION_NAME = "applicationName";
     //(no `/`, `\`, `:`, `[`, `]`, `|`, `,` or `*`)
-    private static final Pattern invalidCharacters = Pattern.compile("[/\\\\:\\[\\]|,*\\]]");
+    private static String backslash = "\\";
+    private static final Pattern invalidCharacters = Pattern.compile("[/"+backslash+backslash+":"+backslash+"["+backslash+"]|,*"+backslash+"]]");
     private static final int MAX_LENGTH = 255;
 
     XLDeployContextInputValidator() {

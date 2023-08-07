@@ -66,7 +66,7 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
 	private final String serviceAccountIssuer;
 	
 	@Override
-	public Optional<String> getClientRegistrationName(String issuer) {
+	public Optional<String> getClientRegistrationNameWithIssuer(String issuer) {
 		if ( clientRegistrationsIssuerMap.containsKey(issuer)) {
 			return Optional.of(clientRegistrationsIssuerMap.get(issuer).getRegistrationId());
 		}

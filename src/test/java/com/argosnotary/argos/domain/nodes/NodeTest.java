@@ -19,29 +19,17 @@
  */
 package com.argosnotary.argos.domain.nodes;
 
-import static com.argosnotary.argos.domain.nodes.NodeTest.TestVisitor.VISIT_END_POINT;
-import static com.argosnotary.argos.domain.nodes.NodeTest.TestVisitor.VISIT_ENTER;
-import static com.argosnotary.argos.domain.nodes.NodeTest.TestVisitor.VISIT_EXIT;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.argosnotary.argos.domain.nodes.ManagementNode;
-import com.argosnotary.argos.domain.nodes.Node;
-import com.argosnotary.argos.domain.nodes.NodeVisitor;
-import com.argosnotary.argos.domain.nodes.Organization;
-import com.argosnotary.argos.domain.nodes.Project;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -62,17 +50,40 @@ class NodeTest {
         org1 = new Organization(UUID.randomUUID(), "org1", null);
         org2 = new Organization(UUID.randomUUID(), "org2", null);
         
-        node1 = new ManagementNode(UUID.randomUUID(), "node1", org2);
-        node2 = new ManagementNode(UUID.randomUUID(), "node2", org2);
-        node3 = new ManagementNode(UUID.randomUUID(), "node3", node2);
-        node4 = new ManagementNode(UUID.randomUUID(), "node4", node2);
+        node1 = new ManagementNode(UUID.randomUUID(), "node1", new ArrayList<>(), org2.getId());
+        node2 = new ManagementNode(UUID.randomUUID(), "node2", new ArrayList<>(), org2.getId());
+        node3 = new ManagementNode(UUID.randomUUID(), "node3", new ArrayList<>(), node2.getId());
+        node4 = new ManagementNode(UUID.randomUUID(), "node4", new ArrayList<>(), node2.getId());
         
 
-        project1 = new Project(UUID.randomUUID(), "project1", org2);
-        project2 = new Project(UUID.randomUUID(), "project2", node1);
-        project3 = new Project(UUID.randomUUID(), "project3", node1);
-        project4 = new Project(UUID.randomUUID(), "project4", node3);
-        project5 = new Project(UUID.randomUUID(), "project5", node2);
+        project1 = new Project(UUID.randomUUID(), "project1", new ArrayList<>(), org2.getId());
+        project2 = new Project(UUID.randomUUID(), "project2", new ArrayList<>(), node1.getId());
+        project3 = new Project(UUID.randomUUID(), "project3", new ArrayList<>(), node1.getId());
+        project4 = new Project(UUID.randomUUID(), "project4", new ArrayList<>(), node3.getId());
+        project5 = new Project(UUID.randomUUID(), "project5", new ArrayList<>(), node2.getId());
+        
+        node1.getPathToRoot().add(node1.getId());
+        node2.getPathToRoot().add(node2.getId());
+        node3.getPathToRoot().add(node3.getId());
+        node4.getPathToRoot().add(node4.getId());
+
+        project1.getPathToRoot().add(project1.getId());
+        project2.getPathToRoot().add(project2.getId());
+        project3.getPathToRoot().add(project3.getId());
+        project4.getPathToRoot().add(project4.getId());
+        project5.getPathToRoot().add(project5.getId());
+        
+        node1.getPathToRoot().addAll(org2.getPathToRoot());
+        node2.getPathToRoot().addAll(org2.getPathToRoot());
+        node3.getPathToRoot().addAll(node2.getPathToRoot());
+        node4.getPathToRoot().addAll(node2.getPathToRoot());
+        
+
+        project1.getPathToRoot().addAll(org2.getPathToRoot());
+        project2.getPathToRoot().addAll(node1.getPathToRoot());
+        project3.getPathToRoot().addAll(node1.getPathToRoot());
+        project4.getPathToRoot().addAll(node3.getPathToRoot());
+        project5.getPathToRoot().addAll(node2.getPathToRoot());
 
     }
     
@@ -100,137 +111,5 @@ class NodeTest {
 		assertEquals(node4.getPathToRoot(), List.of(node4.getId(),node2.getId(),org2.getId()));
 		assertEquals(project5.getPathToRoot(), List.of(project5.getId(),node2.getId(),org2.getId()));
     }
-
-    @Test
-    void visitOnlyRoot() {
-        NodeVisitor<Map<String, Integer>> treeNodeVisitor = new TestVisitor();
-        org1.visit(treeNodeVisitor);
-        assertThat(treeNodeVisitor.result().get(VISIT_ENTER), is(1));
-        assertThat(treeNodeVisitor.result().get(VISIT_EXIT), is(1));
-        assertThat(treeNodeVisitor.result().get(VISIT_END_POINT), is(0));
-    }
-    
-    @Test
-    void visitTree() {
-        NodeVisitor<Map<String, Integer>> treeNodeVisitor = new TestVisitor();
-        org2.visit(treeNodeVisitor);
-        assertThat(treeNodeVisitor.result().get(VISIT_ENTER), is(10));
-        assertThat(treeNodeVisitor.result().get(VISIT_EXIT), is(10));
-        assertThat(treeNodeVisitor.result().get(VISIT_END_POINT), is(0));
-    }
-    
-    @Test
-    void visitDown4Nodes() {
-        NodeVisitor<Map<String, Integer>> treeNodeVisitor = new TestVisitor();
-        project4.visitDown(treeNodeVisitor);
-        assertThat(treeNodeVisitor.result().get(VISIT_ENTER), is(3));
-        assertThat(treeNodeVisitor.result().get(VISIT_EXIT), is(3));
-        assertThat(treeNodeVisitor.result().get(VISIT_END_POINT), is(1));
-    }
-    
-    @Test
-    void visitDownMultiProj() {
-        NodeVisitor<Map<String, Integer>> treeNodeVisitor = new TestVisitor();
-        project3.visitDown(treeNodeVisitor);
-        assertThat(treeNodeVisitor.result().get(VISIT_ENTER), is(2));
-        assertThat(treeNodeVisitor.result().get(VISIT_EXIT), is(2));
-        assertThat(treeNodeVisitor.result().get(VISIT_END_POINT), is(1));
-    }
-    
-    @Test
-    void visitDownOnlyRoot() {
-        NodeVisitor<Map<String, Integer>> treeNodeVisitor = new TestVisitor();
-        org1.visitDown(treeNodeVisitor);
-        assertThat(treeNodeVisitor.result().get(VISIT_ENTER), is(0));
-        assertThat(treeNodeVisitor.result().get(VISIT_EXIT), is(0));
-        assertThat(treeNodeVisitor.result().get(VISIT_END_POINT), is(1));
-    }
-    
-    @Test
-    void typeTest() {
-        assertThat(project1.isLeaf(), is(true));
-        assertThat(project2.isLeaf(), is(true));
-        assertThat(org1.isLeaf(), is(true));
-        assertThat(org2.isLeaf(), is(false));
-        assertThat(node2.isLeaf(), is(false));
-        assertThat(node4.isLeaf(), is(true));
-        
-        assertTrue(org1.getChildren().isEmpty());
-        assertThat(org2.getChildren().size(), is(3));
-        
-        assertThat(node1.getChildren().size(), is(2));
-        assertTrue(node4.getChildren().isEmpty());
-        
-    }
-
-	
-	@Test
-	void testGetParent() {
-		assertThat(project1.getParent().get(), is(org2));
-		assertThat(node3.getParent().get(), is(node2));
-	}
-	
-	@Test
-	void testDefaultNullResult() {
-		NodeVisitor<Map<String, Integer>> treeNodeVisitor = new TestVisitorNullResult();
-		assertNull(treeNodeVisitor.result());
-	}
-
-    static class TestVisitor implements NodeVisitor<Map<String, Integer>> {
-        protected static final String VISIT_ENTER = "visitEnter";
-        protected static final String VISIT_EXIT = "visitExit";
-        protected static final String VISIT_END_POINT = "visitEndPoint";
-        private Map<String, Integer> visits = new HashMap<>();
-
-        public TestVisitor() {
-            visits.put(VISIT_ENTER, 0);
-            visits.put(VISIT_EXIT, 0);
-            visits.put(VISIT_END_POINT, 0);
-        }
-
-        @Override
-        public void visitEnter(Node node) {
-            visits.put(VISIT_ENTER, visits.get(VISIT_ENTER) + 1);
-        }
-
-        @Override
-        public void visitExit(Node node) {
-            visits.put(VISIT_EXIT, visits.get(VISIT_EXIT) + 1);
-        }
-
-        @Override
-        public Map<String, Integer> result() {
-            return visits;
-        }
-
-		@Override
-		public void visitEndPoint(Node node) {
-            visits.put(VISIT_END_POINT, visits.get(VISIT_END_POINT) + 1);
-			
-		}
-    }
-    
-    static class TestVisitorNullResult implements NodeVisitor<Map<String, Integer>> {
-
-		@Override
-		public void visitEnter(Node node) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void visitExit(Node node) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void visitEndPoint(Node node) {
-			// TODO Auto-generated method stub
-			
-		}
-    	
-    }
-    
     
 }

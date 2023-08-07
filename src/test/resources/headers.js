@@ -18,9 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 function fn(auth) {
-    var token = auth.token;
-    var username = auth.username;
-    var password = auth.password;
+    const token = auth.token;
+    const username = auth.username;
+    const password = auth.password;
 
     if (token) {
         return {
@@ -28,9 +28,9 @@ function fn(auth) {
             'Content-Type': 'application/json'
         };
     } else if (username && password) {
-        var temp = username + ':' + password;
-        var Base64 = Java.type('java.util.Base64');
-        var encoded = Base64.getEncoder().encodeToString(temp.bytes);
+        const temp = username + ':' + password;
+        const Base64 = Java.type('java.util.Base64');
+        const encoded = Base64.getEncoder().encodeToString(temp.bytes);
         return {
             Authorization: 'Basic ' + encoded,
             'Content-Type': 'application/json'

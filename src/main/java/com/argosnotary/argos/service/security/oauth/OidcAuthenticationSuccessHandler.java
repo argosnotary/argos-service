@@ -113,7 +113,7 @@ public class OidcAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
         	// new Personal Account
             PersonalAccount oidcAccount = PersonalAccount.builder()
         			.name(oidcUser.getPreferredUsername())
-    				.providerName(clientRegistrationService.getClientRegistrationName(oidcUser.getIssuer().toString()).orElseThrow())
+    				.providerName(clientRegistrationService.getClientRegistrationNameWithIssuer(oidcUser.getIssuer().toString()).orElseThrow())
     				.providerSubject(oidcUser.getSubject())
     				.profile(profile)
     				.build();

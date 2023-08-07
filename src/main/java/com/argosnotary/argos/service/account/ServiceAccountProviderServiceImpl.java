@@ -96,8 +96,10 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
         	String subject = parts[parts.length-1];            
             sa.setProviderSubject(subject);
         	log.info("User created with name: [{}], accountId: [{}] and subject: [{}] ", user.getUsername(), user.getFirstName(), sa.getProviderSubject());
+            return sa;
+        } else {
+        	throw new ArgosError(String.format("Error in registering a service account message: [%s]", response.getStatusInfo()));
         }
-        return sa;
 
 	}
 
@@ -136,7 +138,6 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
 
 	@Override
 	public String getIdToken(UUID id, char[] password) {
-		Optional<String> ff = clientRegistrationService.getClientRegistrationProviderUrl(ServiceAccount.SA_PROVIDER_NAME);
 		return KeycloakBuilder.builder()
 				.serverUrl(clientRegistrationService.getClientRegistrationProviderUrl(ServiceAccount.SA_PROVIDER_NAME).orElseThrow())
 		        .clientId(tokenClientId)

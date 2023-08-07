@@ -19,20 +19,33 @@
  */
 package com.argosnotary.argos.service.account;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.argosnotary.argos.domain.account.PersonalAccount;
+
 class ArgosUserDetailsTest {
+	
+	ArgosUserDetails argosUserDetails;
+	
+	PersonalAccount pa;
 
 	@BeforeEach
 	void setUp() throws Exception {
+		pa = PersonalAccount.builder().name("pa").build();
+		argosUserDetails = new ArgosUserDetails(pa);
 	}
 
 	@Test
-	void test() {
-		//fail("Not yet implemented");
+	void testGetId() {
+		assertEquals(pa.getId(), argosUserDetails.getId());
+	}
+
+	@Test
+	void testGetAccount() {
+		assertEquals(pa, argosUserDetails.getAccount());
 	}
 
 }

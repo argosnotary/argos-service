@@ -19,15 +19,24 @@
  */
 package com.argosnotary.argos.service.account;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -89,8 +98,9 @@ class ServiceAccountServiceTest {
 		ServiceAccount sa = ServiceAccount.builder().name("sa1").id(sa1.getId()).providerSubject("subject1").activeKeyPair(kp1).build();
 		when(serviceAccountProviderService.getIdToken(sa.getId(), "wachtwoord".toCharArray())).thenThrow(NotAuthorizedException.class);
 		String token = null;
+		char[] a = "wachtwoord".toCharArray();
 		Throwable exception = assertThrows(NotAuthorizedException.class, () -> {
-			serviceAccountService.getIdToken(sa, "wachtwoord".toCharArray());
+			serviceAccountService.getIdToken(sa, a);
         });
 		assertNull(token);
 	}
@@ -100,5 +110,56 @@ class ServiceAccountServiceTest {
 		serviceAccountService.delete(sa1);
 		verify(serviceAccountRepository).deleteById(sa1.getId());
 		verify(serviceAccountProviderService).unRegisterServiceAccount(sa1);
+	}
+	
+	@Test
+	void testFindById() {
+		when(serviceAccountRepository.findById(sa1.getId())).thenReturn(Optional.of(sa1));
+		Optional<ServiceAccount> sa = serviceAccountService.findById(sa1.getId());
+		assertEquals(sa1, sa.get());
+	}
+	
+	@Test
+	void testFindByIdNotFound() {
+		when(serviceAccountRepository.findById(sa1.getId())).thenReturn(Optional.empty());
+		Optional<ServiceAccount> sa = serviceAccountService.findById(sa1.getId());
+		assertTrue(sa.isEmpty());
+	}
+
+	@Test
+	void testFindByProviderSubject() {
+		when(serviceAccountRepository.findFirstByProviderSubject("subject")).thenReturn(Optional.of(sa1));
+		Optional<ServiceAccount> sa = serviceAccountService.findByProviderSubject("subject");
+		assertEquals(sa1, sa.get());
+		
+	}
+
+	@Test
+	void testFindByProviderSubjectNotFound() {
+		when(serviceAccountRepository.findFirstByProviderSubject("subject")).thenReturn(Optional.empty());
+		Optional<ServiceAccount> sa = serviceAccountService.findByProviderSubject("subject");
+		assertTrue(sa.isEmpty());
+		
+	}
+    
+	@ParameterizedTest
+	@CsvSource({
+		"true, false, false",
+		"false, true, false",
+		"true, true, true"
+		})
+	void testExistsById(boolean sp, boolean sr, boolean result) {
+		when(serviceAccountProviderService.exists(sa1.getId())).thenReturn(sp);
+		if (sp)
+			when(serviceAccountRepository.existsById(sa1.getId())).thenReturn(sr);
+		assertThat(serviceAccountService.exists(sa1.getId()), is(result));
+	}
+    
+	@Test
+	void testExistsByProjectIdAndName() {
+		UUID pId = UUID.randomUUID();
+		when(serviceAccountRepository.existsByProjectIdAndName(pId, sa1.getName())).thenReturn(true);
+		assertTrue(serviceAccountService.exists(pId, sa1.getName()));
+		
 	}
 }

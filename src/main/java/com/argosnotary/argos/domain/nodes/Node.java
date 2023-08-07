@@ -19,67 +19,31 @@
  */
 package com.argosnotary.argos.domain.nodes;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Document(collection="nodes")
 @CompoundIndex(name = "parentId_name", def = "{'parentId' : 1, 'name': 1}", unique=true)
-public interface Node {
-
-	public default void visit(NodeVisitor<?> treeNodeVisitor) {
-		treeNodeVisitor.visitEnter(this);
-		getChildren().forEach(child -> child.visit(treeNodeVisitor));
-		treeNodeVisitor.visitExit(this);
-	}
+public abstract class Node {
+	@Id
+	private UUID id = UUID.randomUUID();
+    @NotNull
+	private String name;
+	private List<UUID> pathToRoot = new ArrayList<>();
     
-    public default void visitDown(NodeVisitor<?> treeNodeVisitor) {
-        if (isRoot()) {
-            treeNodeVisitor.visitEndPoint(this);
-        } else {
-        	treeNodeVisitor.visitEnter(this);
-        	this.getParent().ifPresent(p -> p.visitDown(treeNodeVisitor));
-        	treeNodeVisitor.visitExit(this);
-        }
-    }
-    
-    @Id
-    public UUID getId();
-    
-    public String getName();
-    
-    public void setId(UUID id);
-    
-    public UUID getParentId();
-    
-    @Transient
-    public Optional<Node> getParent();
-    
-    @Transient
-    public void setParent(@NotNull Node node);
-    
-    @Transient
-    public Set<Node> getChildren();
-    
-    public List<UUID> getPathToRoot();
-    
-    public void setPathToRoot(List<UUID> path);
-    
-    public default boolean isLeaf() {
-		return this.getChildren().isEmpty();
-	}
-
-	public default boolean isRoot() {
-		return this.getParent().isEmpty();
-	}
+	private UUID parentId;
     
 }

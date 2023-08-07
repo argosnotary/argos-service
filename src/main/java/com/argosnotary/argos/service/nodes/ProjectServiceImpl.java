@@ -38,9 +38,9 @@ public class ProjectServiceImpl implements ProjectService {
 	private final NodeService nodeService;
 
 	@Override
-	public Set<Project> find(Node node) {
-		return nodeService.find(Project.class.getCanonicalName(), Optional.of(node))
-				.stream().map(n -> (Project) n).collect(Collectors.toSet());
+	public Set<Project> find(Optional<Node> optNode) {
+		return nodeService.find(Project.class.getCanonicalName(), optNode)
+				.stream().map(Project.class::cast).collect(Collectors.toSet());
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,10 +64,11 @@ public class ProjectRestServiceImpl implements ProjectRestService {
 	public ResponseEntity<RestProject> createProject(UUID parentId, @Valid RestProject restProject) {
 
 		Optional<Node> parent = nodeService.findById(parentId);
-		if (!(parent.isPresent() 
-				&& parent.get().getId().equals(restProject.getParentId()) 
-				&& (parent.get() instanceof Organization || (parent.get() instanceof ManagementNode)))) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent"); 
+		if (!(parentId.equals(restProject.getParentId())
+				&& parent.isPresent() 
+				&& parent.get().getId().equals(restProject.getParentId())
+				&& Project.isValidParentType(parent.get()))) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent");
 		}
 		
 		if (nodeService.existsByParentIdAndName(restProject.getParentId(), restProject.getName())) {
@@ -105,13 +107,16 @@ public class ProjectRestServiceImpl implements ProjectRestService {
 	}
 
 	@Override
-    @PermissionCheck(permissions = Permission.READ)
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<List<RestProject>> getProjects(UUID ancestorId) {
-		Optional<Node> optNode = nodeService.findById(ancestorId);
-		if (optNode.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
+		Optional<Node> optNode = Optional.empty();
+		if (ancestorId != null) {
+			optNode = nodeService.findById(ancestorId);
+			if (optNode.isEmpty()) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
+			}
 		}
-		return ResponseEntity.ok(projectService.find(optNode.get())
+		return ResponseEntity.ok(projectService.find(optNode)
 				.stream().map(projectMapper::convertToRestProject).toList());
 	}
 	

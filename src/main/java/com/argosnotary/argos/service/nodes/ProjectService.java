@@ -33,14 +33,14 @@ public interface ProjectService {
 	 * @param resourceIds
 	 * @return
 	 */
-	Set<Project> find(Node node);
+	Set<Project> find(Optional<Node> optNode);
+	
+	Optional<Project> findById(UUID projectId);
+	
+	boolean exists(UUID projectId);
 	
 	Project create(Project project);
 	
 	void delete(UUID projectId);
-	
-	boolean exists(UUID projectId);
-	
-	Optional<Project> findById(UUID projectId);
 
 }

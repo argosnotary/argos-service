@@ -119,7 +119,8 @@ class VerificationRestServiceTest {
         when(supplyChainService.exists(SUPPLYCHAIN_ID)).thenReturn(true);
         when(layoutMetaBlockService.getLayout(SUPPLYCHAIN_ID))
                 .thenReturn(Optional.empty());
-        ResponseStatusException error = assertThrows(ResponseStatusException.class, () -> verificationRestService.performVerification(SUPPLYCHAIN_ID, singletonList(restArtifact)));
+        List<RestArtifact> l =singletonList(restArtifact);
+        ResponseStatusException error = assertThrows(ResponseStatusException.class, () -> verificationRestService.performVerification(SUPPLYCHAIN_ID, l));
         assertThat(error.getStatusCode().value(), is(400));
     }
 

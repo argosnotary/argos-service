@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,9 +63,10 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
 	public ResponseEntity<RestSupplyChain> createSupplyChain(UUID projectId, @Valid RestSupplyChain restSupplyChain) {
 
 		Optional<Node> parent = nodeService.findById(projectId);
-		if (!(parent.isPresent() 
+		if (!(projectId.equals(restSupplyChain.getParentId())
+				&& parent.isPresent() 
 				&& parent.get().getId().equals(restSupplyChain.getParentId()) 
-				&& (parent.get() instanceof Project))) {
+				&& SupplyChain.isValidParentType(parent.get()))) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent"); 
 		}
 		
@@ -77,7 +79,7 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
 				.create(supplyChainMapper.convertFromRestSupplyChain(restSupplyChain));
 
         URI location = UriComponentsBuilder
-        		.fromPath("/supplychains")
+        		.fromPath("/api/supplychains")
                 .path("/{supplyChainId}")
                 .buildAndExpand(node.getId())
                 .toUri();
@@ -104,13 +106,16 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
 	}
 
 	@Override
-    @PermissionCheck(permissions = Permission.READ)
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<List<RestSupplyChain>> getSupplyChains(UUID ancestorId) {
-		Optional<Node> optNode = nodeService.findById(ancestorId);
-		if (optNode.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
+		Optional<Node> optNode = Optional.empty();
+		if (ancestorId != null) {
+			optNode = nodeService.findById(ancestorId);
+			if (optNode.isEmpty()) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Node with id [%s] not found", ancestorId));
+			}
 		}
-		return ResponseEntity.ok(supplyChainService.find(optNode.get())
+		return ResponseEntity.ok(supplyChainService.find(optNode)
 				.stream().map(supplyChainMapper::convertToRestSupplyChain).toList());
 	}
 
@@ -127,8 +132,7 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
 			throw supplyChainNotFound();
 		}
 		if (!(restSupplyChain.getId() != null
-				&& restSupplyChain.getId().equals(supplyChain.get().getId()) 
-				&& (supplyChain.get() instanceof SupplyChain))) {
+				&& restSupplyChain.getId().equals(supplyChain.get().getId()))) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid supply chain");
 		}
 		

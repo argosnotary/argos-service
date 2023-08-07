@@ -76,9 +76,6 @@ class RoleAssignmentServiceTest {
     private Organization org1, org2, org3;
     private Project project111, project1111, project1112, project211, project3111;
     private ManagementNode node11, node111, node112, node21, node22, node31, node311, node312;
-    private Organization org1Mongo;
-    private ManagementNode node11Mongo, node111Mongo, node112Mongo;
-    private Project project111Mongo, project1111Mongo, project1112Mongo;
     private RoleAssignment ra21, ra22, ra211, ra311;
 
 	@BeforeEach
@@ -90,76 +87,35 @@ class RoleAssignmentServiceTest {
         org2 = new Organization(UUID.randomUUID(), "org2", Domain.builder().domain("org2.com").build());
         org3 = new Organization(UUID.randomUUID(), "org3", Domain.builder().domain("org3.com").build());
         
-        node11 = new ManagementNode(UUID.randomUUID(), "node11", org1);
-        node111 = new ManagementNode(UUID.randomUUID(), "node111", node11);
-        node112 = new ManagementNode(UUID.randomUUID(), "node112", node11);
-        project111 = new Project(UUID.randomUUID(), "project111", node11);
-        project1111 = new Project(UUID.randomUUID(), "project1111", node111);
-        project1112 = new Project(UUID.randomUUID(), "project1112", node111);
+        node11 = new ManagementNode(UUID.randomUUID(), "node11", List.of(), org1.getId());
+        node111 = new ManagementNode(UUID.randomUUID(), "node111", List.of(), node11.getId());
+        node112 = new ManagementNode(UUID.randomUUID(), "node112", List.of(), node11.getId());        
+        node21 = new ManagementNode(UUID.randomUUID(), "node21", new ArrayList<>(), org2.getId());
+        node22 = new ManagementNode(UUID.randomUUID(), "node22", new ArrayList<>(), org2.getId());
+        node31 = new ManagementNode(UUID.randomUUID(), "node31", new ArrayList<>(), org3.getId());
+        node311 = new ManagementNode(UUID.randomUUID(), "node311", new ArrayList<>(), node31.getId());
+        node312 = new ManagementNode(UUID.randomUUID(), "node312", new ArrayList<>(), node31.getId());
         
-        node21 = new ManagementNode(UUID.randomUUID(), "node21", org2);
-        node22 = new ManagementNode(UUID.randomUUID(), "node22", org2);
+        project111 = new Project(UUID.randomUUID(), "project111", List.of(), node11.getId());
+        project1111 = new Project(UUID.randomUUID(), "project1111", List.of(), node111.getId());
+        project1112 = new Project(UUID.randomUUID(), "project1112", List.of(), node111.getId());
+        project211 = new Project(UUID.randomUUID(), "project211", List.of(), node21.getId());        
+        project3111 = new Project(UUID.randomUUID(), "project3111", List.of(), node311.getId());
         
-        node31 = new ManagementNode(UUID.randomUUID(), "node31", org3);
-        node311 = new ManagementNode(UUID.randomUUID(), "node311", node31);
-        node312 = new ManagementNode(UUID.randomUUID(), "node312", node31);
-
-        project211 = new Project(UUID.randomUUID(), "project211", node21);
+        node11.setPathToRoot(List.of(node11.getId(), org1.getId()));
+        node111.setPathToRoot(List.of(node111.getId(), node11.getId(), org1.getId()));
+        node112.setPathToRoot(List.of(node112.getId(), node11.getId(), org1.getId()));
+        node21.setPathToRoot(List.of(node21.getId(), org2.getId()));
+        node22.setPathToRoot(List.of(node22.getId(), org2.getId()));
+        node31.setPathToRoot(List.of(node31.getId(), org3.getId()));
+        node311.setPathToRoot(List.of(node311.getId(), node31.getId(), org3.getId()));
+        node312.setPathToRoot(List.of(node312.getId(), node31.getId(), org3.getId()));
         
-        project3111 = new Project(UUID.randomUUID(), "project3111", node311);
-        
-        org1Mongo = new Organization();
-        org1Mongo.setName("org1");
-        org1Mongo.setId(org1.getId());
-        org1Mongo.getPathToRoot().add(org1.getId());
-        
-        List<UUID> pathToRoot = new ArrayList<>(org1Mongo.getPathToRoot());
-        
-        node11Mongo = new ManagementNode();
-        node11Mongo.setName("node11");
-        node11Mongo.setId(node11.getId());
-        node11Mongo.setParentId(org1.getId());
-        pathToRoot.add(0, node11Mongo.getId());
-        node11Mongo.setPathToRoot(new ArrayList<>(pathToRoot));
-        
-        node111Mongo = new ManagementNode();
-        node111Mongo.setName("node111");
-        node111Mongo.setId(node111.getId());
-        node111Mongo.setParentId(node11.getId());
-        pathToRoot.add(0, node111Mongo.getId());
-        node111Mongo.setPathToRoot(new ArrayList<>(pathToRoot));
-        
-        node112Mongo = new ManagementNode();
-        node112Mongo.setName("node112");
-        node112Mongo.setId(node112.getId());
-        node112Mongo.setParentId(node11.getId());
-        pathToRoot = new ArrayList<>(node11Mongo.getPathToRoot());
-        pathToRoot.add(0, node112Mongo.getId());
-        node112Mongo.setPathToRoot(new ArrayList<>(pathToRoot));
-        
-        project111Mongo = new Project();
-        project111Mongo.setName("project111");
-        project111Mongo.setId(project111.getId());
-        project111Mongo.setParentId(node11.getId());
-        pathToRoot = new ArrayList<>(node11Mongo.getPathToRoot());
-        pathToRoot.add(0, project111Mongo.getId());
-        project111Mongo.setPathToRoot(new ArrayList<>(pathToRoot));
-        
-        project1111Mongo = new Project();
-        project1111Mongo.setName("project1111");
-        project1111Mongo.setId(project1111.getId());
-        project1111Mongo.setParentId(node111.getId());
-        pathToRoot = new ArrayList<>(node111Mongo.getPathToRoot());
-        pathToRoot.add(0, project1111Mongo.getId());
-        project1111Mongo.setPathToRoot(new ArrayList<>(pathToRoot));
-        
-        project1112Mongo = new Project();
-        project1112Mongo.setName("project1112");
-        project1112Mongo.setId(project1112.getId());
-        project1112Mongo.setParentId(node111.getId());
-        pathToRoot = new ArrayList<>(node111Mongo.getPathToRoot());
-        pathToRoot.add(0, project1112Mongo.getId());
-        project1112Mongo.setPathToRoot(new ArrayList<>(pathToRoot));
+        project111.setPathToRoot(List.of(project111.getId(),node11.getId(), org1.getId()));
+        project1111.setPathToRoot(List.of(project1111.getId(),node111.getId(),node11.getId(), org1.getId()));
+        project1112.setPathToRoot(List.of(project1112.getId(),node111.getId(),node11.getId(), org1.getId()));
+        project211.setPathToRoot(List.of(project211.getId(),node21.getId(), org2.getId()));
+        project3111.setPathToRoot(List.of(project3111.getId(),node311.getId(), node31.getId(), org3.getId()));
         
         ra21 = RoleAssignment.builder().resourceId(node21.getId()).identityId(pa.getId()).role(new Role.Reader()).build();
         ra22 = RoleAssignment.builder().resourceId(node22.getId()).identityId(pa.getId()).role(new Role.Reader()).build();

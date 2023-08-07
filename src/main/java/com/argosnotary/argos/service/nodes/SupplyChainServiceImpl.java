@@ -39,19 +39,9 @@ public class SupplyChainServiceImpl implements SupplyChainService {
 	private final NodeService nodeService;
 
 	@Override
-	public Set<SupplyChain>  find(Node node) {
-		return nodeService.find(SupplyChain.class.getCanonicalName(), Optional.of(node))
-				.stream().map(n -> (SupplyChain) n).collect(Collectors.toSet());
-	}
-
-	@Override
-	public SupplyChain create(SupplyChain supplyChain) {
-		return (SupplyChain) nodeService.create(supplyChain);
-	}
-
-	@Override
-	public void delete(UUID supplyChainId) {
-		nodeService.delete(supplyChainId);
+	public Set<SupplyChain> find(Optional<Node> optNode) {
+		return nodeService.find(SupplyChain.class.getCanonicalName(), optNode)
+				.stream().map(SupplyChain.class::cast).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -69,25 +59,18 @@ public class SupplyChainServiceImpl implements SupplyChainService {
 	}
 
 	@Override
-	public Optional<String> getQualifiedName(UUID supplyChainId) {
-		Optional<Node> supplyChainNode = nodeService.findById(supplyChainId);
-		if (supplyChainNode.isEmpty() || !(supplyChainNode.get() instanceof SupplyChain)) {
-			return Optional.empty();
-		}
-		return nodeService.getQualifiedName(supplyChainId);
+	public SupplyChain create(SupplyChain supplyChain) {
+		return (SupplyChain) nodeService.create(supplyChain);
+	}
+
+	@Override
+	public void delete(UUID supplyChainId) {
+		nodeService.delete(supplyChainId);
 	}
 
 	@Override
 	public SupplyChain update(SupplyChain supplyChain) {
 		return (SupplyChain) nodeService.update(supplyChain);
-	}
-
-	@Override
-	public Optional<Organization> getOrganization(UUID supplyChainId) {
-		return nodeService.findRootNodeInPath(supplyChainId)
-				.filter(Organization.class::isInstance)
-				.map(n -> Optional.of((Organization)n))
-				.orElse(Optional.empty());
 	}
 
 }

@@ -38,9 +38,9 @@ public class ManagementNodeServiceImpl implements ManagementNodeService {
 	private final NodeService nodeService;
 
 	@Override
-	public Set<ManagementNode> find(Node node) {
-		return nodeService.find(ManagementNode.class.getCanonicalName(), Optional.of(node))
-				.stream().map(n -> (ManagementNode) n).collect(Collectors.toSet());
+	public Set<ManagementNode> find(Optional<Node> optNode) {
+		return nodeService.find(ManagementNode.class.getCanonicalName(), optNode)
+				.stream().map(ManagementNode.class::cast).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -50,6 +50,11 @@ public class ManagementNodeServiceImpl implements ManagementNodeService {
 			return Optional.of(managementNode);
 		}
 		return Optional.empty();
+	}
+
+	@Override
+	public boolean exists(UUID id) {
+		return nodeService.exists(ManagementNode.class, id);
 	}
 
 	@Override

@@ -20,7 +20,7 @@
 package com.argosnotary.argos.service.nodes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +30,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.nodes.Organization;
+import com.argosnotary.argos.domain.nodes.TreeNode;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.service.mongodb.nodes.NodeRepository;
 import com.argosnotary.argos.service.roles.RoleAssignmentService;
@@ -53,7 +55,12 @@ public class NodeServiceImpl implements NodeService {
 	
 	@Override
 	public Node update(Node node) {
-		return nodeRepository.save(createNode(node));
+		// for update node should exist
+		if (node.getId() != null && nodeRepository.existsById(node.getId())) {
+			return nodeRepository.save(createNode(node));
+		} else {
+			throw new ArgosError(String.format("%s doesn't exist", node.getClass().getSimpleName()));
+		}
 	}
 	
 	private Node createNode(Node node) {
@@ -71,32 +78,7 @@ public class NodeServiceImpl implements NodeService {
 	
 	@Override
 	public void delete(UUID resourceId) {
-		Optional<Node> optNode = this.getSubTree(resourceId);
-		if (!optNode.isEmpty()) {
-			nodeDeleteService.deleteNode(optNode.get());
-		}
-	}
-
-	@Override
-	public Optional<Node> getSubTree(UUID nodeId) {
-		List<Node> nodes = nodeRepository.findByPathToRoot(nodeId);
-		if (nodes.isEmpty()) {
-			return Optional.empty();
-		}
-		return Optional.of(createSubTree(nodeId, nodes));
-	}
-	
-	private Node createSubTree(UUID nodeId, List<Node> nodes) {
-		HashMap<UUID,Node> nodeMap = new HashMap<>();
-		nodes.forEach(n -> nodeMap.put(n.getId(), n));
-		nodes.forEach(n -> {
-			if (n.getParentId() != null && nodeMap.containsKey(n.getParentId())) {
-				n.setParent(nodeMap.get(n.getParentId()));
-				nodeMap.get(n.getParentId()).getChildren().add(n);
-			}
-			});
-		
-		return nodeMap.get(nodeId);
+		nodeDeleteService.deleteNode(TreeNode.createUpTree(nodeRepository.findByPathToRoot(resourceId).stream().collect(Collectors.toSet())));
 	}
 
 	@Override
@@ -104,77 +86,77 @@ public class NodeServiceImpl implements NodeService {
 		return nodeRepository.findById(nodeId);
 	}
 
+	/**
+	 * Find nodes of Class clazz
+	 * If nodeOpt is present find nodes of Class clazz in path to root and up tree
+	 */
 	@Override
 	public Set<Node> find(String clazz, Optional<Node> nodeOpt) {
-		Set<UUID> ids = new HashSet<>();
+		Set<Node> nodes = new HashSet<>();
 		if (nodeOpt.isPresent() && roleAssignmentService.findAllPermissionDownTree(nodeOpt.get()).stream()
 				.anyMatch(Permission.READ::equals)) {
-			ids.add(nodeOpt.get().getId());
+			// tree constraint by nodeOpt
+			nodes.add(nodeOpt.get());
 		} else {
+			// nodeOpt empty -> no constraint
+			// find all nodes for authorized nodes
 			// read authorization is needed
 			// down tree -> implicit
 			// up tree -> explicit
 			
 			// get authorized nodeIds
-			ids = roleAssignmentService.findByIdentity().stream()
+			nodes.addAll(nodeRepository.findWithIds(roleAssignmentService.findByIdentity().stream()
 					.filter(ras -> ras.getRole().getPermissions().contains(Permission.READ))
-					.map(ra -> ra.getResourceId()).collect(Collectors.toSet());
+					.map(ra -> ra.getResourceId()).collect(Collectors.toSet())));
+			
 		}
-		Set<Node> nodes = nodeRepository.findWithClassAndResourceIdsUpTree(clazz, ids).stream().collect(Collectors.toSet());
+		Set<Node> nodesUpTree = nodeRepository.findWithClassAndResourceIdsUpTree(clazz, nodes.stream().map(Node::getId).collect(Collectors.toSet())).stream().collect(Collectors.toSet());
+		Set<UUID> pathUuids = nodeRepository.findWithIds(nodes.stream().map(Node::getPathToRoot).flatMap(List::stream).collect(Collectors.toSet())).stream().map(Node::getId).collect(Collectors.toSet());
 		
-		Set<UUID> pathUuids = nodeRepository.findWithIds(ids).stream()
-				.map(Node::getPathToRoot).flatMap(List::stream).collect(Collectors.toSet());
-		
-		nodes.addAll(nodeRepository.findWithClassAndResourceIds(clazz, pathUuids));
-		return nodes;
+		nodesUpTree.addAll(nodeRepository.findWithClassAndResourceIds(clazz, pathUuids));
+		return nodesUpTree;
 	}
 
 	@Override
-	public boolean exists(Class clazz, UUID resourceId) {
+	public boolean exists(Class<? extends Node> clazz, UUID resourceId) {
 		return nodeRepository.existsByClassAndId(clazz.getCanonicalName(), resourceId);
 	}
 	
 	@Override
-	public boolean exists(Class clazz, String name) {
+	public boolean exists(Class<? extends Node> clazz, String name) {
 		return nodeRepository.existsByClassAndName(clazz.getCanonicalName(), name);
 	}
 
 	@Override
 	public Optional<String> getQualifiedName(UUID resourceId) {
-		Optional<Node> nodeOpt = findRootNodeInPath(resourceId);
-		if (nodeOpt.isEmpty()) {
-			return Optional.empty();
-		}
-		List<String> labels = getQualifiedName(nodeOpt.get());
-		return Optional.of(String.join(".", labels));
-	}
-	
-	private List<String> getQualifiedName(Node node) {
-		List<String> labels = new ArrayList<>();
-		if (node instanceof Organization org) {
-			labels.addAll((org).getDomain().reverseLabels());
-		} else {
-			labels.add(node.getName());
-		}
-		if (node.getChildren().isEmpty()) {
-			return labels;
-		}
-		List<String> tmp = getQualifiedName(node.getChildren().iterator().next());
-		labels.addAll(tmp);
-		return labels;
-	}
-
-	@Override
-	public Optional<Node> findRootNodeInPath(UUID resourceId) {
 		Optional<Node> nodeOpt = nodeRepository.findById(resourceId);
 		if (nodeOpt.isEmpty()) {
 			return Optional.empty();
 		}
-		List<UUID> path = nodeOpt.get().getPathToRoot();
-		UUID rootId = path.get(path.size()-1);
-		List<Node> nodes = nodeRepository.findAllById(path);
-		return Optional.of(createSubTree(rootId, nodes));
+		List<Node> pathNodes = nodeRepository.findAllById(nodeOpt.get().getPathToRoot());
+		List<String> labels = getLabelsToRoot(TreeNode.getPathToRoot(nodeOpt.get(), new HashSet<>(pathNodes)));
+		Collections.reverse(labels);
+		return Optional.of(String.join(".", labels));
+	}
+	
+	private List<String> getLabelsToRoot(TreeNode node) {
+		List<String> labels = new ArrayList<>();
+		if (node.getNode() instanceof Organization org) {
+			labels.addAll(((Organization)node.getNode()).getDomain().getLabels());
+		} else {
+			labels.add(node.getNode().getName());
+			labels.addAll(getLabelsToRoot(node.getParent().orElseThrow()));
+		}
+		return labels;
+	}
 
+	@Override
+	public Organization findOrganizationInPath(UUID resourceId) {
+		Optional<Node> nodeOpt = nodeRepository.findById(resourceId);
+		List<UUID> path = nodeOpt.orElseThrow().getPathToRoot();
+		UUID rootId = path.get(path.size()-1);
+		Optional<Node> org = nodeRepository.findById(rootId);
+		return (Organization) org.orElseThrow();
 	}
 
 	@Override

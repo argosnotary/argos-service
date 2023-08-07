@@ -29,20 +29,16 @@ import com.argosnotary.argos.domain.nodes.SupplyChain;
 
 public interface SupplyChainService {
 	
-	Set<SupplyChain>  find(Node node);
-	
-	SupplyChain create(SupplyChain supplyChain);
-	
-	SupplyChain update(SupplyChain supplyChain);
-	
-	void delete(UUID supplyChainId);
+	Set<SupplyChain> find(Optional<Node> optNode);
 	
 	Optional<SupplyChain> findById(UUID supplyChainId);
 	
 	boolean exists(UUID supplyChainId);
 	
-	Optional<String> getQualifiedName(UUID supplyChainId);
+	SupplyChain create(SupplyChain supplyChain);
 	
-	Optional<Organization> getOrganization(UUID supplyChainId);
+	void delete(UUID supplyChainId);
+	
+	SupplyChain update(SupplyChain supplyChain);
 
 }

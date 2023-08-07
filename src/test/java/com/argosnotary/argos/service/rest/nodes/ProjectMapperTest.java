@@ -19,10 +19,9 @@
  */
 package com.argosnotary.argos.service.rest.nodes;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +32,6 @@ import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.Project;
-import com.argosnotary.argos.service.rest.nodes.ProjectMapper;
 
 class ProjectMapperTest {
 	
@@ -51,18 +49,23 @@ class ProjectMapperTest {
         
         org2.setDomain(Domain.builder().build());
         
-        node21 = new ManagementNode(UUID.randomUUID(), "node21", org2);
-        node22 = new ManagementNode(UUID.randomUUID(), "node22", org2);
+        node21 = new ManagementNode(UUID.randomUUID(), "node21", List.of(), org2.getId());
+        node22 = new ManagementNode(UUID.randomUUID(), "node22", List.of(), org2.getId());
+        
+        node21.setPathToRoot(List.of(node21.getId(), org2.getId()));
+        node22.setPathToRoot(List.of(node22.getId(), org2.getId()));
         
 
-        project211 = new Project(UUID.randomUUID(), "project211", node21);
+        project211 = new Project(UUID.randomUUID(), "project211",List.of(),  node21.getId());
+        
+        project211.setPathToRoot(List.of(project211.getId(), node21.getId(), org2.getId()));
 	}
 
 	@Test
 	void testMapper() {
 		Project node = projectMapper.convertFromRestProject(projectMapper.convertToRestProject(project211));
-		assertThat(node.getChildren(), is(Set.of()));
-		assertThat(node.getParentId(), is(node21.getId()));
+		assertEquals(project211, node);
+		
 	}
 
 }

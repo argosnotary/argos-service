@@ -27,7 +27,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 
 public interface ClientRegistrationService {
 	
-	public Optional<String> getClientRegistrationName(String issuer);
+	public Optional<String> getClientRegistrationNameWithIssuer(String issuer);
 
 	public Optional<ClientRegistration> getClientRegistration(String providerName);
 

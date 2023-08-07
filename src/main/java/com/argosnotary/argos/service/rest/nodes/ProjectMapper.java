@@ -20,7 +20,6 @@
 package com.argosnotary.argos.service.rest.nodes;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
 import com.argosnotary.argos.domain.nodes.Project;
@@ -29,8 +28,6 @@ import com.argosnotary.argos.service.openapi.rest.model.RestProject;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProjectMapper {
 
-	@Mapping(target = "children", ignore = true)
-	@Mapping(target = "parent", ignore = true)
 	Project convertFromRestProject(RestProject restProject);
 
     RestProject convertToRestProject(Project project);

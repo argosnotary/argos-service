@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Node;
@@ -87,25 +89,38 @@ class NodeRepositoryTest {
         
         org2.setDomain(Domain.builder().build());
         
-        node21 = new ManagementNode(UUID.randomUUID(), "node21", org2);
-        node22 = new ManagementNode(UUID.randomUUID(), "node22", org2);
-        node221 = new ManagementNode(UUID.randomUUID(), "node221", node22);
-        node222 = new ManagementNode(UUID.randomUUID(), "node2211", node22);
-        node31 = new ManagementNode(UUID.randomUUID(), "node31", org3);
-        node311 = new ManagementNode(UUID.randomUUID(), "node311", node31);
-        node312 = new ManagementNode(UUID.randomUUID(), "node312", node31);
+        node21 = new ManagementNode(UUID.randomUUID(), "node21", new ArrayList<>(), org2.getId());
+        node22 = new ManagementNode(UUID.randomUUID(), "node22", new ArrayList<>(), org2.getId());
+        node221 = new ManagementNode(UUID.randomUUID(), "node221", new ArrayList<>(), node22.getId());
+        node222 = new ManagementNode(UUID.randomUUID(), "node222", new ArrayList<>(), node22.getId());
+        node31 = new ManagementNode(UUID.randomUUID(), "node31", new ArrayList<>(), org3.getId());
+        node311 = new ManagementNode(UUID.randomUUID(), "node311", new ArrayList<>(), node31.getId());
+        node312 = new ManagementNode(UUID.randomUUID(), "node312", new ArrayList<>(), node31.getId());
         
-
-        project21 = new Project(UUID.randomUUID(), "project21", org2);
-        project211 = new Project(UUID.randomUUID(), "project211", node21);
-        project212 = new Project(UUID.randomUUID(), "project212", node21);
-        project2211 = new Project(UUID.randomUUID(), "project2211", node221);
-        project311 = new Project(UUID.randomUUID(), "project311", node31);
-        project3111 = new Project(UUID.randomUUID(), "project3111", node311);
-        project3112 = new Project(UUID.randomUUID(), "project3112", node31);
+        project21 = new Project(UUID.randomUUID(), "project21", List.of(), org2.getId());
+        project211 = new Project(UUID.randomUUID(), "project211", List.of(), node21.getId());
+        project212 = new Project(UUID.randomUUID(), "project212", List.of(), node21.getId());
+        project2211 = new Project(UUID.randomUUID(), "project2211", List.of(), node221.getId());
+        project311 = new Project(UUID.randomUUID(), "project311", List.of(), node31.getId());
+        project3111 = new Project(UUID.randomUUID(), "project3111", List.of(), node311.getId());
+        project3112 = new Project(UUID.randomUUID(), "project3112", List.of(), node311.getId());
+        
+        node21.setPathToRoot(List.of(node21.getId(), org2.getId()));
+        node22.setPathToRoot(List.of(node22.getId(), org2.getId()));
+        node221.setPathToRoot(List.of(node221.getId(), node22.getId(), org2.getId()));
+        node222.setPathToRoot(List.of(node222.getId(), node22.getId(), org2.getId()));
+        node31.setPathToRoot(List.of(node31.getId(), org3.getId()));
+        node311.setPathToRoot(List.of(node311.getId(), node31.getId(), org3.getId()));
+        
+        project21.setPathToRoot(List.of(project21.getId(), org2.getId()));
+        project211.setPathToRoot(List.of(project211.getId(),node21.getId(), org2.getId()));
+        project212.setPathToRoot(List.of(project212.getId(),node21.getId(), org2.getId()));
+        project2211.setPathToRoot(List.of(project2211.getId(), node221.getId(), node22.getId(), org2.getId()));
+        project311.setPathToRoot(List.of(project311.getId(), node31.getId(), org3.getId()));
+        project3111.setPathToRoot(List.of(project3111.getId(),node311.getId(), node31.getId(), org3.getId()));
+        project3112.setPathToRoot(List.of(project3112.getId(),node311.getId(), node31.getId(), org3.getId()));
 
         nodeRepository.deleteAll();
-
 
         nodeRepository.save(project21);
         nodeRepository.save(project211);

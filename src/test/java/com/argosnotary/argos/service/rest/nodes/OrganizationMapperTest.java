@@ -19,11 +19,9 @@
  */
 package com.argosnotary.argos.service.rest.nodes;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,21 +44,30 @@ class OrganizationMapperTest {
 	void setUp() throws Exception {
 		organizationMapper = Mappers.getMapper(OrganizationMapper.class);
 		
-		org2 = new Organization(UUID.randomUUID(), "org2", null);
+		org2 = new Organization(UUID.randomUUID(), "org2", Domain.builder().domain("org2.com").build());
         
-        org2.setDomain(Domain.builder().build());
+        node21 = new ManagementNode(UUID.randomUUID(), "node21", List.of(), org2.getId());
+        node22 = new ManagementNode(UUID.randomUUID(), "node22", List.of(), org2.getId());
         
-        node21 = new ManagementNode(UUID.randomUUID(), "node21", org2);
-        node22 = new ManagementNode(UUID.randomUUID(), "node22", org2);
+        node21.setPathToRoot(List.of(node21.getId(), org2.getId()));
+        node22.setPathToRoot(List.of(node22.getId(), org2.getId()));
 	}
 
 	@Test
 	void testMapper() {
 		RestOrganization restOrg = organizationMapper.convertToRestOrganization(org2);
 		Organization org = organizationMapper.convertFromRestOrganization(restOrg);
-		assertThat(org.getChildren(), is(Set.of()));
-		assertThat(org.getDomain(), is(Domain.builder().build()));
-		assertThat(org.getParent(), is(Optional.empty()));
+		assertEquals(org2, org);
+		
+	}
+	
+	@Test
+	void testMapperNullDomain() {
+		Organization org1 = new Organization(UUID.randomUUID(), "org1", null);
+		RestOrganization restOrg = organizationMapper.convertToRestOrganization(org1);
+		Organization org = organizationMapper.convertFromRestOrganization(restOrg);
+		assertEquals(org1, org);
+		
 	}
 
 }
