@@ -40,7 +40,7 @@ import com.argosnotary.argos.domain.crypto.Signature;
 import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.link.Link;
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
-import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
+import com.argosnotary.argos.service.ArgosTestContainers;
 
 
 @Testcontainers

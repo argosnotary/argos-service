@@ -21,7 +21,10 @@ package com.argosnotary.argos.service.roles;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -46,11 +49,9 @@ import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.domain.roles.RoleAssignment;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
-import com.argosnotary.argos.service.mongodb.nodes.NodeRepository;
 import com.argosnotary.argos.service.mongodb.roles.RoleAssignmentRepository;
 import com.argosnotary.argos.service.nodes.NodeDeleteService;
 import com.argosnotary.argos.service.nodes.NodeService;
-import com.argosnotary.argos.service.nodes.NodeServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class RoleAssignmentServiceTest {
@@ -117,7 +118,7 @@ class RoleAssignmentServiceTest {
         project211.setPathToRoot(List.of(project211.getId(),node21.getId(), org2.getId()));
         project3111.setPathToRoot(List.of(project3111.getId(),node311.getId(), node31.getId(), org3.getId()));
         
-        ra21 = RoleAssignment.builder().resourceId(node21.getId()).identityId(pa.getId()).role(new Role.Reader()).build();
+        ra21 = RoleAssignment.builder().id(UUID.randomUUID()).resourceId(node21.getId()).identityId(pa.getId()).role(new Role.Reader()).build();
         ra22 = RoleAssignment.builder().resourceId(node22.getId()).identityId(pa.getId()).role(new Role.Reader()).build();
         ra211 = RoleAssignment.builder().resourceId(project211.getId()).identityId(pa.getId()).role(new Role.Reader()).build();
         ra311 = RoleAssignment.builder().resourceId(node311.getId()).identityId(pa.getId()).role(new Role.LinkAdder()).build();
@@ -164,6 +165,73 @@ class RoleAssignmentServiceTest {
 		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(pa));
 		when(roleAssignmentRepository.findByResourceIdsAndIdentityId(project3111.getPathToRoot(), pa.getId())).thenReturn(List.of(ra311));
 		assertThat(roleAssignmentService.findAllPermissionDownTree(project3111), is(Set.of(Permission.LINK_ADD, Permission.READ)));
+	}
+	
+	@Test
+	void testSave() {
+		when(roleAssignmentRepository.save(ra21)).thenReturn(ra21);
+		RoleAssignment ra = roleAssignmentService.save(ra21);
+		verify(roleAssignmentRepository).save(ra21);
+		assertEquals(ra21, ra);
+		
+	}
+	
+	@Test
+	void testSaveIdNull() {
+
+		RoleAssignment ra = roleAssignmentService.save(ra22);
+		verify(roleAssignmentRepository).save(any());
+		
+	}
+
+	@Test
+	void testDelete() {
+		UUID id = UUID.randomUUID();
+		roleAssignmentService.delete(id);
+		verify(roleAssignmentRepository).deleteById(id);
+	}
+
+	@Test
+	void testDeleteByResourceId() {
+		UUID resourceId = UUID.randomUUID();
+		roleAssignmentService.deleteByResourceId(resourceId);
+		verify(roleAssignmentRepository).deleteByResourceId(resourceId);
+		
+	}
+
+	@Test
+	void testFindByResourceId() {
+		when(roleAssignmentRepository.findByResourceId(ra21.getResourceId())).thenReturn(List.of(ra21));
+		List<RoleAssignment> rl = roleAssignmentService.findByResourceId(ra21.getResourceId());
+		assertEquals(List.of(ra21), rl);
+	}
+
+	@Test
+	void testCreate() {
+		RoleAssignment exp = RoleAssignment.builder().id(UUID.randomUUID()).resourceId(node21.getId()).identityId(pa.getId()).role(new Role.Reader()).build();
+		when(roleAssignmentRepository.save(any())).thenReturn(exp);
+		RoleAssignment act = roleAssignmentService.create(node21.getId(), pa.getId(), new Role.Reader());
+		verify(roleAssignmentRepository).save(any());
+		assertEquals(exp.getIdentityId(), act.getIdentityId());
+		assertEquals(exp.getResourceId(), act.getResourceId());
+		assertEquals(exp.getRole(), act.getRole());
+	}
+
+	@Test
+	void testFindByIdentity() {
+		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(pa));
+		when(roleAssignmentRepository.findByIdentityId(pa.getId())).thenReturn(List.of(ra22));
+		List<RoleAssignment> rl = roleAssignmentService.findByIdentity();
+		assertEquals(List.of(ra22), rl);
+		
+	}
+
+	@Test
+	void testFindByIdentityNotAuth() {
+		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.empty());
+		List<RoleAssignment> rl = roleAssignmentService.findByIdentity();
+		assertTrue(rl.isEmpty());
+		
 	}
 
 }

@@ -19,7 +19,6 @@
  */
 package com.argosnotary.argos.domain.nodes;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

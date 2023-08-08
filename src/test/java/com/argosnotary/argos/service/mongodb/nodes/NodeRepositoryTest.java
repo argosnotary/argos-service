@@ -52,7 +52,7 @@ import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.Project;
-import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
+import com.argosnotary.argos.service.ArgosTestContainers;
 
 @Testcontainers
 @DataMongoTest

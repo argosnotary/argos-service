@@ -43,7 +43,7 @@ import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.account.PersonalAccount.Profile;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
-import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
+import com.argosnotary.argos.service.ArgosTestContainers;
 
 
 @Testcontainers

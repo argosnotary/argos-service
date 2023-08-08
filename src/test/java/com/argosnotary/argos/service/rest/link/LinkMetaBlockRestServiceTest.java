@@ -47,7 +47,7 @@ import com.argosnotary.argos.domain.nodes.SupplyChain;
 import com.argosnotary.argos.service.link.LinkMetaBlockService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
 import com.argosnotary.argos.service.openapi.rest.model.RestLinkMetaBlock;
-import com.argosnotary.argos.service.rest.SignatureValidatorService;
+import com.argosnotary.argos.service.verification.SignatureValidatorService;
 
 
 @ExtendWith(MockitoExtension.class)

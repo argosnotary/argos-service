@@ -45,7 +45,7 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 public class SecurityConfig {
 	
-	@Value("${spring.websecurity.debug:true}")
+	@Value("${spring.websecurity.debug:false}")
     boolean webSecurityDebug;
 	
 	//++++++++++++++++++++++++++++++
@@ -60,7 +60,7 @@ public class SecurityConfig {
 				"/actuator/**",
 				"/api/supplychains/verification/**",
 				"/api/oauthprovider/**",
-				"/api/serviceaccounts/me/token")			
+				"/api/serviceaccounts/me/token")
 			.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
 		http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/serviceaccounts/me/token"));
 
@@ -79,7 +79,7 @@ public class SecurityConfig {
 	 */
 	@Bean
 	public CustomStatelessAuthorizationRequestRepository cookieAuthorizationRequestRepository(ObjectMapper mapper) {
-		return new CustomStatelessAuthorizationRequestRepository(mapper);
+		return new CustomStatelessAuthorizationRequestRepository();
 	}
 	
 	@Bean(name = "oidcFilterChain")

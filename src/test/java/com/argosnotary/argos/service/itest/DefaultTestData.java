@@ -111,9 +111,9 @@ public class DefaultTestData {
     }
 
     private static RestOrganization createDefaultOrganization(String ownerToken) {
-    	RestOrganization org = new RestOrganization();
-    	org.setName("default-organization");
-    	org.setDomain(new RestDomain().domain("org.com"));
+    	RestOrganization org = new RestOrganization()
+    			.name("default-organization")
+    			.domain(new RestDomain().domain("org.com"));
     	return getOrganizationApi(ownerToken).createOrganization(org);
     }
 

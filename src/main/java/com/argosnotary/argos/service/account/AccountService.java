@@ -24,13 +24,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.argosnotary.argos.domain.account.Account;
-import com.argosnotary.argos.domain.crypto.KeyPair;
+import com.argosnotary.argos.domain.crypto.PublicKey;
 
 public interface AccountService {
 
     boolean keyPairExists(String keyId);
 
-    Optional<KeyPair> findKeyPairByKeyId(String keyId);
+    Optional<PublicKey> findPublicKeyByKeyId(String keyId);
 
     Optional<Account> loadAuthenticatedUser(String providerIssuer, String providerSubject);
 

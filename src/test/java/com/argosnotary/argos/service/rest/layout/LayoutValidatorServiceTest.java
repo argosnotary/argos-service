@@ -52,7 +52,7 @@ import com.argosnotary.argos.domain.layout.Step;
 import com.argosnotary.argos.domain.layout.rule.MatchRule;
 import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
-import com.argosnotary.argos.service.rest.SignatureValidatorService;
+import com.argosnotary.argos.service.verification.SignatureValidatorService;
 
 @ExtendWith(MockitoExtension.class)
 class LayoutValidatorServiceTest {

@@ -22,8 +22,11 @@ package com.argosnotary.argos.service.rest.account;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.bouncycastle.operator.OperatorCreationException;
@@ -40,6 +43,7 @@ import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestPersonalAccount;
+import com.argosnotary.argos.service.openapi.rest.model.RestProfile;
 
 @ExtendWith(MockitoExtension.class)
 class PersonalAccountMapperTest {
@@ -89,5 +93,15 @@ class PersonalAccountMapperTest {
     private void validate(RestPersonalAccount restPersonalAccount) {
         assertThat(restPersonalAccount.getName(), is(personalAccount.getName()));
         assertThat(restPersonalAccount.getId(), is(personalAccount.getId()));
+    }
+    
+    @Test
+    void testConvertToRestProfile() {
+    	Profile prof = Profile.builder().email(EMAIL).familyName(NAME).fullName(NAME).givenName(NAME).build();
+    	RestProfile rp = mapper.convertToRestProfile(prof);
+    	RestProfile rp2 = mapper.convertToRestProfile(Optional.of(prof));
+    	assertEquals(rp, rp2);
+    	assertNull(mapper.convertToRestProfile(Optional.empty()));
+    	
     }
 }

@@ -20,6 +20,7 @@
 package com.argosnotary.argos.domain.account;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Set;
 import java.util.UUID;
@@ -44,6 +45,7 @@ class ServiceAccountTest {
 		RoleAssignment la = RoleAssignment.builder().resourceId(projectId).role(new Role.LinkAdder()).build();
 		
 		ServiceAccount sa = ServiceAccount.builder().name("sa").projectId(projectId).build();
+		assertNotNull(sa.getId());
 	}
 	
 	@Test

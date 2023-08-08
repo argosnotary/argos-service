@@ -40,7 +40,7 @@ import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.nodes.Project;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.domain.roles.RoleAssignment;
-import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
+import com.argosnotary.argos.service.ArgosTestContainers;
 import com.argosnotary.argos.service.mongodb.roles.RoleAssignmentRepository;
 
 @Testcontainers

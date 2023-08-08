@@ -37,8 +37,8 @@ import com.argosnotary.argos.service.auditlog.AuditLog;
 import com.argosnotary.argos.service.link.LinkMetaBlockService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
 import com.argosnotary.argos.service.openapi.rest.model.RestLinkMetaBlock;
-import com.argosnotary.argos.service.rest.SignatureValidatorService;
 import com.argosnotary.argos.service.roles.PermissionCheck;
+import com.argosnotary.argos.service.verification.SignatureValidatorService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

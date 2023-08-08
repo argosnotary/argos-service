@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.rest;
+package com.argosnotary.argos.service.verification;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -50,6 +50,7 @@ import com.argosnotary.argos.domain.layout.Step;
 import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.link.Link;
 import com.argosnotary.argos.service.account.AccountService;
+import com.argosnotary.argos.service.verification.SignatureValidatorService;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -121,41 +122,48 @@ class SignatureValidatorServiceTest {
 
     @Test
     void validLayoutSignature() {
-        when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.of(pair));
+        when(accountService.findPublicKeyByKeyId(keyId)).thenReturn(Optional.of(pair));
         assertThat(service.validateSignature(layout, layoutSignature), is(true));
     }
 
     @Test
     void inValidLayoutSignature() throws GeneralSecurityException {
-        when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.of(pair));
+        when(accountService.findPublicKeyByKeyId(keyId)).thenReturn(Optional.of(pair));
 
         assertThat(service.validateSignature(layout2, layoutSignature2), is(false));
     }
 
     @Test
+    void validLayoutSignatureExc() {
+        when(accountService.findPublicKeyByKeyId(keyId)).thenReturn(Optional.of(pair));
+        assertThat(service.validateSignature(layout, layoutSignature), is(true));
+    }
+
+    @Test
     void keyNotFoundLayoutSignature() {
-        when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.empty());
+        when(accountService.findPublicKeyByKeyId(keyId)).thenReturn(Optional.empty());
 
         assertThat(service.validateSignature(layout, layoutSignature), is(false));
     }
     
     @Test
     void validLinkSignature() {
-        when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.of(pair));
+        when(accountService.findPublicKeyByKeyId(keyId)).thenReturn(Optional.of(pair));
         assertThat(service.validateSignature(link, linkSignature), is(true));
     	
     }
     
     @Test
     void inValidLinkSignature() {
-        when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.of(pair));
+        when(accountService.findPublicKeyByKeyId(keyId)).thenReturn(Optional.of(pair));
+        boolean ff = service.validateSignature(link, linkSignature2);
 
         assertThat(service.validateSignature(link, linkSignature2), is(false));
     }
     
     @Test
     void keyNotFoundLinkSignature() {
-        when(accountService.findKeyPairByKeyId(keyId)).thenReturn(Optional.empty());
+        when(accountService.findPublicKeyByKeyId(keyId)).thenReturn(Optional.empty());
         assertThat(service.validateSignature(link, linkSignature), is(false));
     }
     

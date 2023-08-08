@@ -20,9 +20,11 @@
 package com.argosnotary.argos.service.roles;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -44,6 +46,8 @@ import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.service.account.ArgosUserDetails;
 import com.argosnotary.argos.service.nodes.NodeService;
+
+import jakarta.ws.rs.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class PermissionCheckAdvisorTest {
@@ -101,12 +105,36 @@ class PermissionCheckAdvisorTest {
 	}
 
 	@Test
-	void testHasNoPermission() {
+	void testNoArgs() {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
-		when(roleAssignmentService.findAllPermissionDownTree(node)).thenReturn(Set.of());
+		when(joinPoint.getArgs()).thenReturn(null);
+		when(joinPoint.getSignature()).thenReturn(signature);
+		when(signature.getName()).thenReturn("testMethode");
 		when(permissionCheck.permissions()).thenReturn(new Permission[] {Permission.READ});
+		assertThrows(AccessDeniedException.class,
+	            ()->{
+	        		permissionCheckAdvisor.checkPermissions(joinPoint, permissionCheck);
+	            });
+	}
+
+	@Test
+	void testZeroArgs() {
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		when(joinPoint.getArgs()).thenReturn(List.of().toArray(new String[0]));
+		when(joinPoint.getSignature()).thenReturn(signature);
+		when(signature.getName()).thenReturn("testMethode");
+		when(permissionCheck.permissions()).thenReturn(new Permission[] {Permission.READ});
+		assertThrows(AccessDeniedException.class,
+	            ()->{
+	        		permissionCheckAdvisor.checkPermissions(joinPoint, permissionCheck);
+	            });
+	}
+
+	@Test
+	void testHasNoPermissions() {
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		when(permissionCheck.permissions()).thenReturn(new Permission[] {});
 		when(joinPoint.getArgs()).thenReturn(new Object[] {resourceId});
-		when(nodeService.findById(resourceId)).thenReturn(Optional.of(node));
 		when(joinPoint.getSignature()).thenReturn(signature);
 		when(signature.getName()).thenReturn("testMethode");
 		assertThrows(AccessDeniedException.class,
@@ -153,6 +181,37 @@ class PermissionCheckAdvisorTest {
 	            ()->{
 	        		permissionCheckAdvisor.checkPermissions(joinPoint, permissionCheck);
 	            });
+	}
+
+	@Test
+	void testHasPermissionsButNoPermission() {
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		when(roleAssignmentService.findAllPermissionDownTree(node)).thenReturn(Set.of());
+		when(permissionCheck.permissions()).thenReturn(new Permission[] {Permission.READ});
+		when(joinPoint.getArgs()).thenReturn(new Object[] {resourceId});
+		when(nodeService.findById(resourceId)).thenReturn(Optional.of(node));
+		when(joinPoint.getSignature()).thenReturn(signature);
+		when(signature.getName()).thenReturn("testMethode");
+		Exception exp = assertThrows(AccessDeniedException.class,
+	            ()->{
+	        		permissionCheckAdvisor.checkPermissions(joinPoint, permissionCheck);
+	            });
+		assertEquals("Access denied", exp.getMessage());
+	}
+
+	@Test
+	void testNoNode() {
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		when(permissionCheck.permissions()).thenReturn(new Permission[] {Permission.READ});
+		when(joinPoint.getArgs()).thenReturn(new Object[] {resourceId});
+		when(nodeService.findById(resourceId)).thenReturn(Optional.empty());
+		when(joinPoint.getSignature()).thenReturn(signature);
+		when(signature.getName()).thenReturn("testMethode");
+		Exception exp = assertThrows(NotFoundException.class,
+	            ()->{
+	        		permissionCheckAdvisor.checkPermissions(joinPoint, permissionCheck);
+	            });
+		assertEquals(String.format("Resource with id [%s] not found", resourceId), exp.getMessage());
 	}
 	
 	@Test

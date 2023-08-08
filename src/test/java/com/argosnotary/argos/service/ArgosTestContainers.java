@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.itest.mongodb;
+package com.argosnotary.argos.service;
 
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
@@ -30,7 +30,7 @@ public class ArgosTestContainers {
 	private static final String MONGO_IMAGE_NAME = "mongo:6";
 	private static final String MONGO_IMAGE_NAME_PROPERTY = "mongo.default.image.name";
 	
-	private static final String KEYCLOAK_IMAGE_NAME = "quay.io/keycloak/keycloak:21.1.1";
+	private static final String KEYCLOAK_IMAGE_NAME = "quay.io/keycloak/keycloak:22.0";
 
 	public static MongoDBContainer getMongoDBContainer() {
 		return new MongoDBContainer(DockerImageName.parse(System.getProperty(MONGO_IMAGE_NAME_PROPERTY, MONGO_IMAGE_NAME)))

@@ -22,18 +22,15 @@ package com.argosnotary.argos.service;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
-import org.springframework.stereotype.Component;
 
-import com.argosnotary.argos.service.security.helpers.OAuth2AuthorizationRequestDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-@Component
+@Configuration
 public class JsonMapperConfig {
     
     @Primary
@@ -41,7 +38,6 @@ public class JsonMapperConfig {
     public ObjectMapper objectMapper() {
         return JsonMapper.builder()
         		.addModule(new JavaTimeModule())
-        		.addModule(oAuth2AuthorizationRequestModule())
         		.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         		.serializationInclusion(NON_NULL).build();
     }
@@ -49,13 +45,6 @@ public class JsonMapperConfig {
     @Bean
     public JavaTimeModule dateTimeModule(){
         return new JavaTimeModule();
-    }
-    
-    @Bean
-    public SimpleModule oAuth2AuthorizationRequestModule() {
-    	SimpleModule module = new SimpleModule();
-    	module.addDeserializer(OAuth2AuthorizationRequest.class, new OAuth2AuthorizationRequestDeserializer());
-    	return module;
     }
 
 }

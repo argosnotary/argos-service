@@ -28,8 +28,6 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
-
 
 @SpringBootTest
 @Testcontainers

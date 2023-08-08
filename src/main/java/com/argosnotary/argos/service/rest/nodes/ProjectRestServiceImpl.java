@@ -33,9 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Node;
-import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.Project;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.service.auditlog.AuditLog;

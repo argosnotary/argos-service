@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.account.ServiceAccount;
-import com.argosnotary.argos.domain.crypto.KeyPair;
+import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.service.mongodb.account.PersonalAccountRepository;
 import com.argosnotary.argos.service.mongodb.account.ServiceAccountRepository;
 
@@ -56,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Optional<KeyPair> findKeyPairByKeyId(String keyId) {
+    public Optional<PublicKey> findPublicKeyByKeyId(String keyId) {
         return serviceAccountRepository
                 .findFirstByActiveKeyId(keyId).map(Account.class::cast)
                 .or(() -> personalAccountRepository.findFirstByActiveKeyId(keyId)).map(Account::getActiveKeyPair);

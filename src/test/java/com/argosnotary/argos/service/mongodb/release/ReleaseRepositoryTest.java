@@ -43,7 +43,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.release.Release;
-import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
+import com.argosnotary.argos.service.ArgosTestContainers;
 
 @Testcontainers
 @DataMongoTest(properties= {"spring.data.mongodb.auto-index-creation=true"})

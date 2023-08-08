@@ -19,7 +19,9 @@
  */
 package com.argosnotary.argos.service.rest.account;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,11 +40,12 @@ class ServiceAccountMapperTest {
 
 	@Test
 	void testConvertToRestServiceAccount() {
+		UUID projectId = UUID.randomUUID();
+		UUID id = UUID.randomUUID();
 		
-	}
-    
-	@Test
-	void testConvertFromRestServiceAccount() {
+		ServiceAccount sa = ServiceAccount.builder().id(id).name("sa").projectId(projectId).build();
+		ServiceAccount saT = serviceAccountMapper.convertFromRestServiceAccount(serviceAccountMapper.convertToRestServiceAccount(sa));
+		assertEquals(sa, saT);
 		
 	}
 

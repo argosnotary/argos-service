@@ -36,6 +36,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -44,6 +45,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.service.openapi.rest.model.RestError;
 import com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage;
+import com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage.TypeEnum;
 import com.argosnotary.argos.service.rest.layout.LayoutValidationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -80,6 +82,9 @@ class RestServiceExceptionHandlerTest {
 
     @Mock
     private ResponseStatusException responseStatusException;
+
+    @Mock
+    private AccessDeniedException accessDeniedException;
 
     @Mock
     private LayoutValidationException layoutValidationException;
@@ -145,10 +150,30 @@ class RestServiceExceptionHandlerTest {
     @Test
     void handleResponseStatusException() {
         when(responseStatusException.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND);
-        when(responseStatusException.getReason()).thenReturn("reason");
+        when(responseStatusException.getReason()).thenReturn("not found");
         ResponseEntity<RestError> response = (ResponseEntity<RestError>) handler.handleResponseStatusException(responseStatusException);
         assertThat(response.getStatusCode().value(), is(404));
-        assertThat(response.getBody().getMessages().get(0).getMessage(), is("reason"));
+        assertThat(response.getBody().getMessages().get(0).getMessage(), is("not found"));
+    }
+
+    @Test
+    void handleResponseStatusExceptionBadRequest() {
+        when(responseStatusException.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
+        when(responseStatusException.getReason()).thenReturn("bad request");
+        ResponseEntity<RestError> response = (ResponseEntity<RestError>) handler.handleResponseStatusException(responseStatusException);
+        assertThat(response.getStatusCode().value(), is(400));
+        assertThat(response.getBody().getMessages().get(0).getMessage(), is("bad request"));
+        assertThat(response.getBody().getMessages().size(), is(1));
+    }
+
+    @Test
+    void handleResponseStatusAccessDenied() {
+        when(accessDeniedException.getMessage()).thenReturn("access denied");
+        ResponseEntity<RestError> response = (ResponseEntity<RestError>) handler.handleAccessDeniedException(accessDeniedException);
+        assertThat(response.getStatusCode().value(), is(403));
+        assertThat(response.getBody().getMessages().get(0).getMessage(), is("access denied"));
+        assertThat(response.getBody().getMessages().get(0).getType(), is(TypeEnum.OTHER));
+        assertThat(response.getBody().getMessages().size(), is(1));
     }
 
     @Test
