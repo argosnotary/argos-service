@@ -52,7 +52,6 @@ import jakarta.ws.rs.ProcessingException;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
-@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 class ServiceAccountProviderServiceTest {
 	
 	private static String getKeycloakUrl(String realm) {

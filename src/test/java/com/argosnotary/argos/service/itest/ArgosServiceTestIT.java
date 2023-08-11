@@ -49,7 +49,6 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
   properties="spring.data.mongodb.auto-index-creation=true")
 @Testcontainers
-@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 class ArgosServiceTestIT {
 
     private static final String DEFAULT_TESTDATA = "default-testdata";

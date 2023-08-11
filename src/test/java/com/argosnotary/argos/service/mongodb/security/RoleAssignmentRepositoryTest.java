@@ -45,7 +45,6 @@ import com.argosnotary.argos.service.ArgosTestContainers;
 import com.argosnotary.argos.service.mongodb.roles.RoleAssignmentRepository;
 
 @Testcontainers
-@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 @DataMongoTest
 class RoleAssignmentRepositoryTest {
 	

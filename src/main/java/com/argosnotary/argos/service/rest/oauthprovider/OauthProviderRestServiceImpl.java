@@ -22,6 +22,7 @@ package com.argosnotary.argos.service.rest.oauthprovider;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.argosnotary.argos.service.account.ClientRegistrationService;
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class OauthProviderRestServiceImpl implements OauthProviderRestService {
     private final ClientRegistrationService clientRegistrationService;
     

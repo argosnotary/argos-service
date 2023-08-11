@@ -49,7 +49,6 @@ import com.argosnotary.argos.service.ArgosTestContainers;
 
 
 @Testcontainers
-@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 @DataMongoTest(properties={"spring.data.mongodb.auto-index-creation=true","spring.data.mongodb.database=argos"})
 class ServiceAccountRepositoryTest {
 	

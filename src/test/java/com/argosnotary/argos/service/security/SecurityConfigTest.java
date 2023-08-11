@@ -21,7 +21,6 @@ package com.argosnotary.argos.service.security;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
@@ -30,11 +29,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -45,7 +42,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.argosnotary.argos.service.ArgosTestContainers;
 import com.argosnotary.argos.service.itest.rest.api.model.RestJwtToken;
-import com.argosnotary.argos.service.itest.rest.api.model.RestKeyPair;
 import com.argosnotary.argos.service.itest.rest.api.model.RestOAuthProvider;
 import com.argosnotary.argos.service.itest.rest.api.model.RestTokenRequest;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -59,15 +55,13 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
 
 import lombok.extern.slf4j.Slf4j;
-import com.argosnotary.argos.service.itest.rest.api.model.RestPersonalAccount;
 
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
   properties={"spring.data.mongodb.auto-index-creation=true", "server.port=8081"})
 @Testcontainers
-@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
-class ArgosSecurityTest {
+class SecurityConfigTest {
 	
 	static final String AUTH_HEADER_KEY= "Authorization";
 	static final String AUTH_HEADER_BEARER_TEMPL= "Bearer %s";

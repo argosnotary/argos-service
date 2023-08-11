@@ -57,7 +57,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.gridfs.model.GridFSFile;
 
 @Testcontainers
-@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 @DataMongoTest(properties= {"spring.data.mongodb.auto-index-creation=true","spring.data.mongodb.database=argos"})
 @ImportAutoConfiguration(classes=MongoConfig.class)
 class ReleaseDossierRepositoryTest {

@@ -47,7 +47,6 @@ import com.argosnotary.argos.domain.release.Release;
 import com.argosnotary.argos.service.ArgosTestContainers;
 
 @Testcontainers
-@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 @DataMongoTest(properties= {"spring.data.mongodb.auto-index-creation=true"})
 class ReleaseRepositoryTest {
 

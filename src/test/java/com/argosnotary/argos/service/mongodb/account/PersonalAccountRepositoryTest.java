@@ -49,7 +49,6 @@ import com.argosnotary.argos.service.ArgosTestContainers;
 
 @Testcontainers
 @DataMongoTest
-@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 class PersonalAccountRepositoryTest {
 	
 	static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
