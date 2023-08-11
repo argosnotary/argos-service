@@ -33,9 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Node;
-import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.Project;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.service.auditlog.AuditLog;
@@ -62,12 +60,13 @@ public class ProjectRestServiceImpl implements ProjectRestService {
     @PermissionCheck(permissions = Permission.WRITE)
     @AuditLog
 	public ResponseEntity<RestProject> createProject(UUID parentId, @Valid RestProject restProject) {
+		Project project = projectMapper.convertFromRestProject(restProject);
 
 		Optional<Node> parent = nodeService.findById(parentId);
 		if (!(parentId.equals(restProject.getParentId())
 				&& parent.isPresent() 
 				&& parent.get().getId().equals(restProject.getParentId())
-				&& Project.isValidParentType(parent.get()))) {
+				&& project.isValidParentType(parent.get()))) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent");
 		}
 		
@@ -77,7 +76,7 @@ public class ProjectRestServiceImpl implements ProjectRestService {
 		}
 		
 		Project node = projectService
-				.create(projectMapper.convertFromRestProject(restProject));
+				.create(project);
 
         URI location = UriComponentsBuilder
         		.fromPath("/api/projects")

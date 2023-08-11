@@ -37,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.util.SerializationUtils;
 
@@ -45,6 +46,7 @@ import com.argosnotary.argos.service.JsonMapperConfig;
 import com.argosnotary.argos.service.security.helpers.CookieHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -79,18 +81,20 @@ class CustomStatelessAuthorizationRequestRepositoryTest {
     @BeforeEach
     void setUp() throws JsonProcessingException {
         oAuth2AuthorizationRequest = OAuth2AuthorizationRequest.authorizationCode().authorizationUri("http://some").clientId("is").build();
-        repository = new CustomStatelessAuthorizationRequestRepository(mapper);
-        ObjectMapper jsonMapper = new ObjectMapper();
+        repository = new CustomStatelessAuthorizationRequestRepository();
+        JsonMapper jsonMapper = JsonMapper.builder()
+        		.addModules(SecurityJackson2Modules.getModules(this.getClass().getClassLoader())).build();
         base64OauthRequest = Base64.getEncoder().encodeToString(jsonMapper.writeValueAsBytes(oAuth2AuthorizationRequest));
         cookies[0] = CookieHelper.generate(CookieHelper.OAUTH_COOKIE_NAME, base64OauthRequest, Duration.ofMinutes(5));
     }
 
     @Test
     void loadAuthorizationRequestFound() throws JsonProcessingException {
-        ObjectMapper jsonMapper = new ObjectMapper();
     	when(request.getCookies()).thenReturn(cookies);
-    	String actual = Base64.getEncoder().encodeToString(jsonMapper.writeValueAsBytes(repository.loadAuthorizationRequest(request)));
-        assertEquals(base64OauthRequest, actual);
+    	OAuth2AuthorizationRequest req = repository.loadAuthorizationRequest(request);
+    	assertEquals(oAuth2AuthorizationRequest.getAuthorizationRequestUri(), req.getAuthorizationRequestUri());
+    	assertEquals(oAuth2AuthorizationRequest.getAuthorizationUri(), req.getAuthorizationUri());
+    	assertEquals(oAuth2AuthorizationRequest.getClientId(), req.getClientId());
     }
 
     @Test
@@ -108,7 +112,7 @@ class CustomStatelessAuthorizationRequestRepositoryTest {
     @Test
     void saveAuthorizationRequestNotNull() {
         repository.saveAuthorizationRequest(oAuth2AuthorizationRequest, request, response);
-        verify(response).addCookie(ArgumentMatchers.any(Cookie.class));
+        verify(response).addCookie(cookies[0]);
         //verify(request).getCookies();
         //verify(response).addCookie(CookieHelper.generate("OAUTH", "-", Duration.ZERO));
     }

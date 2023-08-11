@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Base64;
 
+import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,7 @@ import org.springframework.stereotype.Component;
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.service.security.helpers.CookieHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +44,8 @@ public class CustomStatelessAuthorizationRequestRepository implements Authorizat
 
     private static final Duration OAUTH_COOKIE_EXPIRY = Duration.ofMinutes(5);
     
-    private final ObjectMapper jsonMapper;
+    JsonMapper jsonMapper = JsonMapper.builder()
+    		.addModules(SecurityJackson2Modules.getModules(this.getClass().getClassLoader())).build();
 
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {

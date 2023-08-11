@@ -42,7 +42,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import com.argosnotary.argos.domain.crypto.Signature;
 import com.argosnotary.argos.domain.layout.Layout;
 import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
-import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
+import com.argosnotary.argos.service.ArgosTestContainers;
 
 
 @Testcontainers

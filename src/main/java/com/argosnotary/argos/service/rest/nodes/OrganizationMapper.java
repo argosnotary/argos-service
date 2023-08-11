@@ -20,7 +20,6 @@
 package com.argosnotary.argos.service.rest.nodes;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
 import com.argosnotary.argos.domain.nodes.Organization;

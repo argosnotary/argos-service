@@ -44,6 +44,7 @@ import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
+import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.service.mongodb.account.PersonalAccountRepository;
 import com.argosnotary.argos.service.mongodb.account.ServiceAccountRepository;
 
@@ -91,10 +92,10 @@ class AccountServiceTest {
 	}
 
 	@Test
-	void testFindKeyPairByKeyId() {
+	void testFindPublicKeyByKeyId() {
 		when(personalAccountRepository.findFirstByActiveKeyId(kp1.getKeyId())).thenReturn(Optional.of(pa1));
 		when(serviceAccountRepository.findFirstByActiveKeyId(kp1.getKeyId())).thenReturn(Optional.empty());
-		assertThat(accountService.findKeyPairByKeyId(kp1.getKeyId()), is(Optional.of(kp1)));
+		assertThat(accountService.findPublicKeyByKeyId(kp1.getKeyId()), is(Optional.of((PublicKey)kp1)));
 		verify(personalAccountRepository).findFirstByActiveKeyId(kp1.getKeyId());
 		verify(serviceAccountRepository).findFirstByActiveKeyId(kp1.getKeyId());
 		

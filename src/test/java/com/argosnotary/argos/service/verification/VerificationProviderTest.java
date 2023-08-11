@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,6 +52,7 @@ import com.argosnotary.argos.domain.layout.rule.RuleType;
 import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.link.Link;
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
+import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.mongodb.link.LinkMetaBlockRepository;
 import com.argosnotary.argos.service.verification.rules.AllowRuleVerification;
 import com.argosnotary.argos.service.verification.rules.CreateOrModifyRuleVerification;
@@ -69,6 +71,11 @@ class VerificationProviderTest {
 	
 	@Mock
 	LinkMetaBlockRepository linkMetaBlockRepository;
+    
+    @Mock
+    private AccountService accountService;
+    
+    private SignatureValidatorService signatureValidatorService;
 
     private List<RuleVerification> ruleVerificationList;
 
@@ -88,6 +95,7 @@ class VerificationProviderTest {
 
     @BeforeEach
     void setup() throws NoSuchAlgorithmException, OperatorCreationException, PemGenerationException {
+    	signatureValidatorService = new SignatureValidatorService(accountService);
     	kp1 = CryptoHelper.createKeyPair(PASSWORD);
     	kp2 = CryptoHelper.createKeyPair(PASSWORD);
     	kp3 = CryptoHelper.createKeyPair(PASSWORD);
@@ -160,10 +168,10 @@ class VerificationProviderTest {
     	ruleVer.init();
         verifications = new ArrayList<>(List.of(
         		new LayoutAuthorizedKeyIdVerification(), 
-        		new LayoutMetaBlockSignatureVerification(), 
+        		new LayoutMetaBlockSignatureVerification(signatureValidatorService), 
         		new KnownStepVerification(), 
         		new StepAuthorizedKeyIdVerification(), 
-        		new LinkMetaBlockSignatureVerification(), 
+        		new LinkMetaBlockSignatureVerification(signatureValidatorService), 
         		new RequiredNumberOfLinksVerification(), 
         		ruleVer,
         		new ExpectedEndProductsVerification()));
@@ -214,6 +222,7 @@ class VerificationProviderTest {
     void verifyShouldProduceVerificationRunResult() {
         Artifact artifact = new Artifact("target/argos-test-0.0.1-SNAPSHOT.jar", "49e73a11c5e689db448d866ce08848ac5886cac8aa31156ea4de37427aca6162");
     	when(linkMetaBlockRepository.findBySupplyChainId(SUPPLY_CHAIN_ID)).thenReturn(List.of(buildStepLink, testStepLink));
+        when(accountService.findPublicKeyByKeyId(kp1.getKeyId())).thenReturn(Optional.of(kp1));
         assertThat(verificationProvider.verifyRun(layoutMetaBlock, Set.of(artifact)).isRunIsValid(), is(true));
     }
 

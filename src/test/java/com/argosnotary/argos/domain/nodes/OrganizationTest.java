@@ -64,10 +64,10 @@ class OrganizationTest {
 	
 	@Test
 	void testParentType() {
-		assertFalse(Organization.isValidParentType(new SupplyChain()));
-		assertFalse(Organization.isValidParentType(new Project()));
-		assertFalse(Organization.isValidParentType(new ManagementNode()));
-		assertFalse(Organization.isValidParentType(new Organization()));
+		assertFalse(org1.isValidParentType(new SupplyChain()));
+		assertFalse(org1.isValidParentType(new Project()));
+		assertFalse(org1.isValidParentType(new ManagementNode()));
+		assertFalse(org1.isValidParentType(new Organization()));
 	}
 
 }

@@ -44,9 +44,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.domain.account.ServiceAccount;
-import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
+import com.argosnotary.argos.service.ArgosTestContainers;
 
 import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.ProcessingException;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
@@ -117,14 +118,18 @@ class ServiceAccountProviderServiceTest {
 		
 		assertTrue(serviceAccountProviderService.exists(sa2.getId()));
 	}
-
+	
 	@Test
-	void testRegisterServiceAccountErrorStauts() {
-		ServiceAccount sa2 = serviceAccountProviderService.registerServiceAccount(sa);
-		assertEquals(sa.getId(), sa2.getId());
-		assertNotNull(sa2.getProviderSubject());
-		
-		assertTrue(serviceAccountProviderService.exists(sa2.getId()));
+	void testRegisterServiceAccountStatusNotOk() {
+		// no samanager client
+		ServiceAccountProviderService service = new ServiceAccountProviderServiceImpl(
+				clientRegistrationService,
+				"saprovider-client", "644TyDbo7pTeyqDLM7kj4LWMwjRcUcBr",
+				"saprovider-client", "644TyDbo7pTeyqDLM7kj4LWMwjRcUcBr");
+		Throwable exception = assertThrows(ArgosError.class, () -> {
+			service.registerServiceAccount(sa);
+        });
+		assertEquals("Error in registering a service account message: [jakarta.ws.rs.NotAuthorizedException: HTTP 401 Unauthorized]", exception.getMessage());
 	}
 	
 	@Test
@@ -144,6 +149,20 @@ class ServiceAccountProviderServiceTest {
 		assertFalse(serviceAccountProviderService.exists(sa2.getId()));
 
 		serviceAccountProviderService.unRegisterServiceAccount(sa2);
+	}
+	
+	@Test
+	void testUnRegisterServiceAccountStatusNotOk() {
+		ServiceAccount sa2 = serviceAccountProviderService.registerServiceAccount(sa);
+		// no samanager client
+		ServiceAccountProviderService service = new ServiceAccountProviderServiceImpl(
+				clientRegistrationService,
+				"saprovider-client", "644TyDbo7pTeyqDLM7kj4LWMwjRcUcBr",
+				"saprovider-client", "644TyDbo7pTeyqDLM7kj4LWMwjRcUcBr");
+		Throwable exception = assertThrows(ArgosError.class, () -> {
+			service.unRegisterServiceAccount(sa2);
+        });
+		assertEquals(String.format("Service Account unregister with id: [%s] failed with message [jakarta.ws.rs.NotAuthorizedException: HTTP 401 Unauthorized]", sa2.getId()), exception.getMessage());
 	}
 	
 	@Test

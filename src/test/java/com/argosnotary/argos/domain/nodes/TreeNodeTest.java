@@ -132,16 +132,17 @@ class TreeNodeTest {
         assertEquals(String.format("Inconsistent creation of Treenode with node [%s] and parent [%s]",project21.toString(), "empty"), exception.getMessage());
         
         TreeNode orgNode = new TreeNode(org2, Optional.empty());
+        Optional<TreeNode> optOrgNode = Optional.of(orgNode);
         
         project21.setParentId(null);
 		exception = assertThrows(ValidationException.class, () -> {
-			new TreeNode(project21, Optional.of(orgNode));
+			new TreeNode(project21, optOrgNode);
           });
         assertEquals(String.format("Inconsistent creation of Treenode with node [%s] and parent [%s]",project21.toString(), orgNode.toString()), exception.getMessage());
         
         project21.setParentId(UUID.randomUUID());
 		exception = assertThrows(ValidationException.class, () -> {
-			new TreeNode(project21, Optional.of(orgNode));
+			new TreeNode(project21, optOrgNode);
           });
         assertEquals(String.format("Inconsistent creation of Treenode with node [%s] and parent [%s]",project21.toString(), orgNode.toString()), exception.getMessage());
         
@@ -154,13 +155,16 @@ class TreeNodeTest {
     
     @Test
     void testCreateUpTree() {
+		Set<Node> empty = Set.of();
     	Throwable exception = assertThrows(ArgosError.class, () -> {
-	    	TreeNode.createUpTree(Set.of());
+	    	TreeNode.createUpTree(empty);
           });
         assertEquals("No pivot", exception.getMessage());
+        
+        Set<Node> orgSet = Set.of(org1, org2);
     	
         exception = assertThrows(ArgosError.class, () -> {
-        	TreeNode.createUpTree(Set.of(org1, org2));
+        	TreeNode.createUpTree(orgSet);
           });
         assertEquals("More than 1 pivot", exception.getMessage());
     }

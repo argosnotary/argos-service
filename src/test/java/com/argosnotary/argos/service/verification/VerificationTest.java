@@ -30,6 +30,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -56,6 +57,7 @@ import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.link.Link;
 import com.argosnotary.argos.domain.link.Link.LinkBuilder;
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
+import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.mongodb.link.LinkMetaBlockRepository;
 import com.argosnotary.argos.service.verification.rules.AllowRuleVerification;
 import com.argosnotary.argos.service.verification.rules.CreateRuleVerification;
@@ -72,6 +74,11 @@ class VerificationTest {
     
     @Mock
     private LinkMetaBlockRepository linkMetaBlockRepository;
+    
+    @Mock
+    private AccountService accountService;
+    
+    private SignatureValidatorService signatureValidatorService;
 
     private List<Verification> verifications;
     
@@ -102,6 +109,7 @@ class VerificationTest {
     
     @BeforeEach
     void setup() throws Exception {
+    	signatureValidatorService = new SignatureValidatorService(accountService);
     	bobKey = CryptoHelper.createKeyPair(PASSWORD);
         aliceKey = CryptoHelper.createKeyPair(PASSWORD);
         carlKey = CryptoHelper.createKeyPair(PASSWORD);
@@ -119,8 +127,8 @@ class VerificationTest {
         rulesVerification.init();
         verifications = Arrays.asList(
                 new LayoutAuthorizedKeyIdVerification(),
-                new LayoutMetaBlockSignatureVerification(),
-                new LinkMetaBlockSignatureVerification(),
+                new LayoutMetaBlockSignatureVerification(signatureValidatorService),
+                new LinkMetaBlockSignatureVerification(signatureValidatorService),
                 new RequiredNumberOfLinksVerification(),
                 rulesVerification,
                 new StepAuthorizedKeyIdVerification()
@@ -182,9 +190,10 @@ class VerificationTest {
         stepMap.put(step1.getName(), artifactTypeHashes);
         
         when(linkMetaBlockRepository.findBySupplyChainId(SUPPLYCHAIN_ID)).thenReturn(Arrays.asList(alicesStep1Block));
+        when(accountService.findPublicKeyByKeyId(bobKey.getKeyId())).thenReturn(Optional.of(bobKey));
 
         VerificationRunResult result = verificationProvider.verifyRun(layoutMetaBlock, Set.of(artifact1));
-        assertTrue(result.isRunIsValid());        
+        assertTrue(result.isRunIsValid());     
     }
     
     @Test
@@ -240,6 +249,7 @@ class VerificationTest {
         artifactTypeHashes.put(ArtifactType.PRODUCTS, Set.of(artifact5));
         
         when(linkMetaBlockRepository.findBySupplyChainId(SUPPLYCHAIN_ID)).thenReturn(List.of(alicesStep1Block));
+        when(accountService.findPublicKeyByKeyId(bobKey.getKeyId())).thenReturn(Optional.of(bobKey));
 
         VerificationRunResult result = verificationProvider.verifyRun(layoutMetaBlock, Set.of(artifact5));
         assertTrue(result.isRunIsValid());        
@@ -313,6 +323,7 @@ class VerificationTest {
         stepMap.put(step2.getName(), artifactTypeHashes2);
 
         when(linkMetaBlockRepository.findBySupplyChainId(SUPPLYCHAIN_ID)).thenReturn(List.of(alicesStep1Block, alicesStep2Block));
+        when(accountService.findPublicKeyByKeyId(bobKey.getKeyId())).thenReturn(Optional.of(bobKey));
         
         VerificationRunResult result = verificationProvider.verifyRun(layoutMetaBlock, Set.of(artifact1));
         assertTrue(result.isRunIsValid());        

@@ -38,6 +38,6 @@ class RestServiceDefaultExceptionHandlerTest {
     @Test
     void handleRuntimeException() {
         ResponseEntity<?> error = exceptionHandler.handleRuntimeException(new RuntimeException("error"));
-        assertThat(error.getStatusCodeValue(), is(500));
+        assertThat(error.getStatusCode().value(), is(500));
     }
 }

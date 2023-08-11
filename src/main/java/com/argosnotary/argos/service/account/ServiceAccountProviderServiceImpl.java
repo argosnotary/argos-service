@@ -19,8 +19,6 @@
  */
 package com.argosnotary.argos.service.account;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,7 +29,6 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +37,7 @@ import org.springframework.stereotype.Service;
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.domain.account.ServiceAccount;
 
+import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 
@@ -90,28 +88,40 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
         UsersResource userResource = realmResource.users();
 
         // Create user (requires manage-users role)
-        Response response = userResource.create(user);
-        if (response.getStatus() == 201) {
-        	String[] parts = response.getLocation().getPath().split("/");
-        	String subject = parts[parts.length-1];            
-            sa.setProviderSubject(subject);
-        	log.info("User created with name: [{}], accountId: [{}] and subject: [{}] ", user.getUsername(), user.getFirstName(), sa.getProviderSubject());
-            return sa;
-        } else {
-        	throw new ArgosError(String.format("Error in registering a service account message: [%s]", response.getStatusInfo()));
+        Response response = null;
+        try {
+        	response = userResource.create(user);
+        } catch (ProcessingException exc) {
+            log.info("Error in registering a service account message: [%s]", exc.getMessage());
+        	throw new ArgosError(String.format("Error in registering a service account message: [%s]", exc.getMessage()));
         }
+        String[] parts = response.getLocation().getPath().split("/");
+        String subject = parts[parts.length-1];            
+        sa.setProviderSubject(subject);
+        log.info("User created with name: [{}], accountId: [{}] and subject: [{}] ", 
+        		user.getUsername(), 
+        		user.getFirstName(), 
+        		sa.getProviderSubject());
+        return sa;
 
 	}
 
 	@Override
 	public void unRegisterServiceAccount(ServiceAccount sa) {
-		Optional<UserRepresentation> optUser = getUser(sa.getId());
-		if (optUser.isPresent()) {
-			Response response = realmResource.users().delete(optUser.get().getId());
-	        if (response.getStatus() != 204) {
-	        	log.info("User unregister with name: [{}], accountId: [{}] and subject: [{}]  failed", optUser.get().getUsername(), optUser.get().getFirstName(), sa.getProviderSubject());	        	
-	        }
-		}
+		Optional<UserRepresentation> optUser = Optional.empty();
+        try {
+        	optUser = getUser(sa.getId());
+        	if (optUser.isPresent()) {
+	        	realmResource.users().delete(optUser.get().getId());
+        	}
+        } catch (ProcessingException exc) {
+        	log.info("Service Account unregister with id: [{}] failed with message [{}]", 
+        			sa.getId().toString(), 
+        			exc.getMessage());
+        	throw new ArgosError(String.format("Service Account unregister with id: [%s] failed with message [%s]", 
+        			sa.getId().toString(), 
+        			exc.getMessage()));
+        }
 	}
 
 	@Override

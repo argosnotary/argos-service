@@ -44,7 +44,7 @@ import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
 import com.argosnotary.argos.domain.crypto.PublicKey;
-import com.argosnotary.argos.service.itest.mongodb.ArgosTestContainers;
+import com.argosnotary.argos.service.ArgosTestContainers;
 
 
 @Testcontainers

@@ -48,6 +48,7 @@ import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.link.Link;
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
+import com.argosnotary.argos.service.account.AccountService;
 
 @ExtendWith(MockitoExtension.class)
 class LinkMetaBlockSignatureVerificationTest {
@@ -58,6 +59,11 @@ class LinkMetaBlockSignatureVerificationTest {
 
     @Mock
     private VerificationContext context;
+    
+    @Mock
+    private AccountService accountService;
+    
+    private SignatureValidatorService signatureValidatorService;
 
     private LinkMetaBlock linkMetaBlock;
     private LinkMetaBlock linkMetaBlock2;
@@ -79,7 +85,8 @@ class LinkMetaBlockSignatureVerificationTest {
 
     @BeforeEach
     void setUp() throws OperatorCreationException, PemGenerationException, GeneralSecurityException {
-        verification = new LinkMetaBlockSignatureVerification();
+    	signatureValidatorService = new SignatureValidatorService(accountService);
+        verification = new LinkMetaBlockSignatureVerification(signatureValidatorService);
 
         link = Link.builder()
                 .products(singletonList(Artifact.builder().hash("hash2").uri("/path/tofile2").build()))

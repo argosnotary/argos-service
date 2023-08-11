@@ -37,7 +37,7 @@ import com.argosnotary.argos.domain.layout.Step;
 import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
 import com.argosnotary.argos.service.openapi.rest.model.RestErrorMessage;
-import com.argosnotary.argos.service.rest.SignatureValidatorService;
+import com.argosnotary.argos.service.verification.SignatureValidatorService;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

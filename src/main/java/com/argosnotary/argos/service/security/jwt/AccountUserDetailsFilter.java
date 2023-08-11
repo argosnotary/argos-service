@@ -34,6 +34,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.account.ServiceAccount;
+import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.account.ArgosUserDetails;
 
@@ -41,15 +42,17 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AccountUserDetailsFilter  extends OncePerRequestFilter {
 
-	private AccountService accountService;
+	private final AccountService accountService;
+
+    private final AccountSecurityContext accountSecurityContext;
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

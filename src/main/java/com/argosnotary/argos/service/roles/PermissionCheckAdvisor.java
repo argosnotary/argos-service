@@ -89,9 +89,6 @@ public class PermissionCheckAdvisor {
 
     private boolean hasPermission(Set<Permission> permissionsToCheck, Node node) {
     	Set<Permission> permissions = roleAssignmentService.findAllPermissionDownTree(node);
-    	if (permissions.isEmpty()) {
-    		return false;
-    	}
     	return permissions
     			.stream()
     			.anyMatch(permissionsToCheck::contains);

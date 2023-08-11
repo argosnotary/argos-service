@@ -8,7 +8,7 @@ docker run -p 8080:8080 \
            -v $PWD/keycloak/import:/opt/keycloak/data/import \
            -e KEYCLOAK_ADMIN=admin \
            -e KEYCLOAK_ADMIN_PASSWORD=admin \
-           quay.io/keycloak/keycloak:19.0.3 \
+           quay.io/keycloak/keycloak:22.0 \
              --verbose \
              start-dev \
                -Dkeycloak.migration.action=import \
@@ -22,6 +22,7 @@ oauth-stub
 
 redirects
 http://localhost:8080/login/oauth2/code/oauth-stub
+http://localhost:8081/login/oauth2/code/oauth-stub
 http://localhost:8080/login/oauth2/code/saprovider
 
 ```

@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.Optional;
 
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.io.pem.PemGenerationException;
@@ -43,6 +44,7 @@ import com.argosnotary.argos.domain.crypto.signing.JsonSigningSerializer;
 import com.argosnotary.argos.domain.layout.Layout;
 import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 import com.argosnotary.argos.domain.layout.Step;
+import com.argosnotary.argos.service.account.AccountService;
 
 @ExtendWith(MockitoExtension.class)
 class LayoutMetaBlockSignatureVerificationTest {
@@ -50,9 +52,17 @@ class LayoutMetaBlockSignatureVerificationTest {
 
 	private String keyId;
     private String keyId2;
+    
+    private KeyPair pair;
+    private KeyPair pair2;
 
     @Mock
     private VerificationContext context;
+    
+    @Mock
+    private AccountService accountService;
+    
+    private SignatureValidatorService signatureValidatorService;
 
     private LayoutMetaBlock layoutMetaBlock;
     private LayoutMetaBlock layoutMetaBlock2;
@@ -68,11 +78,12 @@ class LayoutMetaBlockSignatureVerificationTest {
 
     @BeforeEach
     void setUp() throws GeneralSecurityException, OperatorCreationException, PemGenerationException {
-        verification = new LayoutMetaBlockSignatureVerification();
+    	signatureValidatorService = new SignatureValidatorService(accountService);
+        verification = new LayoutMetaBlockSignatureVerification(signatureValidatorService);
         
         Step step = Step.builder().build();
         // valid
-        KeyPair pair = CryptoHelper.createKeyPair(PASSPHRASE);
+        pair = CryptoHelper.createKeyPair(PASSPHRASE);
         keyId = KeyIdProvider.computeKeyId(pair.getPublicKey());
         domainPublicKey = new PublicKey(keyId, pair.getPublicKey());
         Layout layout = Layout.builder()
@@ -85,13 +96,13 @@ class LayoutMetaBlockSignatureVerificationTest {
                 .layout(layout).build();
         
         // key not found
-        pair = CryptoHelper.createKeyPair(PASSPHRASE);
-        keyId2 = KeyIdProvider.computeKeyId(pair.getPublicKey());
-        domainPublicKey2 = new PublicKey(keyId2, pair.getPublicKey());
+        pair2 = CryptoHelper.createKeyPair(PASSPHRASE);
+        keyId2 = KeyIdProvider.computeKeyId(pair2.getPublicKey());
+        domainPublicKey2 = new PublicKey(keyId2, pair2.getPublicKey());
         layout = Layout.builder()
                 .steps(List.of(step))
         		.keys(List.of(domainPublicKey)).build();
-        signature2 = CryptoHelper.sign(pair, PASSPHRASE, new JsonSigningSerializer().serialize(layout));
+        signature2 = CryptoHelper.sign(pair2, PASSPHRASE, new JsonSigningSerializer().serialize(layout));
         layoutMetaBlock2 = LayoutMetaBlock.builder()
         		.signatures(List.of(signature, signature2))
                 .layout(layout).build();
@@ -114,6 +125,7 @@ class LayoutMetaBlockSignatureVerificationTest {
     @Test
     void verifyOkay() throws GeneralSecurityException {
         when(context.getLayoutMetaBlock()).thenReturn(layoutMetaBlock);
+        when(accountService.findPublicKeyByKeyId(signature.getKeyId())).thenReturn(Optional.of(pair));
     	
         assertThat(verification.verify(context).isRunIsValid(), is(true));
     }
@@ -121,12 +133,14 @@ class LayoutMetaBlockSignatureVerificationTest {
     @Test
     void verifyNotOkay() throws GeneralSecurityException {
         when(context.getLayoutMetaBlock()).thenReturn(layoutMetaBlock3);
+        when(accountService.findPublicKeyByKeyId(signature.getKeyId())).thenReturn(Optional.of(pair));
         assertThat(verification.verify(context).isRunIsValid(), is(false));
     }
 
     @Test
     void verifyKeyNotFound() {
         when(context.getLayoutMetaBlock()).thenReturn(layoutMetaBlock2);
+        when(accountService.findPublicKeyByKeyId(signature.getKeyId())).thenReturn(Optional.empty());
         assertThat(verification.verify(context).isRunIsValid(), is(false));
     }
 }

@@ -61,12 +61,13 @@ public class SupplyChainRestServiceImpl implements SupplyChainRestService {
     @PermissionCheck(permissions = Permission.WRITE)
     @AuditLog
 	public ResponseEntity<RestSupplyChain> createSupplyChain(UUID projectId, @Valid RestSupplyChain restSupplyChain) {
+		SupplyChain supplyChain = supplyChainMapper.convertFromRestSupplyChain(restSupplyChain);
 
 		Optional<Node> parent = nodeService.findById(projectId);
 		if (!(projectId.equals(restSupplyChain.getParentId())
 				&& parent.isPresent() 
 				&& parent.get().getId().equals(restSupplyChain.getParentId()) 
-				&& SupplyChain.isValidParentType(parent.get()))) {
+				&& supplyChain.isValidParentType(parent.get()))) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent"); 
 		}
 		

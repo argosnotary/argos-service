@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.argosnotary.argos.domain.nodes.Node;
-import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.SupplyChain;
 
 public interface SupplyChainService {

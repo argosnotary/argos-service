@@ -35,7 +35,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Node;
-import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.service.auditlog.AuditLog;
 import com.argosnotary.argos.service.nodes.ManagementNodeService;
@@ -62,11 +61,12 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
     @AuditLog
 	public ResponseEntity<RestManagementNode> createManagementNode(UUID parentId,
 			@Valid RestManagementNode restManagementNode) {
+		ManagementNode managementNode = managementNodeMapper.convertFromRestManagementNode(restManagementNode);
 		Optional<Node> parent = nodeService.findById(parentId);
 		if (!(parentId.equals(restManagementNode.getParentId())
 				&& parent.isPresent() 
 				&& parent.get().getId().equals(restManagementNode.getParentId()) 
-				&& ManagementNode.isValidParentType(parent.get()))) {
+				&& managementNode.isValidParentType(parent.get()))) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent"); 
 		}
 		
@@ -76,7 +76,7 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
 		}
 		
 		ManagementNode node = managementNodeService
-				.create(managementNodeMapper.convertFromRestManagementNode(restManagementNode));
+				.create(managementNode);
 
         URI location = UriComponentsBuilder
         		.fromPath("/api/managementnodes")

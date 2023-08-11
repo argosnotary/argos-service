@@ -45,5 +45,7 @@ public abstract class Node {
 	private List<UUID> pathToRoot = new ArrayList<>();
     
 	private UUID parentId;
+	
+	public abstract boolean isValidParentType(Node parent);
     
 }

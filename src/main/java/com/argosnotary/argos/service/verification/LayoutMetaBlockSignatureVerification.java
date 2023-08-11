@@ -21,23 +21,19 @@ package com.argosnotary.argos.service.verification;
 
 import static com.argosnotary.argos.service.verification.Verification.Priority.LAYOUT_METABLOCK_SIGNATURE;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.PublicKey;
-import java.util.Optional;
-
 import org.springframework.stereotype.Component;
 
-import com.argosnotary.argos.domain.crypto.Signature;
-import com.argosnotary.argos.domain.crypto.signing.SignatureValidator;
-import com.argosnotary.argos.domain.layout.Layout;
 import com.argosnotary.argos.domain.layout.LayoutMetaBlock;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class LayoutMetaBlockSignatureVerification implements Verification {
+	
+	private final SignatureValidatorService signatureValidatorService;
 
     @Override
     public Priority getPriority() {
@@ -53,7 +49,7 @@ public class LayoutMetaBlockSignatureVerification implements Verification {
         boolean isValid = layoutMetaBlock
                 .getSignatures()
                 .stream()
-                .allMatch(signature -> isValidSignature(signature, layoutMetaBlock.getLayout()));
+                .allMatch(signature -> signatureValidatorService.validateSignature(layoutMetaBlock.getLayout(), signature));
                         
         if (!isValid) {
             log.info("failed LayoutMetaBlockSignatureVerification");
@@ -62,31 +58,5 @@ public class LayoutMetaBlockSignatureVerification implements Verification {
                 .runIsValid(isValid)
                 .build();
 
-    }
-    
-    private boolean isValidSignature(Signature signature, Layout layout) {
-        Optional<PublicKey> publicKey = getPublicKey(layout, signature.getKeyId());
-        if (publicKey.isEmpty()) {
-            log.info("Public Key with id [{}] is not avaiable in the layout.", signature.getKeyId());
-            return false;
-        }
-        if (!SignatureValidator.isValid(layout, signature, publicKey.get())) {
-            log.info("Signature of layout with keyId [{}] is not valid.", signature.getKeyId());
-            return false;
-        }
-        return true;
-    }
-
-    private Optional<PublicKey> getPublicKey(Layout layout, String keyId) {
-        return layout.getKeys().stream()
-                .filter(publicKey -> publicKey.getKeyId().equals(keyId))
-                .map(t -> {
-					try {
-						return com.argosnotary.argos.domain.crypto.PublicKey.getJavaPublicKey(t.getPublicKey());
-					} catch (GeneralSecurityException | IOException e) {
-						log.error(e.getMessage());
-						return null;
-					}
-				}).findFirst();
     }
 }

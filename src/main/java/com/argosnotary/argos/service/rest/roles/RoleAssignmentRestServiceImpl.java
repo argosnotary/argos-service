@@ -26,7 +26,7 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.RoleAssignment;
@@ -51,11 +51,9 @@ public class RoleAssignmentRestServiceImpl implements RoleAssignmentRestService 
 	public ResponseEntity<RestRoleAssignment> createRoleAssignment(UUID resourceId,
 			@Valid RestRoleAssignment restRoleAssignment) {
 		RoleAssignment ra = roleAssignmentService.save(roleAssignmentMapper.convertFromRestRoleAssignment(restRoleAssignment));
-		URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{roleAssignmentId}")
-                .buildAndExpand(ra.getId())
-                .toUri();
+		URI location = UriComponentsBuilder
+        		.fromPath("/api/roleassignments/{roleassignmentId}")
+				.buildAndExpand(ra.getId()).toUri();
 		return ResponseEntity.created(location).body(roleAssignmentMapper.convertToRestRoleAssignment(ra));
 	}
 
