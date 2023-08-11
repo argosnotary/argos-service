@@ -121,23 +121,27 @@ class ServiceAccountRestServiceTest {
 
 	@Test
 	void testCreateServiceAccountKeyByIdNoSa() {
+    	UUID sa1ProjectId = sa1.getProjectId();
+    	UUID sa1Id = sa1.getId();
 		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
         
 		when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.empty());
-		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.createServiceAccountKeyById(sa1.getProjectId(), sa1.getId(), rskp));
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.createServiceAccountKeyById(sa1ProjectId, sa1Id, rskp));
         assertThat(exception.getMessage(), is(String.format("404 NOT_FOUND \"no service account with id : %s found\"", sa1.getId())));
 		
 	}
 
 	@Test
 	void testCreateServiceAccountKeyByIdNoPassphrase() {
+    	UUID sa1ProjectId = sa1.getProjectId();
+    	UUID sa1Id = sa1.getId();
 		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
         
         when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
         rskp.setPassphrase(null);
-		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.createServiceAccountKeyById(sa1.getProjectId(), sa1.getId(), rskp));
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.createServiceAccountKeyById(sa1ProjectId, sa1Id, rskp));
         assertThat(exception.getMessage(), is(String.format("400 BAD_REQUEST \"Passphrase not available on request for sa [%s]\"", sa1.getName())));
 		
 	}
@@ -163,10 +167,11 @@ class ServiceAccountRestServiceTest {
 
     @Test
     void createServiceAccountNameExistsOnProject() {
-        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+    	UUID rsa1ProjectId = rsa1.getProjectId();
+    	ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
         when(serviceAccountService.exists(rsa1.getProjectId(), rsa1.getName())).thenReturn(true);
-    	ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.createServiceAccount(rsa1.getProjectId(), rsa1));
+    	ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.createServiceAccount(rsa1ProjectId, rsa1));
         assertThat(exception.getMessage(), is(String.format("400 BAD_REQUEST \"Service account already exists with projectId [%s] and name [%s]\"", rsa1.getProjectId().toString(), rsa1.getName())));
     }
 
