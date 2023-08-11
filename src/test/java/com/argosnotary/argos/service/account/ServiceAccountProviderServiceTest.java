@@ -38,6 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -51,7 +52,7 @@ import jakarta.ws.rs.ProcessingException;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
-//@SpringBootTest(classes={ServiceAccountProviderServiceImpl.class, ClientRegistrationServiceImpl.class, ClientRegistrationRepository.class, InMemoryClientRegistrationRepository.class})
+@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 class ServiceAccountProviderServiceTest {
 	
 	private static String getKeycloakUrl(String realm) {

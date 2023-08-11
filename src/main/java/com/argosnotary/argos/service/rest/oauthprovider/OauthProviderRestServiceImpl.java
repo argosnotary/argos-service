@@ -22,13 +22,26 @@ package com.argosnotary.argos.service.rest.oauthprovider;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.argosnotary.argos.service.openapi.rest.api.OauthProviderApi;
+import com.argosnotary.argos.service.account.ClientRegistrationService;
 import com.argosnotary.argos.service.openapi.rest.model.RestOAuthProvider;
 
-public interface OauthProviderRestService extends OauthProviderApi {
+import lombok.RequiredArgsConstructor;
 
-	@Override
-	public ResponseEntity<List<RestOAuthProvider>> getOAuthProviders();
+@RestController
+@RequiredArgsConstructor
+public class OauthProviderRestServiceImpl implements OauthProviderRestService {
+    private final ClientRegistrationService clientRegistrationService;
+    
+    private final OauthProviderMapper oauthProviderMapper;
 
+    @Override
+    public ResponseEntity<List<RestOAuthProvider>> getOAuthProviders() {
+        List<RestOAuthProvider> restOAuthProviders = oauthProviderMapper
+        		.convertToRestOAuthProviderList(clientRegistrationService.getAllExternalProviderIds());
+        
+        return ResponseEntity.ok(restOAuthProviders);
+    }
 }
+
