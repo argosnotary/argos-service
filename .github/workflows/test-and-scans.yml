@@ -38,6 +38,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B sonar:sonar -Dspring.profiles.active=itest
+        run: mvn -B sonar:sonar -Dsonar.projectKey=argosnotary_argos-service
       - name: pitest
         run: mvn -B org.pitest:pitest-maven:mutationCoverage
