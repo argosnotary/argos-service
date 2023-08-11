@@ -34,6 +34,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -65,6 +66,7 @@ import com.argosnotary.argos.service.itest.rest.api.model.RestPersonalAccount;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
   properties={"spring.data.mongodb.auto-index-creation=true", "server.port=8081"})
 @Testcontainers
+@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 class ArgosSecurityTest {
 	
 	static final String AUTH_HEADER_KEY= "Authorization";

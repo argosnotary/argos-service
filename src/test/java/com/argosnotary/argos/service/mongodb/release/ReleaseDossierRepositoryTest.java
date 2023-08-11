@@ -38,6 +38,7 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -56,6 +57,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.gridfs.model.GridFSFile;
 
 @Testcontainers
+@EnabledIf(expression = "#{environment['spring.profiles.active'] == 'itest'}")
 @DataMongoTest(properties= {"spring.data.mongodb.auto-index-creation=true","spring.data.mongodb.database=argos"})
 @ImportAutoConfiguration(classes=MongoConfig.class)
 class ReleaseDossierRepositoryTest {

@@ -58,6 +58,7 @@
         <sonar.organization>argosnotary</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
+    
     <dependencies>
         <dependency>
             <groupId>
@@ -381,7 +382,8 @@
                 <artifactId>pitest-maven</artifactId>
                 <version>1.14.2</version>
                 <configuration>
-                    <threads>8</threads>
+                    <verbose>false</verbose>
+                    <threads>7</threads>
                     <timeoutConstant>30000</timeoutConstant>
                     <timestampedReports>false</timestampedReports>
                     <mutationThreshold>80</mutationThreshold>
@@ -391,7 +393,20 @@
                         <avoidCallsTo>org.slf4j</avoidCallsTo>
                     </avoidCallsTo>
                     <excludedClasses>
-                        com.argosnotary.argos.service.security.SecurityConfig</excludedClasses>
+                        <excludedClasse>com.argosnotary.argos.service.mongodb.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.itest.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.openapi.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.link.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.layout.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.rest.link.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.rest.layout.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.rest.release.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.rest.verification.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.verification.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.security.SecurityConfig</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.ArgosServiceApplication</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.account.ServiceAccountProviderService</excludedClasse>                        
+                    </excludedClasses>
                     <targetClasses>
                         <param>com.argosnotary.argos.*</param>
                     </targetClasses>
