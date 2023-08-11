@@ -61,11 +61,12 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
     @AuditLog
 	public ResponseEntity<RestManagementNode> createManagementNode(UUID parentId,
 			@Valid RestManagementNode restManagementNode) {
+		ManagementNode managementNode = managementNodeMapper.convertFromRestManagementNode(restManagementNode);
 		Optional<Node> parent = nodeService.findById(parentId);
 		if (!(parentId.equals(restManagementNode.getParentId())
 				&& parent.isPresent() 
 				&& parent.get().getId().equals(restManagementNode.getParentId()) 
-				&& ManagementNode.isValidParentType(parent.get()))) {
+				&& managementNode.isValidParentType(parent.get()))) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid parent"); 
 		}
 		
@@ -75,7 +76,7 @@ public class ManagementNodeRestServiceImpl implements ManagementNodeRestService 
 		}
 		
 		ManagementNode node = managementNodeService
-				.create(managementNodeMapper.convertFromRestManagementNode(restManagementNode));
+				.create(managementNode);
 
         URI location = UriComponentsBuilder
         		.fromPath("/api/managementnodes")

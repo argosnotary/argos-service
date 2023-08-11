@@ -36,7 +36,8 @@ public class Project extends Node {
 		super(id, name, pathToRoot, parentId);
 	}
 	
-	public static boolean isValidParentType(Node parent) {
+	@Override
+	public boolean isValidParentType(Node parent) {
 		return parent instanceof Organization || parent instanceof ManagementNode;
 	}
 

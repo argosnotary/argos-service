@@ -37,7 +37,8 @@ public class SupplyChain extends Node {
 		
 	}
 	
-	public static boolean isValidParentType(Node parent) {
+	@Override
+	public boolean isValidParentType(Node parent) {
 		return parent instanceof Project;
 	}
 }

@@ -45,4 +45,9 @@ public class Organization extends Node {
 		super.setPathToRoot(List.of(super.getId()));
 		this.domain = domain;
 	}
+	
+    @Override
+	public boolean isValidParentType(Node parent) {
+		return false;
+	}
 }
