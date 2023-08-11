@@ -19,12 +19,16 @@
  */
 package com.argosnotary.argos.service.security.jwt;
 
-import lombok.EqualsAndHashCode;
-
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class AccountAuthenticationToken extends AbstractAuthenticationToken {
 
@@ -40,14 +44,5 @@ public class AccountAuthenticationToken extends AbstractAuthenticationToken {
     @Override
     public String getCredentials() {
         return this.token.toString();
-    }
-
-    public Jwt getToken() {
-        return token;
-    }
-
-    @Override
-    public UserDetails getPrincipal() {
-        return principal;
     }
 }

@@ -39,6 +39,7 @@ import com.argosnotary.argos.service.auditlog.AuditLog;
 import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestPersonalAccount;
 import com.argosnotary.argos.service.openapi.rest.model.RestPublicKey;
+import com.argosnotary.argos.service.rest.KeyPairMapper;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

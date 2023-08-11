@@ -22,10 +22,8 @@ package com.argosnotary.argos.service.rest.release;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -35,17 +33,11 @@ import java.util.UUID;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -53,40 +45,33 @@ import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.release.Release;
 import com.argosnotary.argos.domain.release.ReleaseResult;
-import com.argosnotary.argos.service.account.AccountService;
-import com.argosnotary.argos.service.nodes.NodeService;
 import com.argosnotary.argos.service.openapi.rest.model.RestArtifact;
 import com.argosnotary.argos.service.openapi.rest.model.RestReleaseArtifacts;
 import com.argosnotary.argos.service.openapi.rest.model.RestReleaseResult;
 import com.argosnotary.argos.service.release.ReleaseService;
-import com.argosnotary.argos.service.security.helpers.LogContextHelper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.argosnotary.argos.service.rest.ArtifactMapper;
+import com.argosnotary.argos.service.rest.ArtifactMapperImpl;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes= {ArtifactMapperImpl.class, ReleaseResultMapperImpl.class, JsonMapper.class})
 class ReleaseRestServiceTest {
 
 
     private static final String APPLICATION_JSON = "application/json";
+    
     @Mock
     private ReleaseService releaseService;
     
-    private ReleaseArtifactMapper artifactMapper = Mappers.getMapper(ReleaseArtifactMapper.class);
+    @Autowired
+    private ArtifactMapper artifactMapper;
     
-    private ReleaseResultMapper releaseResultMapper = Mappers.getMapper(ReleaseResultMapper.class);
+    @Autowired
+    private ReleaseResultMapper releaseResultMapper;
     
     ReleaseRestService releaseRestService;
-    
-    @MockBean
-    private LogContextHelper logContextHelper;
-    
-    @MockBean
-    private NodeService nodeService;
-    
-    @MockBean
-    private AccountService accountService;
 
     private ReleaseResult releaseResult;
 
@@ -103,18 +88,6 @@ class ReleaseRestServiceTest {
     RestReleaseArtifacts res;
 
     private Domain domain;
-    
-    @Mock
-    private ObjectMapper mapper;
-
-    @Autowired
-    private MockMvc mockMvc;
-    
-    @MockBean
-    private ClientRegistrationRepository mockClientRegistrationRepository;
-    
-    @Autowired
-    ApplicationContext context;
     
     Set<String> releaseArtifactHashes;
     

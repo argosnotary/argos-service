@@ -19,10 +19,12 @@
  */
 package com.argosnotary.argos.service.security.jwt;
 
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +44,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
@@ -63,12 +66,11 @@ class AccountUserDetailsFilterTest {
 	
 	AccountUserDetailsFilter filter;
 	
-	@Mock
 	private SecurityContext securityContext;
-	@Mock
+	
 	private ArgosUserDetails argosUserDetails;
-	@Mock
-	private Authentication authentication;
+	
+	private Authentication jwtAuthentication;
 
     @Mock
 	private AccountService accountService;
@@ -91,9 +93,10 @@ class AccountUserDetailsFilterTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		
 		accountSecurityContext = new AccountSecurityContextImpl();
+		securityContext = new SecurityContextImpl();
 		SecurityContextHolder.setContext(securityContext);
+		assertThat(accountSecurityContext.getSecurityContext(), sameInstance(securityContext));
 		pa = PersonalAccount.builder().name("pa").build();
 		argosUserDetails = new ArgosUserDetails(pa);
 		filter = new AccountUserDetailsFilter(accountService, accountSecurityContext);
@@ -102,26 +105,40 @@ class AccountUserDetailsFilterTest {
 
 	@Test
 	void testNotAuthenticated() throws ServletException, IOException {
-		when(securityContext.getAuthentication()).thenReturn(null);
 		filter.doFilter(httpServletRequest, httpServletResponse, filterChain);
 		verify(filterChain).doFilter(httpServletRequest, httpServletResponse);
-		verify(securityContext, never()).setAuthentication(any());
+		assertNull(securityContext.getAuthentication());
+	}
+
+	@Test
+	void testJwtUser() throws ServletException, IOException {
+		Authentication auth = new JwtAuthenticationToken(jwtUser, null, null);
+		URL issuer = new URL("http://theissuer");
+		securityContext.setAuthentication(auth);
+		when(jwtUser.getIssuer()).thenReturn(issuer);
+		when(jwtUser.getSubject()).thenReturn("theSubject");
+		when(accountService.loadAuthenticatedUser(issuer.toString(), "theSubject")).thenReturn(Optional.of(pa));
+		filter.doFilter(httpServletRequest, httpServletResponse, filterChain);
+		verify(filterChain).doFilter(httpServletRequest, httpServletResponse);
+		assertTrue(securityContext.getAuthentication().isAuthenticated());
+		ArgosUserDetails details = (ArgosUserDetails) securityContext.getAuthentication().getPrincipal();
+		assertEquals(pa, details.getAccount() );
 	}
 
 	@Test
 	void testNoJwtuser() throws ServletException, IOException {
 		Authentication auth = new UsernamePasswordAuthenticationToken("user", "pass");
-		when(securityContext.getAuthentication()).thenReturn(auth);
+		securityContext.setAuthentication(auth);
 		filter.doFilter(httpServletRequest, httpServletResponse, filterChain);
 		verify(filterChain).doFilter(httpServletRequest, httpServletResponse);
-		verify(securityContext, never()).setAuthentication(any());
+		assertThat(securityContext.getAuthentication(), sameInstance(auth));
 	}
 
 	@Test
 	void testAccountNotKnown() throws ServletException, IOException {
 		Authentication auth = new JwtAuthenticationToken(jwtUser, null, null);
 		URL issuer = new URL("http://theissuer");
-		when(securityContext.getAuthentication()).thenReturn(auth);
+		securityContext.setAuthentication(auth);
 		when(jwtUser.getIssuer()).thenReturn(issuer);
 		when(jwtUser.getSubject()).thenReturn("theSubject");
 		when(jwtUser.getClaims()).thenReturn(claims);

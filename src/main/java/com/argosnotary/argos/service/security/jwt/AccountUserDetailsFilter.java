@@ -57,7 +57,7 @@ public class AccountUserDetailsFilter  extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		SecurityContext context = SecurityContextHolder.getContext();
+		SecurityContext context = accountSecurityContext.getSecurityContext();
     	if(context.getAuthentication() != null && context.getAuthentication().getPrincipal() instanceof Jwt jwtUser) {
     		ArgosUserDetails userDetails = (ArgosUserDetails) loadUserByToken(jwtUser);
     		Authentication authenticatedPersonalAccount = new AccountAuthenticationToken(jwtUser, userDetails);
@@ -71,15 +71,9 @@ public class AccountUserDetailsFilter  extends OncePerRequestFilter {
 	
 	UserDetails loadUserByToken(Jwt jwtUser) {
         Optional<Account> optionalAccount = accountService.loadAuthenticatedUser(jwtUser.getIssuer().toString(), jwtUser.getSubject());
-    	if (optionalAccount.isEmpty()) {
-    		log.warn("Login attempt with unknown username: [{}], issuer: [{}], subject: [{}]", jwtUser.getClaims().get("preferred_username"), jwtUser.getIssuer().toString(), jwtUser.getSubject());
-    		throw new InternalAuthenticationServiceException("unknown account");
-    	}
-		if (optionalAccount.get() instanceof ServiceAccount) {
-			return new ArgosUserDetails(optionalAccount.get());
-		}
-		PersonalAccount personalAccount = (PersonalAccount) optionalAccount.get();
-	    return new ArgosUserDetails(personalAccount);
+	    return new ArgosUserDetails(optionalAccount.orElseThrow(() -> {
+	    	log.warn("Login attempt with unknown username: [{}], issuer: [{}], subject: [{}]", jwtUser.getClaims().get("preferred_username"), jwtUser.getIssuer().toString(), jwtUser.getSubject());
+	    	return new InternalAuthenticationServiceException("unknown account");
+	    }));
     }
-
 }

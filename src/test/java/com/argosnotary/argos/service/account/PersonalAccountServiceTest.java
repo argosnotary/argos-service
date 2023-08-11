@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ class PersonalAccountServiceTest {
 	
 	private PersonalAccountService personalAccountService; 
 	
-	private PersonalAccount pa1;
+	private PersonalAccount pa1, pa1NewKey;
 	private KeyPair kp1, kp2;
     @Mock
     private PersonalAccountRepository personalAccountRepository;
@@ -53,13 +54,15 @@ class PersonalAccountServiceTest {
 		kp1 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		kp2 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		pa1 = PersonalAccount.builder().name("pa1").activeKeyPair(kp1).providerName("provider1").providerSubject("subject1").build();
+		pa1NewKey = PersonalAccount.builder().id(pa1.getId()).name("pa1").activeKeyPair(kp2).inactiveKeyPairs(Set.of(kp1)).providerName("provider1").providerSubject("subject1").build();
 	}
 
 	@Test
 	void testActivateNewKey() {
-		personalAccountService.activateNewKey(pa1, kp2);
-		pa1.deactivateKeyPair(kp2);
-		verify(personalAccountRepository).save(pa1);
+		when(personalAccountRepository.save(pa1NewKey)).thenReturn(pa1NewKey);
+		PersonalAccount pa = personalAccountService.activateNewKey(pa1, kp2);
+		assertEquals(pa1NewKey, pa);
+		
 		
 	}
 	
@@ -93,8 +96,9 @@ class PersonalAccountServiceTest {
 
 	@Test
 	void testSave() {
-		personalAccountService.save(pa1);
-		verify(personalAccountRepository).save(pa1);
+		when(personalAccountRepository.save(pa1)).thenReturn(pa1);
+		PersonalAccount pa = personalAccountService.save(pa1);
+		assertEquals(pa1, pa);
 	}
 
 }

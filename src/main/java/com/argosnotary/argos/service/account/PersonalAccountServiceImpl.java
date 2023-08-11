@@ -47,8 +47,8 @@ public class PersonalAccountServiceImpl implements PersonalAccountService {
 	}
 
     @Override
-    public void save(PersonalAccount personalAccount) {
-    	personalAccountRepository.save(personalAccount);
+    public PersonalAccount save(PersonalAccount personalAccount) {
+    	return personalAccountRepository.save(personalAccount);
     }
     
     @Override

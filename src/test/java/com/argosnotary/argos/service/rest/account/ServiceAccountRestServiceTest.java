@@ -35,10 +35,9 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -52,15 +51,18 @@ import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyPair;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.account.ServiceAccountService;
+import com.argosnotary.argos.service.openapi.rest.model.RestJwtToken;
 import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccount;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccountKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestTokenRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.argosnotary.argos.service.rest.KeyPairMapper;
+import com.argosnotary.argos.service.rest.KeyPairMapperImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.NotAuthorizedException;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes= {ServiceAccountMapperImpl.class, KeyPairMapperImpl.class})
 class ServiceAccountRestServiceTest {
 	
 	private static final UUID accountId = UUID.fromString("9af61fef-a517-44fc-93a5-d5ae5fada255");
@@ -77,8 +79,10 @@ class ServiceAccountRestServiceTest {
 	RestKeyPair rkp;
 	KeyPair kp;
 
-    private ServiceAccountMapper accountMapper;
+    @Autowired
+	private ServiceAccountMapper accountMapper;
     
+    @Autowired
     private KeyPairMapper keyPairMapper;
     
     @Mock
@@ -94,8 +98,6 @@ class ServiceAccountRestServiceTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		accountMapper = Mappers.getMapper(ServiceAccountMapper.class);
-		keyPairMapper = Mappers.getMapper(KeyPairMapper.class);
 		serviceAccountRestService = new ServiceAccountRestServiceImpl(accountMapper, keyPairMapper, serviceAccountService, accountSecurityContext);
 		kp = CryptoHelper.createKeyPair("test".toCharArray());
 		rkp = keyPairMapper.convertToRestKeyPair(kp);
@@ -116,6 +118,20 @@ class ServiceAccountRestServiceTest {
 		ResponseEntity<RestKeyPair> rkp = serviceAccountRestService.createServiceAccountKeyById(sa1.getProjectId(), sa1.getId(), rskp);
 		KeyPair kp = keyPairMapper.convertFromRestServiceAccountKeyPair(rskp);
 		assertEquals(kp, keyPairMapper.convertFromRestKeyPair(rkp.getBody()));
+		
+	}
+
+	@Test
+	void testCreateServiceAccountKeyByIdWrongProjectId() {
+		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+        
+		when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
+		when(serviceAccountService.activateNewKey(sa1, keyPairMapper.convertFromRestServiceAccountKeyPair(rskp), "test".toCharArray())).thenReturn(sa1Updated);
+		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->  {
+			serviceAccountRestService.createServiceAccountKeyById(UUID.randomUUID(), sa1.getId(), rskp);
+		});
+		assertThat(exception.getMessage(), is("400 BAD_REQUEST \"projectIds not equal\""));
 		
 	}
 
@@ -202,11 +218,30 @@ class ServiceAccountRestServiceTest {
     }
 
     @Test
+    void getServiceAccountKeyByIdWrongProjectId() {
+        when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
+    	UUID id = sa1.getId();
+    	UUID pId = UUID.randomUUID();
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountKeyById(pId, id));
+        assertThat(exception.getStatusCode().value(), is(400));
+        assertThat(exception.getMessage(), is("400 BAD_REQUEST \"projectIds not equal\""));
+    }
+
+    @Test
     void getServiceAccountById() {
         when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
         ResponseEntity<RestServiceAccount> response = serviceAccountRestService.getServiceAccountById(sa1.getProjectId(), sa1.getId());
         assertThat(response.getStatusCode().value(), is(200));
         assertEquals(response.getBody(), rsa1);
+    }
+
+    @Test
+    void getServiceAccountByIdWrongProjectId() {
+        when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
+        UUID id = sa1.getId();
+    	ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountById(UUID.randomUUID(), id));
+        assertThat(exception.getStatusCode().value(), is(400));
+        assertThat(exception.getMessage(), is("400 BAD_REQUEST \"projectIds not equal\""));
     }
 
     @Test
@@ -224,6 +259,15 @@ class ServiceAccountRestServiceTest {
         ResponseEntity<Void> response = serviceAccountRestService.deleteServiceAccount(sa1.getProjectId(), sa1.getId());
         assertThat(response.getStatusCode().value(), is(204));
         verify(serviceAccountService).delete(sa1);
+    }
+
+    @Test
+    void deleteServiceAccountWrongprojectId() {
+    	UUID sa1Id = sa1.getId();
+    	when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
+        	serviceAccountRestService.deleteServiceAccount(UUID.randomUUID(), sa1Id));
+        assertThat(exception.getMessage(), is("400 BAD_REQUEST \"projectIds not equal\""));
     }
 
     @Test
@@ -258,20 +302,29 @@ class ServiceAccountRestServiceTest {
         assertThat(exception.getMessage(), is("404 NOT_FOUND \"no active service account key found\""));
     }
     
-    //@Test
-    //@WithMockUser(username = "9af61fef-a517-44fc-93a5-d5ae5fada255", password = "wachtwoord")
+    @Test
     void getIdTokenAuth() throws Exception {
-    	ObjectMapper mapper = new ObjectMapper(); // Mappers.getMapper(RestTokenRequest.class);
+    	RestTokenRequest restTokenRequest = new RestTokenRequest(accountId, passphrase);
+    	RestJwtToken jwtToken = new RestJwtToken("jwtToken");
     	ServiceAccount sa = ServiceAccount.builder().id(accountId).build();
-    	RestTokenRequest req = new RestTokenRequest(sa.getId(),passphrase);
-    	this.mvc = MockMvcBuilders.standaloneSetup(serviceAccountRestService).build();
+    	when(serviceAccountService.getIdToken(sa, passphrase.toCharArray())).thenReturn(jwtToken.getToken());
     	
-    	when(serviceAccountService.getIdToken(sa, "wachtwoord".toCharArray())).thenReturn("token");
-    	mvc.perform(get("/api/serviceaccounts/me/token")
-              .accept("application/json")
-              .content(mapper.writeValueAsBytes(req)))
-    			.andExpect(status().isOk())
-    			.andExpect(MockMvcResultMatchers.content().string(containsString("token")));
+    	ResponseEntity<RestJwtToken> response = serviceAccountRestService.getIdToken(restTokenRequest);
+        assertThat(response.getStatusCode().value(), is(200));
+        assertThat(response.getBody(), is(jwtToken));
+        
+    }
+    
+    @Test
+    void getIdTokenNotAuth() throws Exception {
+    	RestTokenRequest restTokenRequest = new RestTokenRequest(accountId, passphrase);
+    	RestJwtToken jwtToken = new RestJwtToken("jwtToken");
+    	ServiceAccount sa = ServiceAccount.builder().id(accountId).build();
+    	when(serviceAccountService.getIdToken(sa, passphrase.toCharArray())).thenThrow(new NotAuthorizedException("not authorized"));
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getIdToken(restTokenRequest));
+        assertThat(exception.getMessage(), is(String.format("401 UNAUTHORIZED \"Service Account [%s] is not authorized\"", sa.getId().toString())));
+        assertThat(exception.getStatusCode().value(), is(401));
         
     }
 

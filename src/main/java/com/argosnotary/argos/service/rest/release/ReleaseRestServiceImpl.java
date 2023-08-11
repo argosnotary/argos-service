@@ -34,6 +34,7 @@ import com.argosnotary.argos.service.auditlog.AuditLog;
 import com.argosnotary.argos.service.openapi.rest.model.RestReleaseArtifacts;
 import com.argosnotary.argos.service.openapi.rest.model.RestReleaseResult;
 import com.argosnotary.argos.service.release.ReleaseService;
+import com.argosnotary.argos.service.rest.ArtifactMapper;
 import com.argosnotary.argos.service.roles.PermissionCheck;
 
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ import lombok.RequiredArgsConstructor;
 public class ReleaseRestServiceImpl implements ReleaseRestService {
 
     private final ReleaseService releaseService;
-    private final ReleaseArtifactMapper artifactMapper;
+    private final ArtifactMapper artifactMapper;
     private final ReleaseResultMapper releaseResultMapper;
 
     @Override

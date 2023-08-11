@@ -26,8 +26,9 @@ import org.mapstruct.MappingConstants;
 
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
 import com.argosnotary.argos.service.openapi.rest.model.RestLinkMetaBlock;
+import com.argosnotary.argos.service.rest.ArtifactMapper;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {ArtifactMapper.class})
 public interface LinkMetaBlockMapper {
 
     @Mapping(target = "supplyChainId", ignore = true)

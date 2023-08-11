@@ -22,6 +22,7 @@ package com.argosnotary.argos.service.account;
 import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -32,10 +33,15 @@ public class AccountSecurityContextImpl implements AccountSecurityContext {
 
     @Override
     public Optional<Account> getAuthenticatedAccount() {
-        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+        return Optional.ofNullable(getSecurityContext().getAuthentication())
                 .map(Authentication::getPrincipal)
                 .map(ArgosUserDetails.class::cast)
                 .map(ArgosUserDetails::getAccount);
     }
+
+	@Override
+	public SecurityContext getSecurityContext() {
+		return SecurityContextHolder.getContext();
+	}
 }
 

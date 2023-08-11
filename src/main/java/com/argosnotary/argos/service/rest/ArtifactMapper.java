@@ -17,26 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.rest.account;
+package com.argosnotary.argos.service.rest;
+
+import java.util.List;
+import java.util.Set;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
-import com.argosnotary.argos.domain.crypto.KeyPair;
-import com.argosnotary.argos.domain.crypto.PublicKey;
-import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
-import com.argosnotary.argos.service.openapi.rest.model.RestPublicKey;
-import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccountKeyPair;
+import com.argosnotary.argos.domain.link.Artifact;
+import com.argosnotary.argos.service.openapi.rest.model.RestArtifact;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public interface KeyPairMapper {
-
-    public KeyPair convertFromRestKeyPair(RestKeyPair restKeyPair);
-    
-    public RestKeyPair convertToRestKeyPair(KeyPair keyPair);
-
-    public RestPublicKey convertToRestPublicKey(PublicKey publicKey);
-    
-    public KeyPair convertFromRestServiceAccountKeyPair(RestServiceAccountKeyPair restKeyPair);
+public interface ArtifactMapper {
+	
+	Artifact restArtifactToArtifact(RestArtifact restArtifact);
+	
+	RestArtifact artifactToRestArtifact(Artifact artifact);
+	
+	List<Artifact> restArtifactListToArtifactList(List<RestArtifact> list);
+	
+	List<RestArtifact> artifactListToRestArtifactList(List<Artifact> list);
+	
+	List<Set<Artifact>> mapToArtifacts(List<List<RestArtifact>> restArtifacts);
+	
+	Set<Artifact> mapToSetArtifacts(List<RestArtifact> restArtifacts);
+	
 
 }

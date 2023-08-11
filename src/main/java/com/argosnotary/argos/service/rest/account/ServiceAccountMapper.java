@@ -24,8 +24,9 @@ import org.mapstruct.MappingConstants;
 
 import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccount;
+import com.argosnotary.argos.service.rest.KeyPairMapper;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {KeyPairMapper.class})
 public interface ServiceAccountMapper {
 
     public RestServiceAccount convertToRestServiceAccount(ServiceAccount serviceAccount);
