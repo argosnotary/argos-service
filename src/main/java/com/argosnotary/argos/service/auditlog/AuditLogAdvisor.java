@@ -31,7 +31,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuditLogAdvisor {
     public static final String ARGOS_AUDIT_LOG = "argos.AuditLog";    
     
-    private static final JsonMapper jsonMapper = JsonMapper.builder().build();
+    private final ObjectMapper objectMapper;
 
     @Pointcut("@annotation(auditLog)")
     public void auditLogPointCut(AuditLog auditLog) {
@@ -55,19 +55,19 @@ public class AuditLogAdvisor {
     public void auditLog(JoinPoint joinPoint, AuditLog auditLog, Object returnValue) throws JsonProcessingException {
 
         Object[] argumentValues = joinPoint.getArgs();
-        String serializedReturnValue = jsonMapper.writeValueAsString(returnValue);
+        String serializedReturnValue = objectMapper.writeValueAsString(returnValue);
         CodeSignature methodSignature = (CodeSignature) joinPoint.getSignature();
         String[] parameterNames = methodSignature.getParameterNames();
         
         Map<String, String> parameterValueMap = new HashMap<>();
         for (int i=0;i < parameterNames.length;i++) {
-        	parameterValueMap.put(parameterNames[i], jsonMapper.writeValueAsString(argumentValues[i]));
+        	parameterValueMap.put(parameterNames[i], objectMapper.writeValueAsString(argumentValues[i]));
         }
         AuditLogData auditLogData = AuditLogData.builder()
                 .argumentData(parameterValueMap)
                 .methodName(methodSignature.getName())
                 .returnValue(serializedReturnValue)
                 .build();
-        log.info("AuditLog: {}", jsonMapper.writeValueAsString(auditLogData));
+        log.info("AuditLog: {}", objectMapper.writeValueAsString(auditLogData));
     }
 }

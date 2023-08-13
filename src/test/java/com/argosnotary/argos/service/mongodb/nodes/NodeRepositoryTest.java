@@ -144,14 +144,6 @@ class NodeRepositoryTest {
 	}
 	
 	@Test
-	void testParentIdNull() {
-
-	}
-
-	/**
-	 * @see #153
-	 */
-	@Test
 	void countByConcreteSubtypeExample() {
 
 		List<Node> nodes = nodeRepository.findAll();

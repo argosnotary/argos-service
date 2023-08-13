@@ -126,10 +126,13 @@ class ServiceAccountRestServiceTest {
 		ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
         
+        UUID saId = sa1.getId();
+        UUID randomId = UUID.randomUUID();
+        
 		when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
 		when(serviceAccountService.activateNewKey(sa1, keyPairMapper.convertFromRestServiceAccountKeyPair(rskp), "test".toCharArray())).thenReturn(sa1Updated);
 		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () ->  {
-			serviceAccountRestService.createServiceAccountKeyById(UUID.randomUUID(), sa1.getId(), rskp);
+			serviceAccountRestService.createServiceAccountKeyById(randomId, saId, rskp);
 		});
 		assertThat(exception.getMessage(), is("400 BAD_REQUEST \"projectIds not equal\""));
 		
@@ -239,7 +242,8 @@ class ServiceAccountRestServiceTest {
     void getServiceAccountByIdWrongProjectId() {
         when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
         UUID id = sa1.getId();
-    	ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountById(UUID.randomUUID(), id));
+        UUID rId = UUID.randomUUID();
+    	ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> serviceAccountRestService.getServiceAccountById(rId, id));
         assertThat(exception.getStatusCode().value(), is(400));
         assertThat(exception.getMessage(), is("400 BAD_REQUEST \"projectIds not equal\""));
     }
@@ -264,9 +268,10 @@ class ServiceAccountRestServiceTest {
     @Test
     void deleteServiceAccountWrongprojectId() {
     	UUID sa1Id = sa1.getId();
+    	UUID rId = UUID.randomUUID();
     	when(serviceAccountService.findById(sa1.getId())).thenReturn(Optional.of(sa1));
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
-        	serviceAccountRestService.deleteServiceAccount(UUID.randomUUID(), sa1Id));
+        	serviceAccountRestService.deleteServiceAccount(rId, sa1Id));
         assertThat(exception.getMessage(), is("400 BAD_REQUEST \"projectIds not equal\""));
     }
 

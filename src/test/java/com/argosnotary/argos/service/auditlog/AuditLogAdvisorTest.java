@@ -37,13 +37,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.Builder;
-import lombok.Data;
 
 @ExtendWith(MockitoExtension.class)
 class AuditLogAdvisorTest {
@@ -58,10 +57,7 @@ class AuditLogAdvisorTest {
     protected static final UUID LABEL_ID = UUID.randomUUID();
     protected static final String PATH = "path";
     protected static final String MRBEAN = "mrbean";
-    @Mock
-    private ApplicationContext applicationContext;
-//    @Mock
-//    private ReflectionHelper reflectionHelper;
+    
     @Mock
     private ObjectMapper objectMapper;
 
@@ -79,36 +75,19 @@ class AuditLogAdvisorTest {
     @Captor
     private ArgumentCaptor<AuditLogData> serializerArgumentCaptor;
 
+    
     private AuditLogAdvisor auditLogAdvisor;
 
     private static final Object[] ARGUMENT_VALUES = {LABEL_ID, STRING_ARGUMENT_VALUE};
     private static final String[] PARAMETER_NAMES = {"param1", "param2"};
     private static final Class[] PARAMETER_TYPES = {UUID.class, String.class};
-
-//    @Mock
-//    private ParameterData<AuditParam, Object> parameterData;
-//
-//    @Mock
-//    private PermissionCheck permissionCheck;
-//
-//    @Mock
-//    private PermissionCheckDataExtractor permissionCheckDataExtractor;
-//
-//    @Mock
-//    private LocalPermissionCheckData localPermissionCheckData;
-//
+    
     @Mock
     private CodeSignature methodSignature;
 
-    //@Mock
-    //private TreeNode treeNode;
-
-//    @Mock
-//    private ObjectArgumentFilter<ArgumentValue> objectArgumentFilter;
-
     @BeforeEach
     void setup() throws NoSuchMethodException, SecurityException {
-        auditLogAdvisor = new AuditLogAdvisor(); //, nodeRepository, objectMapper);
+        auditLogAdvisor = new AuditLogAdvisor(objectMapper); //, nodeRepository, objectMapper);
 
         method = DummyClass.class.getMethod(METHOD_NAME);
         when(joinPoint.getSignature()).thenReturn(signature);
@@ -138,92 +117,16 @@ class AuditLogAdvisorTest {
         when(joinPoint.getSignature()).thenReturn(methodSignature);
         when(methodSignature.getParameterNames()).thenReturn(PARAMETER_NAMES);
         when(methodSignature.getName()).thenReturn(METHOD_NAME);
+        when(objectMapper.writeValueAsString(STRING_RETURN_VALUE)).thenReturn("\""+STRING_RETURN_VALUE+"\"");
+        when(objectMapper.writeValueAsString(LABEL_ID)).thenReturn("\""+LABEL_ID.toString()+"\"");
+        when(objectMapper.writeValueAsString(STRING_ARGUMENT_VALUE)).thenReturn("\""+STRING_ARGUMENT_VALUE.toString()+"\"");
         auditLogAdvisor.auditLog(joinPoint, auditLog, STRING_RETURN_VALUE);
-//        verify(objectMapper).writeValueAsString(serializerArgumentCaptor.capture());
-//        AuditLogData auditLogData = serializerArgumentCaptor.getValue();
-//        assertThat(auditLogData.getMethodName(), is(METHOD_NAME));
-//        assertThat(auditLogData.getReturnValue(), is(STRING_RETURN_VALUE));
-//        assertThat(auditLogData.getArgumentData().isEmpty(), is(false));
-//        assertThat(auditLogData.getArgumentData().get("param2"), is(STRING_ARGUMENT_VALUE));
+        verify(objectMapper).writeValueAsString(serializerArgumentCaptor.capture());
+        
+        AuditLogData auditLogData = serializerArgumentCaptor.getValue();
+        assertThat(auditLogData.getMethodName(), is(METHOD_NAME));
+        assertThat(auditLogData.getReturnValue(), is("\""+STRING_RETURN_VALUE+"\""));
+        assertThat(auditLogData.getArgumentData().get("param1"), is("\""+LABEL_ID.toString()+"\""));
+        assertThat(auditLogData.getArgumentData().get("param2"), is("\""+STRING_ARGUMENT_VALUE.toString()+"\""));
     }
-
-//    //@Test
-//    void auditLogWithObjectArgument() throws JsonProcessingException {
-//        ArgumentValue argumentValue = ArgumentValue.builder().value("stringValue").build();
-//        Object[] argumentvalues = new Object[]{argumentValue};
-//        when(joinPoint.getArgs()).thenReturn(argumentvalues);
-//        when(auditParam.value()).thenReturn(ARGUMENT_NAME);
-//        when(auditParam.objectArgumentFilterBeanName()).thenReturn("");
-//        when(auditLog.argumentSerializerBeanName()).thenReturn(BEAN_NAME);
-//        //when(applicationContext.getBean(BEAN_NAME, ArgumentSerializer.class)).thenReturn(argumentSerializer);
-//        when(parameterData.getAnnotation()).thenReturn(auditParam);
-//        when(parameterData.getValue()).thenReturn(argumentValue);
-//        when(signature.getMethod()).thenReturn(method);
-//        when(argumentSerializer.serialize(argumentValue)).thenReturn(VALUE_STRINGVALUE);
-//        when(reflectionHelper.getParameterDataByAnnotation(any(), eq(AuditParam.class), any()))
-//                .thenReturn(Stream.of(parameterData));
-//        auditLogAdvisor.auditLog(joinPoint, auditLog, STRING_RETURN_VALUE);
-//        //verify(argumentSerializer, times(2)).serialize(serializerArgumentCaptor.capture());
-//        AuditLogData auditLogData = serializerArgumentCaptor.getValue();
-//        assertThat(auditLogData.getMethodName(), is(METHOD_NAME));
-//        assertThat(auditLogData.getReturnValue(), is(STRING_RETURN_VALUE));
-//        assertThat(auditLogData.getArgumentData().isEmpty(), is(false));
-//        assertThat(auditLogData.getArgumentData().get(ARGUMENT_NAME), is(VALUE_STRINGVALUE));
-//    }
-//
-//    //@Test
-//    void auditLogWithObjectArgumentFilter() throws JsonProcessingException {
-//        ArgumentValue argumentValue = ArgumentValue.builder().value("stringValue").build();
-//        Object[] argumentvalues = new Object[]{argumentValue};
-//        Map<String, Object> filteredValues = new HashMap<>();
-//        filteredValues.put("value", "value");
-//        when(argumentSerializer.serialize(filteredValues)).thenReturn(FILTERED_VALUE);
-//        when(objectArgumentFilter.filterObjectArguments(argumentValue)).thenReturn(filteredValues);
-//        when(joinPoint.getArgs()).thenReturn(argumentvalues);
-//        when(auditParam.value()).thenReturn(ARGUMENT_NAME);
-//        when(auditParam.objectArgumentFilterBeanName()).thenReturn(FILTER_BEAN_NAME);
-//        when(auditLog.argumentSerializerBeanName()).thenReturn(BEAN_NAME);
-//        when(applicationContext.getBean(BEAN_NAME, ArgumentSerializer.class)).thenReturn(argumentSerializer);
-//        when(applicationContext.getBean(FILTER_BEAN_NAME, ObjectArgumentFilter.class)).thenReturn(objectArgumentFilter);
-//        when(parameterData.getAnnotation()).thenReturn(auditParam);
-//        when(parameterData.getValue()).thenReturn(argumentValue);
-//        when(signature.getMethod()).thenReturn(method);
-//        when(argumentSerializer.serialize(argumentValue)).thenReturn(VALUE_STRINGVALUE);
-//        when(reflectionHelper.getParameterDataByAnnotation(any(), eq(AuditParam.class), any()))
-//                .thenReturn(Stream.of(parameterData));
-//        auditLogAdvisor.auditLog(joinPoint, auditLog, STRING_RETURN_VALUE);
-//        verify(argumentSerializer, times(2)).serialize(serializerArgumentCaptor.capture());
-//        AuditLogData auditLogData = serializerArgumentCaptor.getValue();
-//        assertThat(auditLogData.getMethodName(), is(METHOD_NAME));
-//        assertThat(auditLogData.getReturnValue(), is(STRING_RETURN_VALUE));
-//        assertThat(auditLogData.getArgumentData().isEmpty(), is(false));
-//        assertThat(auditLogData.getArgumentData().get(ARGUMENT_NAME), is(FILTERED_VALUE));
-//    }
-
-//    //@Test
-//    void auditLogWithOptionalPath() throws NoSuchMethodException, SecurityException, JsonProcessingException {
-//    	Method permMethod = PermissionCheckDummyClass.class.getMethod(METHOD_NAME);
-//        when(joinPoint.getArgs()).thenReturn(STRING_ARGUMENT_VALUES);
-//        when(applicationContext.getBean(DefaultPermissionCheckDataExtractor.DEFAULT_PERMISSION_CHECK_DATA_EXTRACTOR_BEAN_NAME, PermissionCheckDataExtractor.class)).thenReturn(permissionCheckDataExtractor);
-//        when(permissionCheckDataExtractor.extractPermissionCheckData(any(), any())).thenReturn(localPermissionCheckData);
-//        when(localPermissionCheckData.getLabelIds()).thenReturn(Collections.singleton(LABEL_ID));
-//        when(hierarchyRepository.getSubTree(LABEL_ID, HierarchyMode.NONE, 0)).thenReturn(Optional.of(treeNode));
-//        when(treeNode.getName()).thenReturn("name");
-//        when(treeNode.getPathToRoot()).thenReturn(Collections.singletonList(PATH));
-//        when(auditParam.value()).thenReturn(ARGUMENT_NAME);
-//        when(auditLog.argumentSerializerBeanName()).thenReturn(BEAN_NAME);
-//        when(applicationContext.getBean(BEAN_NAME, ArgumentSerializer.class)).thenReturn(argumentSerializer);
-//        when(parameterData.getAnnotation()).thenReturn(auditParam);
-//        when(parameterData.getValue()).thenReturn(STRING_ARGUMENT_VALUE);
-//        when(signature.getMethod()).thenReturn(permMethod);
-//        when(reflectionHelper.getParameterDataByAnnotation(permMethod, AuditParam.class, STRING_ARGUMENT_VALUES)).thenReturn(Stream.of(parameterData));
-//        auditLogAdvisor.auditLog(joinPoint, auditLog, STRING_RETURN_VALUE);
-//        verify(argumentSerializer, times(1)).serialize(serializerArgumentCaptor.capture());
-//        AuditLogData auditLogData = serializerArgumentCaptor.getValue();
-//        assertThat(auditLogData.getMethodName(), is(METHOD_NAME));
-//        assertThat(auditLogData.getReturnValue(), is(STRING_RETURN_VALUE));
-//        assertThat(auditLogData.getArgumentData().isEmpty(), is(false));
-//        assertThat(auditLogData.getPaths().get(0), is("path/name"));
-//        assertThat(auditLogData.getArgumentData().get(ARGUMENT_NAME), is(STRING_ARGUMENT_VALUE));
-//    }
 }

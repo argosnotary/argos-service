@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,6 +66,18 @@ class JsonMapperTest {
 		assertEquals(nm.getModuleName(), m.getModuleName());
 		ObjectMapper o = jsonMapperConfig.objectMapper();
 		assertFalse(o.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+		
+	}
+	
+	@Test
+	void someTests() throws JsonProcessingException {
+		UUID id = UUID.randomUUID();
+		String str = "testString";
+		String idStr = objectMapper.writeValueAsString(id);
+		assertEquals("\""+id.toString()+"\"", idStr);
+
+		String strStr = objectMapper.writeValueAsString(str);
+		assertEquals("\""+str+"\"", strStr);
 		
 	}
 }
