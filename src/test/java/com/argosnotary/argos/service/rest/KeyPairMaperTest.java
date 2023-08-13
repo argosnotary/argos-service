@@ -17,10 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.rest.account;
+package com.argosnotary.argos.service.rest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +52,8 @@ class KeyPairMaperTest {
 		
 		kp = CryptoHelper.createKeyPair("test".toCharArray());
 		
+		rkp = keyPairMapper.convertToRestKeyPair(kp);
+		
 		
     	sa = new RestServiceAccount();
     	sa.setProjectId(UUID.randomUUID());
@@ -67,6 +73,11 @@ class KeyPairMaperTest {
 	void test() {
 		KeyPair keyPair = keyPairMapper.convertFromRestServiceAccountKeyPair(rskp);
 		assertEquals(kp, keyPair);
+		
+
+	    Set<KeyPair> ks = keyPairMapper.restKeyPairListToKeyPairSet(List.of(rkp));
+        assertThat(ks, hasSize(1));
+    	assertEquals(kp, ks.iterator().next());
 	}
 
 }

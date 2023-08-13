@@ -23,8 +23,6 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -48,6 +46,7 @@ import com.argosnotary.argos.service.layout.LayoutMetaBlockService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
 import com.argosnotary.argos.service.openapi.rest.model.RestArtifact;
 import com.argosnotary.argos.service.openapi.rest.model.RestVerificationResult;
+import com.argosnotary.argos.service.rest.ArtifactMapper;
 import com.argosnotary.argos.service.verification.VerificationRunResult;
 import com.argosnotary.argos.service.verification.VerificationService;
 
@@ -96,7 +95,7 @@ class VerificationRestServiceTest {
     
     @Test
     void testArtifactMapper() {
-    	List<Artifact> ff = List.of(artifactMapper.convertToArtifact(restArtifact));
+    	List<Artifact> ff = List.of(artifactMapper.restArtifactToArtifact(restArtifact));
         assertThat(ff.size(), is(1));
     }
 

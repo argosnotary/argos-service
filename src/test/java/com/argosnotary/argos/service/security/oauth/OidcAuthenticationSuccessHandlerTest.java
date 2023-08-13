@@ -139,6 +139,9 @@ class OidcAuthenticationSuccessHandlerTest {
         when(clientRegistrationService.getClientRegistrationNameWithIssuer("http://oidcIssuer")).thenReturn(Optional.of("providerName"));
         successHandler.onAuthenticationSuccess(request, response, authentication);
         verify(customStatelessAuthorizationRequestRepository).removeAuthorizationRequestCookies(request, response);
+        verify(response).setContentType("application/json");
+        verify(servletOutputStream).close();
+        verify(servletOutputStream).flush();
         verify(servletOutputStream).print("token");
         verify(request).getSession(false);
 
@@ -181,6 +184,31 @@ class OidcAuthenticationSuccessHandlerTest {
         when(oidcUser.getGivenName()).thenReturn(profile1.getGivenName());
         when(oidcUser.getEmail()).thenReturn(profile1.getEmail());
         when(oidcUser.getPicture()).thenReturn(profile1.getPicture().toString());
+        when(oidcUser.getEmailVerified()).thenReturn(true);
+        when(idToken.getTokenValue()).thenReturn("token");
+        when(response.getOutputStream()).thenReturn(servletOutputStream);
+        when(accountService.loadAuthenticatedUser(oidcUser.getIssuer().toString(), oidcUser.getSubject())).thenReturn(Optional.of(personalAccount2));
+        when(response.getOutputStream()).thenReturn(servletOutputStream);
+        successHandler.onAuthenticationSuccess(request, response, authentication);
+        verify(customStatelessAuthorizationRequestRepository).removeAuthorizationRequestCookies(request, response);
+        verify(servletOutputStream).print("token");
+        verify(request).getSession(false);
+        verify(personalAccountService).save(personalAccount1);
+
+    }
+    
+    @Test
+    void onAuthenticationSuccessPersonalAccountWrongPictureUrl() throws IOException, ServletException {
+    	personalAccount1.getProfile().setPicture(null);
+        when(authentication.getPrincipal()).thenReturn(oidcUser);
+        when(oidcUser.getIssuer()).thenReturn(new URL("http://oidcIssuer"));
+        when(oidcUser.getSubject()).thenReturn("idToken");
+        when(oidcUser.getIdToken()).thenReturn(idToken);
+        when(oidcUser.getFamilyName()).thenReturn(profile1.getFamilyName());
+        when(oidcUser.getFullName()).thenReturn(profile1.getFullName());
+        when(oidcUser.getGivenName()).thenReturn(profile1.getGivenName());
+        when(oidcUser.getEmail()).thenReturn(profile1.getEmail());
+        when(oidcUser.getPicture()).thenReturn("zomaarwat");
         when(oidcUser.getEmailVerified()).thenReturn(true);
         when(idToken.getTokenValue()).thenReturn("token");
         when(response.getOutputStream()).thenReturn(servletOutputStream);

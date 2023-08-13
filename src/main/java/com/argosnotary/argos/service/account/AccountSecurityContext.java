@@ -21,9 +21,13 @@ package com.argosnotary.argos.service.account;
 
 import java.util.Optional;
 
+import org.springframework.security.core.context.SecurityContext;
+
 import com.argosnotary.argos.domain.account.Account;
 
 public interface AccountSecurityContext {
     Optional<Account> getAuthenticatedAccount();
+    
+    SecurityContext getSecurityContext();
 }
 

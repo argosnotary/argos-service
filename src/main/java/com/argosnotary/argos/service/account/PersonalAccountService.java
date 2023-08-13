@@ -30,7 +30,7 @@ public interface PersonalAccountService {
     
     Optional<PersonalAccount> findByProviderNameAndProviderSubject(String providerName, String providerSubject);
     
-    void save(PersonalAccount personalAccount);
+    PersonalAccount save(PersonalAccount personalAccount);
     
     public PersonalAccount activateNewKey(PersonalAccount account, KeyPair newKeyPair);
 }

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.rest.release;
+package com.argosnotary.argos.service.rest;
 
 import java.util.List;
 import java.util.Set;
@@ -25,14 +25,25 @@ import java.util.Set;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
-import com.argosnotary.argos.domain.link.Artifact;
-import com.argosnotary.argos.service.openapi.rest.model.RestArtifact;
+import com.argosnotary.argos.domain.crypto.KeyPair;
+import com.argosnotary.argos.domain.crypto.PublicKey;
+import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
+import com.argosnotary.argos.service.openapi.rest.model.RestPublicKey;
+import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccountKeyPair;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public interface ReleaseArtifactMapper {
+public interface KeyPairMapper {
 
-    List<Set<Artifact>> mapToArtifacts(List<List<RestArtifact>> restArtifacts);
+    public KeyPair convertFromRestKeyPair(RestKeyPair restKeyPair);
+    
+    public RestKeyPair convertToRestKeyPair(KeyPair keyPair);
 
-    Set<Artifact> mapToSetArtifacts(List<RestArtifact> restArtifacts);
+    public RestPublicKey convertToRestPublicKey(PublicKey publicKey);
+    
+    public KeyPair convertFromRestServiceAccountKeyPair(RestServiceAccountKeyPair restKeyPair);
+    
+    public List<RestKeyPair> keyPairSetToRestKeyPairList(Set<KeyPair> set);
+    
+    public Set<KeyPair> restKeyPairListToKeyPairSet(List<RestKeyPair> list);
 
 }

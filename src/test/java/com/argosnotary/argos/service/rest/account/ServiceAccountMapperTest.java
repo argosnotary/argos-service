@@ -21,29 +21,55 @@ package com.argosnotary.argos.service.rest.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.Set;
 import java.util.UUID;
 
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.util.io.pem.PemGenerationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import com.argosnotary.argos.domain.account.ServiceAccount;
+import com.argosnotary.argos.domain.crypto.CryptoHelper;
+import com.argosnotary.argos.domain.crypto.KeyPair;
+import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
+import com.argosnotary.argos.service.rest.KeyPairMapper;
+import com.argosnotary.argos.service.rest.KeyPairMapperImpl;
 
+@SpringBootTest(classes= {ServiceAccountMapperImpl.class, KeyPairMapperImpl.class})
 class ServiceAccountMapperTest {
 	
-	private ServiceAccountMapper serviceAccountMapper;
+    @Autowired
+    private ServiceAccountMapper serviceAccountMapper;
+
+    @Autowired
+    private KeyPairMapper keyPairMapper;
+    
+    private static final char[] PRIVAT_KEY_PASSPHRASE = "test".toCharArray();
+    
+    private RestKeyPair restKeyPair;
+
+    private KeyPair keyPair;
 
 	@BeforeEach
 	void setUp() throws Exception {
-		serviceAccountMapper = Mappers.getMapper(ServiceAccountMapper.class);
 	}
 
 	@Test
-	void testConvertToRestServiceAccount() {
+	void testConvertToRestServiceAccount() throws NoSuchAlgorithmException, OperatorCreationException, PemGenerationException {
 		UUID projectId = UUID.randomUUID();
 		UUID id = UUID.randomUUID();
+		keyPair = CryptoHelper.createKeyPair(PRIVAT_KEY_PASSPHRASE);
 		
-		ServiceAccount sa = ServiceAccount.builder().id(id).name("sa").projectId(projectId).build();
+		ServiceAccount sa = ServiceAccount.builder()
+				.id(id)
+        		.activeKeyPair(keyPair)
+        		.providerSubject("subject")
+        		.inactiveKeyPairs(Set.of(keyPair))
+				.name("sa").projectId(projectId).build();
 		ServiceAccount saT = serviceAccountMapper.convertFromRestServiceAccount(serviceAccountMapper.convertToRestServiceAccount(sa));
 		assertEquals(sa, saT);
 		

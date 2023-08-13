@@ -17,36 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.rest.release;
+package com.argosnotary.argos.service.rest.oauthprovider;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.OffsetDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 
-import com.argosnotary.argos.service.JsonMapperConfig;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.argosnotary.argos.service.account.OAuthProvider;
+import com.argosnotary.argos.service.openapi.rest.model.RestOAuthProvider;
 
-@SpringBootTest(classes={JsonMapperConfig.class})
-class JsonMapperTest {
-	
-	@Autowired
-	ObjectMapper objectMapper;
+class OauthProviderMapperTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
 	}
 
 	@Test
-	void test() throws JsonProcessingException {
-		OffsetDateTime time = OffsetDateTime.now();
+	void test() {
+		OauthProviderMapper mapper = Mappers.getMapper(OauthProviderMapper.class);
+		OAuthProvider p = new OAuthProvider("oauth-provider");
+		RestOAuthProvider rp = mapper.convertToRestOauthProvider(p);
+		assertEquals(p.getName(), rp.getName());
 		
-		String timeStr = objectMapper.writeValueAsString(time);
+		List<RestOAuthProvider> lrp = mapper.convertToRestOAuthProviderList(List.of(p));
+		assertEquals(lrp.get(0), rp);
+		
+		lrp = mapper.convertToRestOAuthProviderList(List.of());
+		assertTrue(lrp.isEmpty());
 		
 	}
 

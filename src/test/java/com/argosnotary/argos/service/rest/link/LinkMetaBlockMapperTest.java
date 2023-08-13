@@ -26,23 +26,26 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
 import com.argosnotary.argos.service.openapi.rest.model.RestLinkMetaBlock;
+import com.argosnotary.argos.service.rest.ArtifactMapperImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@SpringBootTest(classes= {LinkMetaBlockMapperImpl.class, ArtifactMapperImpl.class})
 class LinkMetaBlockMapperTest {
 
-    private LinkMetaBlockMapper converter;
+    @Autowired
+	private LinkMetaBlockMapper converter;
     private ObjectMapper mapper;
     private String linkJson;
 
     @BeforeEach
     void setUp() throws IOException {
-        converter = Mappers.getMapper(LinkMetaBlockMapper.class);
         mapper = new ObjectMapper();
         linkJson = IOUtils.toString(LinkMetaBlockMapperTest.class.getResourceAsStream("/link.json"), StandardCharsets.UTF_8);
     }

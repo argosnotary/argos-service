@@ -32,17 +32,19 @@ import org.springframework.stereotype.Component;
 import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.account.PersonalAccount.Profile;
+import com.argosnotary.argos.domain.account.ServiceAccount;
 import com.argosnotary.argos.service.account.AccountService;
 import com.argosnotary.argos.service.account.ClientRegistrationService;
 import com.argosnotary.argos.service.account.PersonalAccountService;
-import com.argosnotary.argos.domain.account.ServiceAccount;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 @AllArgsConstructor
 public class OidcAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
@@ -97,7 +99,7 @@ public class OidcAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 				URL pictureUrl = new URL(oidcUser.getPicture());
 				profile.setPicture(pictureUrl);
 			} catch (MalformedURLException e) {
-				logger.info(String.format("User: %s has a malformed picture url.", profile.getFullName()));
+				log.info(String.format("User: %s has a malformed picture url.", profile.getFullName()));
 			}
     	}
         

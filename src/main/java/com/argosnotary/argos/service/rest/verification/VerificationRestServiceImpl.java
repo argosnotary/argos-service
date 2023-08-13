@@ -38,6 +38,7 @@ import com.argosnotary.argos.service.layout.LayoutMetaBlockService;
 import com.argosnotary.argos.service.nodes.SupplyChainService;
 import com.argosnotary.argos.service.openapi.rest.model.RestArtifact;
 import com.argosnotary.argos.service.openapi.rest.model.RestVerificationResult;
+import com.argosnotary.argos.service.rest.ArtifactMapper;
 import com.argosnotary.argos.service.roles.PermissionCheck;
 import com.argosnotary.argos.service.verification.VerificationRunResult;
 import com.argosnotary.argos.service.verification.VerificationService;
@@ -81,7 +82,7 @@ public class VerificationRestServiceImpl implements VerificationRestService {
         LayoutMetaBlock layoutMetaBlock = layoutMetaBlockService.getLayout(supplyChainId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "no active layout could be found for supplychain:" + supplyChainId));
 
-        Set<Artifact> products = expectedProducts.stream().map(artifactMapper::convertToArtifact).collect(Collectors.toSet());
+        Set<Artifact> products = expectedProducts.stream().map(artifactMapper::restArtifactToArtifact).collect(Collectors.toSet());
         return ResponseEntity.ok(
         		verificationResultMapper.mapToRestVerificationResult(verificationService.performVerification(layoutMetaBlock, products)));
     }

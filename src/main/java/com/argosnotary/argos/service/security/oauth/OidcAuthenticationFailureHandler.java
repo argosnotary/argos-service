@@ -47,6 +47,6 @@ public class OidcAuthenticationFailureHandler extends SimpleUrlAuthenticationFai
 
         customStatelessAuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
 
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        this.getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }

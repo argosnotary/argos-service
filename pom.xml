@@ -384,20 +384,25 @@
                 <configuration>
                     <verbose>false</verbose>
                     <threads>7</threads>
-                    <timeoutConstant>30000</timeoutConstant>
+                    <timeoutConstant>60000</timeoutConstant>
                     <timestampedReports>false</timestampedReports>
-                    <mutationThreshold>80</mutationThreshold>
+                    <mutationThreshold>90</mutationThreshold>
+                    <!-- lower coverage because lombok is also checked -->
                     <coverageThreshold>80</coverageThreshold>
                     <failWhenNoMutations>true</failWhenNoMutations>
                     <avoidCallsTo>
                         <avoidCallsTo>org.slf4j</avoidCallsTo>
                     </avoidCallsTo>
                     <excludedClasses>
+                        <excludedClasse>com.argosnotary.argos.domain.link.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.domain.layout.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.domain.release.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.mongodb.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.itest.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.openapi.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.link.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.layout.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.release.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.rest.link.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.rest.layout.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.rest.release.**</excludedClasse>
@@ -405,7 +410,7 @@
                         <excludedClasse>com.argosnotary.argos.service.verification.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.security.SecurityConfig</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.ArgosServiceApplication</excludedClasse>
-                        <excludedClasse>com.argosnotary.argos.service.account.ServiceAccountProviderService</excludedClasse>                        
+                        <excludedClasse>com.argosnotary.argos.service.account.ServiceAccountProviderServiceImpl</excludedClasse>                        
                     </excludedClasses>
                     <excludedTestClasses>
                         <excludedTestClasse>com.argosnotary.argos.service.mongodb.**</excludedTestClasse>

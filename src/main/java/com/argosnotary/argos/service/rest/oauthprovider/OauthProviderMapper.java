@@ -30,7 +30,7 @@ import com.argosnotary.argos.service.openapi.rest.model.RestOAuthProvider;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OauthProviderMapper {
 
-	public abstract RestOAuthProvider convertToRestOauthProvider(OAuthProvider provider);
-    public abstract List<RestOAuthProvider> convertToRestOAuthProviderList(List<OAuthProvider> providers);
+	public RestOAuthProvider convertToRestOauthProvider(OAuthProvider provider);
+    public List<RestOAuthProvider> convertToRestOAuthProviderList(List<OAuthProvider> providers);
 
 }

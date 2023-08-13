@@ -37,12 +37,9 @@ import org.bouncycastle.util.io.pem.PemGenerationException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -56,8 +53,10 @@ import com.argosnotary.argos.service.account.PersonalAccountService;
 import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestPersonalAccount;
 import com.argosnotary.argos.service.openapi.rest.model.RestPublicKey;
+import com.argosnotary.argos.service.rest.KeyPairMapper;
+import com.argosnotary.argos.service.rest.KeyPairMapperImpl;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes= {PersonalAccountMapperImpl.class, KeyPairMapperImpl.class})
 class PersonalAccountRestServiceTest {
 
     private static final String USER_NAME = "accountName";
@@ -77,8 +76,10 @@ class PersonalAccountRestServiceTest {
     @Mock
     private AccountSecurityContext accountSecurityContext;
 
+    @Autowired
     private KeyPairMapper keyPairMapper;
 
+    @Autowired
     private PersonalAccountMapper personalAccountMapper;
 
     private RestPersonalAccount restPersonalAccount;
@@ -101,9 +102,7 @@ class PersonalAccountRestServiceTest {
 
     @BeforeEach
     void setUp() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, OperatorCreationException, PemGenerationException {
-    	personalAccountMapper = Mappers.getMapper(PersonalAccountMapper.class);
-    	keyPairMapper = Mappers.getMapper(KeyPairMapper.class);
-        keyPair = CryptoHelper.createKeyPair(PRIVAT_KEY_PASSPHRASE);
+    	keyPair = CryptoHelper.createKeyPair(PRIVAT_KEY_PASSPHRASE);
         restKeyPair = keyPairMapper.convertToRestKeyPair(keyPair);
         restPublicKey = new RestPublicKey(restKeyPair.getKeyId(), restKeyPair.getPublicKey());
         personalAccount = PersonalAccount.builder()
@@ -144,6 +143,15 @@ class PersonalAccountRestServiceTest {
         when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(personalAccount));
         assertThat(service.createKey(restKeyPair).getStatusCode().value(), is(204));
         verify(accountService).activateNewKey(personalAccount, keyPair);
+    }
+
+    @Test
+    void storeInvalidKeyShouldReturnException() {
+    	restKeyPair.setKeyId("invalid");
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> { 
+        	service.createKey(restKeyPair);
+        });
+        assertEquals(String.format("400 BAD_REQUEST \"invalid key id : invalid\"", restKeyPair.getKeyId()), exception.getMessage());
     }
 
     @Test

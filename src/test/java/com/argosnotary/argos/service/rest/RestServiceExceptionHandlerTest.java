@@ -116,12 +116,17 @@ class RestServiceExceptionHandlerTest {
     @Test
     void handleLayoutValidationException() {
         when(layoutValidationException.getValidationMessages())
-                .thenReturn(new ArrayList(List.of(new RestErrorMessage().field("key").message("message").type(MODEL_CONSISTENCY))));
+                .thenReturn(new ArrayList<>(List.of(
+                		new RestErrorMessage().field("key2").message("message2").type(MODEL_CONSISTENCY),
+                		new RestErrorMessage().field("key1").message("message1").type(MODEL_CONSISTENCY))));
         ResponseEntity<RestError> response = handler.handleLayoutValidationException(layoutValidationException);
         assertThat(response.getStatusCode().value(), is(400));
-        assertThat(response.getBody().getMessages().get(0).getField(), is("key"));
-        assertThat(response.getBody().getMessages().get(0).getMessage(), is("message"));
+        assertThat(response.getBody().getMessages().get(0).getField(), is("key1"));
+        assertThat(response.getBody().getMessages().get(0).getMessage(), is("message1"));
         assertThat(response.getBody().getMessages().get(0).getType(), is(MODEL_CONSISTENCY));
+        assertThat(response.getBody().getMessages().get(1).getField(), is("key2"));
+        assertThat(response.getBody().getMessages().get(1).getMessage(), is("message2"));
+        assertThat(response.getBody().getMessages().get(1).getType(), is(MODEL_CONSISTENCY));
     }
 
     @Test
@@ -154,6 +159,7 @@ class RestServiceExceptionHandlerTest {
         ResponseEntity<RestError> response = (ResponseEntity<RestError>) handler.handleResponseStatusException(responseStatusException);
         assertThat(response.getStatusCode().value(), is(404));
         assertThat(response.getBody().getMessages().get(0).getMessage(), is("not found"));
+        assertThat(response.getBody().getMessages().get(0).getType(), is(TypeEnum.OTHER));
     }
 
     @Test
@@ -164,6 +170,7 @@ class RestServiceExceptionHandlerTest {
         assertThat(response.getStatusCode().value(), is(400));
         assertThat(response.getBody().getMessages().get(0).getMessage(), is("bad request"));
         assertThat(response.getBody().getMessages().size(), is(1));
+        assertThat(response.getBody().getMessages().get(0).getType(), is(TypeEnum.DATA_INPUT));
     }
 
     @Test

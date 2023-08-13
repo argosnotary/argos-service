@@ -42,6 +42,7 @@ import com.argosnotary.argos.service.openapi.rest.model.RestKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccount;
 import com.argosnotary.argos.service.openapi.rest.model.RestServiceAccountKeyPair;
 import com.argosnotary.argos.service.openapi.rest.model.RestTokenRequest;
+import com.argosnotary.argos.service.rest.KeyPairMapper;
 import com.argosnotary.argos.service.roles.PermissionCheck;
 
 import jakarta.validation.Valid;
@@ -111,7 +112,7 @@ public class ServiceAccountRestServiceImpl implements ServiceAccountRestService 
 
 	@Override
     @PermissionCheck(permissions = Permission.WRITE)
-	public ResponseEntity<Void> deleteServiceAccount(UUID projectId, UUID serviceAccountId) {
+    public ResponseEntity<Void> deleteServiceAccount(UUID projectId, UUID serviceAccountId) {
 		ServiceAccount serviceAccount = serviceAccountService.findById(serviceAccountId)
     			.orElseThrow(() -> accountNotFound(serviceAccountId));
 		verifyProjectId(projectId, serviceAccount.getProjectId());
@@ -151,9 +152,9 @@ public class ServiceAccountRestServiceImpl implements ServiceAccountRestService 
 	@Override
     @PermissionCheck(permissions = Permission.WRITE)
 	public ResponseEntity<RestKeyPair> getServiceAccountKeyById(UUID projectId, UUID serviceAccountId) {
-		return serviceAccountService.findById(serviceAccountId)
-				.filter(a -> projectId.equals(a.getProjectId()))
-                .flatMap(account -> Optional.ofNullable(account.getActiveKeyPair()))
+		ServiceAccount sa = serviceAccountService.findById(serviceAccountId).orElseThrow(() -> keyNotFound(serviceAccountId));
+		verifyProjectId(projectId, sa.getProjectId());
+		return  Optional.ofNullable(sa.getActiveKeyPair())
                 .map(keyPairMapper::convertToRestKeyPair)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> keyNotFound(serviceAccountId));
