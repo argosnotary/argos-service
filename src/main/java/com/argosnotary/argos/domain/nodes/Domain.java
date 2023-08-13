@@ -28,10 +28,10 @@ import lombok.Data;
 @Builder
 @Data
 public class Domain {
-	String domain;
+	String name;
 	
 	public List<String> getLabels() {
-		return Arrays.asList(this.domain.split("\\."));
+		return Arrays.asList(this.name.split("\\."));
 	}
 
 }

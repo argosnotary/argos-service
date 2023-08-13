@@ -96,9 +96,9 @@ class ReleaseDossierRepositoryTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		releaseDossierRepository = new ReleaseDossierRepository(gridFsTemplate, mapper);
-		org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().domain("domainName1").build());
+		org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().name("domainName1").build());
 		
-		r11 = Release.builder().name("releaseName11").qualifiedSupplyChainName("supply1.domainName1").releaseDate(OffsetDateTime.now(ZoneOffset.UTC)).supplyChainId(UUID.randomUUID()).id(UUID.randomUUID()).domain(Domain.builder().domain("domainName1").build()).releasedProductsHashes(Set.of("hash111","hash112","hash113")).build();
+		r11 = Release.builder().name("releaseName11").qualifiedSupplyChainName("supply1.domainName1").releaseDate(OffsetDateTime.now(ZoneOffset.UTC)).supplyChainId(UUID.randomUUID()).id(UUID.randomUUID()).domain(Domain.builder().name("domainName1").build()).releasedProductsHashes(Set.of("hash111","hash112","hash113")).build();
 		
 		
 	}

@@ -1567,9 +1567,9 @@ components:
     Domain:
       type: object
       required:
-        - domain
+        - name
       properties:
-        domain:
+        name:
           $ref: "#/components/schemas/HostnameString"
 
     ManagementNode:

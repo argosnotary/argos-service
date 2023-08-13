@@ -118,7 +118,7 @@ class ReleaseServiceTest {
 		releaseArtifacts.add(Set.of(a21,a22, a23));
 		
 
-		org = new Organization(UUID.randomUUID(), "org", Domain.builder().domain("org.com").build());
+		org = new Organization(UUID.randomUUID(), "org", Domain.builder().name("org.com").build());
 		
 		releaseArtifactHashes = convertToReleaseArtifactHashes(releaseArtifacts);
 		

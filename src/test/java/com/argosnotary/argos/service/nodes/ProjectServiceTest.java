@@ -22,7 +22,6 @@ package com.argosnotary.argos.service.nodes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +56,7 @@ class ProjectServiceTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		projectService = new ProjectServiceImpl(nodeService);
-        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().domain("org1.com").build());
+        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().name("org1.com").build());
         
         node11 = new ManagementNode(UUID.randomUUID(), "node11", List.of(), org1.getId());
         node111 = new ManagementNode(UUID.randomUUID(), "node111", List.of(), node11.getId());

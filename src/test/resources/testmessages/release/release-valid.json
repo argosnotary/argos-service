@@ -6,7 +6,7 @@
         "releaseDate": "#string",
         "qualifiedSupplyChainName": "#string",
         "domain": {
-            "domain": "#string"
+            "name": "#string"
         },
         "dossierId": "#string",
         "supplyChainId": "#uuid",

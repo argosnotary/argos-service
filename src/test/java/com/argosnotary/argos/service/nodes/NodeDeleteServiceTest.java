@@ -89,7 +89,7 @@ class NodeDeleteServiceTest {
 		nodeDeleteService = new NodeDeleteService(nodeRepository, layoutMetaBlockRepository, linkMetaBlockRepository, approvalConfigurationRepository, serviceAccountRepository, roleAssignmentService, releaseConfigurationRepository);
 
 		
-		Organization o = new Organization(UUID.randomUUID(), "org1", Domain.builder().domain("org1.com").build());
+		Organization o = new Organization(UUID.randomUUID(), "org1", Domain.builder().name("org1.com").build());
 		Project p = new Project(UUID.randomUUID(), "proj", List.of(), o.getId());
 		SupplyChain s = new SupplyChain(UUID.randomUUID(), "sc", List.of(), p.getId());
 		

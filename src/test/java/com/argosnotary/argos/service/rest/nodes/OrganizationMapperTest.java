@@ -44,7 +44,7 @@ class OrganizationMapperTest {
 	void setUp() throws Exception {
 		organizationMapper = Mappers.getMapper(OrganizationMapper.class);
 		
-		org2 = new Organization(UUID.randomUUID(), "org2", Domain.builder().domain("org2.com").build());
+		org2 = new Organization(UUID.randomUUID(), "org2", Domain.builder().name("org2.com").build());
         
         node21 = new ManagementNode(UUID.randomUUID(), "node21", List.of(), org2.getId());
         node22 = new ManagementNode(UUID.randomUUID(), "node22", List.of(), org2.getId());

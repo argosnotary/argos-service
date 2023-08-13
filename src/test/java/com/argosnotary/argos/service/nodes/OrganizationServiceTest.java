@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +42,6 @@ import com.argosnotary.argos.domain.account.PersonalAccount;
 import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Organization;
-import com.argosnotary.argos.domain.nodes.Project;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.service.account.AccountSecurityContext;
 import com.argosnotary.argos.service.roles.RoleAssignmentService;
@@ -70,7 +68,7 @@ class OrganizationServiceTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		organizationService = new OrganizationServiceImpl(nodeService, roleAssignmentService, accountSecurityContext);
-        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().domain("org1.com").build());
+        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().name("org1.com").build());
         
         node11 = new ManagementNode(UUID.randomUUID(), "node11", List.of(), org1.getId());
         node111 = new ManagementNode(UUID.randomUUID(), "node111", List.of(), node11.getId());

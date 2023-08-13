@@ -39,7 +39,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.nodes.ManagementNode;
 import com.argosnotary.argos.domain.nodes.Organization;
-import com.argosnotary.argos.domain.nodes.Project;
 
 @ExtendWith(MockitoExtension.class)
 class ManagementNodeServiceTest {
@@ -55,7 +54,7 @@ class ManagementNodeServiceTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		managementNodeService = new ManagementNodeServiceImpl(nodeService);
-        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().domain("org1.com").build());
+        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().name("org1.com").build());
         
         node11 = new ManagementNode(UUID.randomUUID(), "node11", List.of(), org1.getId());
         node111 = new ManagementNode(UUID.randomUUID(), "node111", List.of(), node11.getId());

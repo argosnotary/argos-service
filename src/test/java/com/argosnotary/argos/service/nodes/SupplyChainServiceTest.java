@@ -19,7 +19,9 @@
  */
 package com.argosnotary.argos.service.nodes;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +38,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.argosnotary.argos.domain.nodes.Domain;
 import com.argosnotary.argos.domain.nodes.ManagementNode;
-import com.argosnotary.argos.domain.nodes.Node;
 import com.argosnotary.argos.domain.nodes.Organization;
 import com.argosnotary.argos.domain.nodes.Project;
 import com.argosnotary.argos.domain.nodes.SupplyChain;
@@ -57,7 +58,7 @@ class SupplyChainServiceTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		supplyChainService = new SupplyChainServiceImpl(nodeService);
-        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().domain("org1.com").build());
+        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().name("org1.com").build());
         
         node11 = new ManagementNode(UUID.randomUUID(), "node11", List.of(), org1.getId());
         node111 = new ManagementNode(UUID.randomUUID(), "node111", List.of(), node11.getId());

@@ -84,9 +84,9 @@ class RoleAssignmentServiceTest {
 		
 		roleAssignmentService = new RoleAssignmentServiceImpl(roleAssignmentRepository, accountSecurityContext);
 
-        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().domain("org1.com").build());
-        org2 = new Organization(UUID.randomUUID(), "org2", Domain.builder().domain("org2.com").build());
-        org3 = new Organization(UUID.randomUUID(), "org3", Domain.builder().domain("org3.com").build());
+        org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().name("org1.com").build());
+        org2 = new Organization(UUID.randomUUID(), "org2", Domain.builder().name("org2.com").build());
+        org3 = new Organization(UUID.randomUUID(), "org3", Domain.builder().name("org3.com").build());
         
         node11 = new ManagementNode(UUID.randomUUID(), "node11", List.of(), org1.getId());
         node111 = new ManagementNode(UUID.randomUUID(), "node111", List.of(), node11.getId());

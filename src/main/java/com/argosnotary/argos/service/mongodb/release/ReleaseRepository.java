@@ -31,7 +31,7 @@ import com.argosnotary.argos.domain.release.Release;
 
 public interface ReleaseRepository extends MongoRepository<Release, UUID> {
 
-	@Query(value="{'domain.domain': {$in: ?0}, 'releasedProductsHashes': {$in: ?1}}", exists=true)
+	@Query(value="{'domain.name': {$in: ?0}, 'releasedProductsHashes': {$in: ?1}}", exists=true)
     boolean existsByDomainNamesAndHashes(List<String> domainNames, Set<String> releasedArtifacts);
 	
 	@Query(value="{'releasedProductsHashes': {$in: ?0}}", exists=true)

@@ -74,9 +74,9 @@ class ReleaseRepositoryTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		domain1 = Domain.builder().domain("org1.com").build();
-		domain2 = Domain.builder().domain("org2.com").build();
-		domain3 = Domain.builder().domain("org3.com").build();
+		domain1 = Domain.builder().name("org1.com").build();
+		domain2 = Domain.builder().name("org2.com").build();
+		domain3 = Domain.builder().name("org3.com").build();
 		
 		releaseRepository.deleteAll();
 		r111 = Release.builder().name("r111").supplyChainId(sc11).id(UUID.randomUUID()).domain(domain1).releasedProductsHashes(Set.of("hash1","hash2","hash3")).build();

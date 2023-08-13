@@ -79,8 +79,8 @@ class RoleAssignmentRestServiceTest {
 	void setUp() throws Exception {
 		roleAssignmentRestService = new RoleAssignmentRestServiceImpl(roleAssignmentService, roleAssignmentMapper);
 
-        org2 = new Organization(UUID.randomUUID(), "org2", Domain.builder().domain("org2.com").build());
-        org3 = new Organization(UUID.randomUUID(), "org3", Domain.builder().domain("org3.com").build());
+        org2 = new Organization(UUID.randomUUID(), "org2", Domain.builder().name("org2.com").build());
+        org3 = new Organization(UUID.randomUUID(), "org3", Domain.builder().name("org3.com").build());
         
         node21 = new ManagementNode(UUID.randomUUID(), "node21", new ArrayList<>(), org2.getId());
         node22 = new ManagementNode(UUID.randomUUID(), "node22", new ArrayList<>(), org2.getId());
