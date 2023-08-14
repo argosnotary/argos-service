@@ -2,11 +2,11 @@
 	"keys": [
 			{
 				"keyId": "#(layoutKey.keyId)",
-				"publicKey": "#(layoutKey.publicKey)"
+				"pub": "#(layoutKey.pub)"
 			},
 			{
 				"keyId": "#(key2.keyId)",
-				"publicKey": "#(key2.publicKey)"
+				"pub": "#(key2.pub)"
 			}
 		],
 		"authorizedKeyIds": [

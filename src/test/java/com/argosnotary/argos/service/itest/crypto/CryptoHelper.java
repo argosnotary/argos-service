@@ -100,7 +100,7 @@ public class CryptoHelper {
         PemObject obj2 = gen2.generate();
         RestKeyPair restKeyPair = new RestKeyPair();
         restKeyPair.keyId(computeKeyId(keyPair.getPublic()));
-        restKeyPair.publicKey(keyPair.getPublic().getEncoded());
+        restKeyPair.pub(keyPair.getPublic().getEncoded());
         restKeyPair.encryptedPrivateKey(obj2.getContent());
         return restKeyPair;
 	}

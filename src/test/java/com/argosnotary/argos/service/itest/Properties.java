@@ -19,17 +19,14 @@
  */
 package com.argosnotary.argos.service.itest;
 
-import com.argosnotary.argos.service.itest.Properties;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import lombok.Getter;
 
 @Getter
 public class Properties {
 
-    private final String apiBaseUrl;
-    private final String paAuthorizationUri;
-    private final String saAuthorizationUri;
+    private final String apiBaseUrl = "http://localhost:8080";
+    private final String paAuthorizationUri = "/oauth2/authorization/oauth-stub";
+    private final String saAuthorizationUri = "/oauth2/authorization/saprovider";
     private static Properties INSTANCE;
 
 
@@ -38,13 +35,6 @@ public class Properties {
             INSTANCE = new Properties();
         }
         return INSTANCE;
-    }
-
-    private Properties() {
-        Config conf = ConfigFactory.load("app.conf");
-        apiBaseUrl = conf.getString("argos-service.rest-api.base-url");
-        paAuthorizationUri = conf.getString("argos-service.rest-api.pa-authorization-uri");
-        saAuthorizationUri = conf.getString("argos-service.rest-api.sa-authorization-uri");
     }
 }
 

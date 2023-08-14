@@ -209,7 +209,7 @@ class LayoutValidatorServiceTest {
 
     @Test
     void validateInvalidPublicKeyId() {
-        PublicKey otherPublicKey = new PublicKey(publicKey2.getKeyId(), publicKey1.getPublicKey());
+        PublicKey otherPublicKey = new PublicKey(publicKey2.getKeyId(), publicKey1.getPub());
 
         when(layout.getKeys()).thenReturn(List.of(otherPublicKey));
 

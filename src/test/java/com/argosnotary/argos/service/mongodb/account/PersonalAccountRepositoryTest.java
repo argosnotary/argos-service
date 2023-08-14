@@ -72,8 +72,8 @@ class PersonalAccountRepositoryTest {
 		kp1 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		kp2 = CryptoHelper.createKeyPair("wachtwoord".toCharArray());
 		
-		kp1NoKey = new KeyPair(kp1.getKeyId(),kp1.getPublicKey(), null);
-		kp2NoKey = new KeyPair(kp2.getKeyId(),kp2.getPublicKey(), null);
+		kp1NoKey = new KeyPair(kp1.getKeyId(),kp1.getPub(), null);
+		kp2NoKey = new KeyPair(kp2.getKeyId(),kp2.getPub(), null);
 		
 		pa1 = PersonalAccount.builder().id(UUID.randomUUID()).name("pa1").profile(Profile.builder().build()).activeKeyPair(kp1).providerName("provider1").providerSubject("subject1").build();
 		pa1WithoutProfileAndKey = PersonalAccount.builder().id(pa1.getId()).name("pa1").activeKeyPair(kp1NoKey).providerName("provider1").providerSubject("subject1").build();

@@ -63,7 +63,7 @@ class KeyPairMaperTest {
 			.keyId(kp.getKeyId())
 	        .passphrase("test")
 	        .encryptedPrivateKey(kp.getEncryptedPrivateKey())
-	        .publicKey(kp.getPublicKey());
+	        .pub(kp.getPub());
         
         
 		

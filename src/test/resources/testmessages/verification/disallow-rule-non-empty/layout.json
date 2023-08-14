@@ -3,15 +3,15 @@
 		"keys": [
             {
                 "keyId": "#(layoutKey.keyId)",
-                "publicKey": "#(layoutKey.publicKey)"
+                "pub": "#(layoutKey.pub)"
             },
             {
                 "keyId": "#(key2.keyId)",
-                "publicKey": "#(key2.publicKey)"
+                "pub": "#(key2.pub)"
             },
             {
                 "keyId": "#(key3.keyId)",
-                "publicKey": "#(key3.publicKey)"
+                "pub": "#(key3.pub)"
             }
 		],
 		"authorizedKeyIds": [

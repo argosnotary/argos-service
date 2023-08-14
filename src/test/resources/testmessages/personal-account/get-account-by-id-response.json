@@ -6,7 +6,7 @@
     "activeKeyPair": {
         "encryptedPrivateKey": "#string",
         "keyId": "#string",
-        "publicKey": "#string"
+        "pub": "#string"
     },
     "inactiveKeyPairs": []
 }

@@ -66,7 +66,7 @@ Feature: Personal Account
     * def extraAccount = paLogin('user6')
     * configure headers = call read('classpath:headers.js') { token: #(extraAccount.token)}
     Given path '/api/personalaccounts/me/key'
-    And request {"keyId": "invalidkeyid","publicKey": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/Ldm84IhBvssdweZOZSPcx87J0Xy63g0JhlOYlr66aKmbXz5YD+J+b4NlIIbvaa5sEg4FS0+gkOPgexqCzgRUqHK5coLchpuLFggmDiL4ShqGIvqb/HPq7Aauk8Ss+0TaHfkJjd2kEBPRgWLII1gytjKkqlRGD/LxRtsppnleQwIDAQAB"}
+    And request {"keyId": "invalidkeyid","pub": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/Ldm84IhBvssdweZOZSPcx87J0Xy63g0JhlOYlr66aKmbXz5YD+J+b4NlIIbvaa5sEg4FS0+gkOPgexqCzgRUqHK5coLchpuLFggmDiL4ShqGIvqb/HPq7Aauk8Ss+0TaHfkJjd2kEBPRgWLII1gytjKkqlRGD/LxRtsppnleQwIDAQAB"}
     When method POST
     Then status 400
 
@@ -82,7 +82,7 @@ Feature: Personal Account
     Given path '/api/personalaccounts/'+pa1.personalAccount.id+'/key'
     When method GET
     Then status 200
-    Then match response == {keyId: #(pa1.personalAccount.activeKeyPair.keyId), publicKey: #(pa1.personalAccount.activeKeyPair.publicKey)}
+    Then match response == {keyId: #(pa1.personalAccount.activeKeyPair.keyId), pub: #(pa1.personalAccount.activeKeyPair.pub)}
 
   Scenario: search personal account not authenticated should return a 401
     * configure headers = null

@@ -79,7 +79,7 @@ public class LayoutValidatorService {
 
     private void validatePublicKeys(LayoutValidationReport report, Layout layout) {
         layout.getKeys().forEach(key -> {
-            if (!key.getKeyId().equals(KeyIdProvider.computeKeyId(key.getPublicKey()))) {
+            if (!key.getKeyId().equals(KeyIdProvider.computeKeyId(key.getPub()))) {
                 report.addValidationMessage("keys",
                     "key with id " + key.getKeyId() + " does not match computed key id from public key");
             }

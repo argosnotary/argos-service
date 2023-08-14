@@ -1694,11 +1694,11 @@ components:
       type: object
       required:
         - keyId
-        - publicKey
+        - pub
       properties:
         keyId:
           $ref: '#/components/schemas/KeyId'
-        publicKey:
+        pub:
           $ref: '#/components/schemas/ByteString'
     
     KeyPair:
@@ -1706,13 +1706,13 @@ components:
       required:
         - encryptedPrivateKey
         - keyId
-        - publicKey
+        - pub
       properties:
         encryptedPrivateKey:
           $ref: '#/components/schemas/ByteString'
         keyId:
           $ref: '#/components/schemas/KeyId'
-        publicKey:
+        pub:
           $ref: '#/components/schemas/ByteString'
 
     ServiceAccountKeyPair:
@@ -1721,7 +1721,7 @@ components:
         - encryptedPrivateKey
         - passphrase
         - keyId
-        - publicKey
+        - pub
       properties:
         encryptedPrivateKey:
           $ref: '#/components/schemas/ByteString'
@@ -1731,7 +1731,7 @@ components:
           pattern: '^(?=.*?[a-zA-Z\d])[\w@#&*+=$-]+$'
         keyId:
           $ref: '#/components/schemas/KeyId'
-        publicKey:
+        pub:
           $ref: '#/components/schemas/ByteString'
           #writeOnly: true
           #description: used for authentication of a service account via http basic authentication

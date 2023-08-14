@@ -44,29 +44,29 @@ class KeyPairTest {
 		byte[] encodedKey = Base64.getEncoder().encode(keyPair.getEncryptedPrivateKey());
 		String jsonTempl = "{\n" + 
 				"  \"keyId\": \"%s\",\n" + 
-				"  \"publicKey\": \"%s\",\n" + 
+				"  \"pub\": \"%s\",\n" + 
 				"  \"encryptedPrivateKey\": \"%s\",\n" +
 				"  \"passphrase\": \"%s\"\n" +
 				"}";
 		System.out.println("id:           "+keyPair.getKeyId());
 		System.out.println("encryptedKey: "+new String(encodedKey));
-		System.out.println("publicKey:    "+new String(Base64.getEncoder().encode(keyPair.getPublicKey())));
+		System.out.println("publicKey:    "+new String(Base64.getEncoder().encode(keyPair.getPub())));
 		System.out.println(String.format(jsonTempl, 
 				keyPair.getKeyId(), 
-				new String(Base64.getEncoder().encode(keyPair.getPublicKey())),
+				new String(Base64.getEncoder().encode(keyPair.getPub())),
 				new String(Base64.getEncoder().encode(keyPair.getEncryptedPrivateKey())), 
 				passphrase));
 		Signature signature = CryptoHelper.sign(keyPair, passphrase.toCharArray(), "zomaar");
 		System.out.println("signature: "+new String(Base64.getEncoder().encode(signature.getSignature().getBytes())));
 		assertThat(signature.getKeyId(), is(keyPair.getKeyId()));
-		assertThat(signature.getKeyAlgorithm(), is(KeyAlgorithm.valueOf(PublicKey.getJavaPublicKey(keyPair.getPublicKey()).getAlgorithm())));
+		assertThat(signature.getKeyAlgorithm(), is(KeyAlgorithm.valueOf(PublicKey.getJavaPublicKey(keyPair.getPub()).getAlgorithm())));
 		
 	}
 	
 	@Test
     void toStringTest() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, OperatorCreationException, PemGenerationException {
         KeyPair keyPair = new KeyPair("keyId", "publicKey".getBytes(), "encryptedPrivateKey".getBytes());
-        assertThat(keyPair.toString(), is("KeyPair(super=PublicKey(keyId=keyId, publicKey=[112, 117, 98, 108, 105, 99, 75, 101, 121]), encryptedPrivateKey=[101, 110, 99, 114, 121, 112, 116, 101, 100, 80, 114, 105, 118, 97, 116, 101, 75, 101, 121])"));
+        assertThat(keyPair.toString(), is("KeyPair(super=PublicKey(keyId=keyId, pub=[112, 117, 98, 108, 105, 99, 75, 101, 121]), encryptedPrivateKey=[101, 110, 99, 114, 121, 112, 116, 101, 100, 80, 114, 105, 118, 97, 116, 101, 75, 101, 121])"));
         
     }
 	
@@ -75,7 +75,7 @@ class KeyPairTest {
         KeyPair keyPair = new KeyPair("keyId", "publicKey".getBytes(), "encryptedPrivateKey".getBytes());
         assertThat(keyPair.getKeyId(), is("keyId"));
         assertThat(new String(keyPair.getEncryptedPrivateKey()), is("encryptedPrivateKey"));
-        assertThat(new String(keyPair.getPublicKey()), is("publicKey"));
+        assertThat(new String(keyPair.getPub()), is("publicKey"));
         
         
     }

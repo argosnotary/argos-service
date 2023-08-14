@@ -14,7 +14,7 @@
 	"keys": [
 		{
 			"keyId": "keyId",
-			"publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEjdjAZjwvCrYGEv/zKVAhSItOV91OpPGmMPNCR3Dr0oryke0PhRO6HCbb+kS5NOJUEaGHbFeJUujpn/zQQIVlkQ=="
+			"pub": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEjdjAZjwvCrYGEv/zKVAhSItOV91OpPGmMPNCR3Dr0oryke0PhRO6HCbb+kS5NOJUEaGHbFeJUujpn/zQQIVlkQ=="
 		}
 	],
 	"steps": [

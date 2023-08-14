@@ -115,7 +115,7 @@ Feature: Non Personal Account
     * def result = call read('create-service-account.feature') {projectId: #(defaultProjectId), sa: { name: 'sa1', projectId: #(defaultProjectId)}}
     * def keyPair = read('classpath:testmessages/key/sa-keypair1.json')
     * def result = call read('create-service-account-key.feature') {projectId: #(defaultProjectId), accountId: #(result.response.id), key: #(keyPair)}
-    * match result.response == {keyId: #(keyPair.keyId), publicKey: #(keyPair.publicKey), encryptedPrivateKey: #(keyPair.encryptedPrivateKey)}
+    * match result.response == {keyId: #(keyPair.keyId), pub: #(keyPair.pub), encryptedPrivateKey: #(keyPair.encryptedPrivateKey)}
 
   Scenario: create a service account key without WRITE permission should return a 403 error
     * def result = call read('create-service-account.feature') {projectId: #(defaultProjectId), sa: { name: 'sa1', projectId: #(defaultProjectId)}}
@@ -143,7 +143,7 @@ Feature: Non Personal Account
     Given path restPath
     When method GET
     Then status 200
-    And match response == {keyId: #(keyPair.keyId), publicKey: #(keyPair.publicKey), encryptedPrivateKey: #(keyPair.encryptedPrivateKey)}
+    And match response == {keyId: #(keyPair.keyId), pub: #(keyPair.pub), encryptedPrivateKey: #(keyPair.encryptedPrivateKey)}
 
   Scenario: get a active service account key with implicit read permission should return a 200
     * configure headers = call read('classpath:headers.js') { token: #(pa3.token)}
@@ -154,7 +154,7 @@ Feature: Non Personal Account
     Given path restPath
     When method GET
     Then status 200
-    And match response == {keyId: #(keyPair.keyId), publicKey: #(keyPair.publicKey), encryptedPrivateKey: #(keyPair.encryptedPrivateKey)}
+    And match response == {keyId: #(keyPair.keyId), pub: #(keyPair.pub), encryptedPrivateKey: #(keyPair.encryptedPrivateKey)}
 
   Scenario: get a active service account key without READ permission should return a 403 error
     * def result = call read('create-service-account.feature') {projectId: #(defaultProjectId), sa: { name: 'sa1', projectId: #(defaultProjectId)}}
@@ -181,7 +181,7 @@ Feature: Non Personal Account
     Given path '/api/serviceaccounts/me/activekey'
     When method GET
     Then status 200
-    And match response == {keyId: #(sa1.serviceAccount.activeKeyPair.keyId), publicKey: #(sa1.serviceAccount.activeKeyPair.publicKey), encryptedPrivateKey: #(sa1.serviceAccount.activeKeyPair.encryptedPrivateKey)}
+    And match response == {keyId: #(sa1.serviceAccount.activeKeyPair.keyId), pub: #(sa1.serviceAccount.activeKeyPair.pub), encryptedPrivateKey: #(sa1.serviceAccount.activeKeyPair.encryptedPrivateKey)}
 
   Scenario: get active key of authenticated sa with invalid credentials should return a 401
     * configure headers =  call read('classpath:headers.js') { token: "bar"}
@@ -197,7 +197,7 @@ Feature: Non Personal Account
     Given path restPath
     When method GET
     Then status 200
-    And match response == {keyId: #(keyPair.keyId), publicKey: #(keyPair.publicKey), encryptedPrivateKey: #(keyPair.encryptedPrivateKey)}
+    And match response == {keyId: #(keyPair.keyId), pub: #(keyPair.pub), encryptedPrivateKey: #(keyPair.encryptedPrivateKey)}
 
 
 

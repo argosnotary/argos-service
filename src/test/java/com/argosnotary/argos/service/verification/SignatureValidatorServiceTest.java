@@ -95,8 +95,8 @@ class SignatureValidatorServiceTest {
 
         // valid
         pair = CryptoHelper.createKeyPair(PASSPHRASE);
-        keyId = KeyIdProvider.computeKeyId(pair.getPublicKey());
-        domainPublicKey = new PublicKey(keyId, pair.getPublicKey());
+        keyId = KeyIdProvider.computeKeyId(pair.getPub());
+        domainPublicKey = new PublicKey(keyId, pair.getPub());
         layout = Layout.builder()
                 .steps(List.of(step))
         		.keys(List.of(domainPublicKey)).build();
@@ -108,8 +108,8 @@ class SignatureValidatorServiceTest {
         
         // not valid
         pair2 = CryptoHelper.createKeyPair(PASSPHRASE);
-        keyId2 = KeyIdProvider.computeKeyId(pair2.getPublicKey());
-        domainPublicKey2 = new PublicKey(keyId2, pair2.getPublicKey());
+        keyId2 = KeyIdProvider.computeKeyId(pair2.getPub());
+        domainPublicKey2 = new PublicKey(keyId2, pair2.getPub());
         layout2 = Layout.builder()
                 .steps(List.of(step))
         		.keys(List.of(domainPublicKey, domainPublicKey2)).build();

@@ -96,7 +96,7 @@ class ServiceAccountRestServiceTest {
 		serviceAccountRestService = new ServiceAccountRestServiceImpl(accountMapper, keyPairMapper, serviceAccountService, accountSecurityContext);
 		kp = CryptoHelper.createKeyPair("test".toCharArray());
 		rkp = keyPairMapper.convertToRestKeyPair(kp);
-		rskp = new RestServiceAccountKeyPair(kp.getEncryptedPrivateKey(), "test", kp.getKeyId(), kp.getPublicKey());
+		rskp = new RestServiceAccountKeyPair(kp.getEncryptedPrivateKey(), "test", kp.getKeyId(), kp.getPub());
 		sa1 = ServiceAccount.builder().name("sa1").providerSubject("subject1").projectId(UUID.randomUUID()).build();
 		sa2 = ServiceAccount.builder().name("sa2").providerSubject("subject2").activeKeyPair(kp).projectId(UUID.randomUUID()).build();
 		rsa1 = accountMapper.convertToRestServiceAccount(sa1);

@@ -194,7 +194,7 @@ public class DefaultTestData {
 			.keyId(kp.getKeyId())
 	        .passphrase(KEY_PASSPHRASE)
 	        .encryptedPrivateKey(kp.getEncryptedPrivateKey())
-	        .publicKey(kp.getPublicKey());
+	        .pub(kp.getPub());
         serviceAccountApi.createServiceAccountKeyById(projectId, sa.getId(), rkp);
                 
         sa.activeKeyPair(keyPair.getKeyPair());

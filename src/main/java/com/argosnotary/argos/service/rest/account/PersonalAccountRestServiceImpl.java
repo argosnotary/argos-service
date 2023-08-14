@@ -69,7 +69,7 @@ public class PersonalAccountRestServiceImpl implements PersonalAccountRestServic
 	}
 
     private void validateKeyId(KeyPair keyPair) {
-        if (!keyPair.getKeyId().equals(KeyIdProvider.computeKeyId(keyPair.getPublicKey()))) {
+        if (!keyPair.getKeyId().equals(KeyIdProvider.computeKeyId(keyPair.getPub()))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid key id : " + keyPair.getKeyId());
         }
     }

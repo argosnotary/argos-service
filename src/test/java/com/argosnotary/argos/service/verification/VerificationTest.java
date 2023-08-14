@@ -113,9 +113,9 @@ class VerificationTest {
     	bobKey = CryptoHelper.createKeyPair(PASSWORD);
         aliceKey = CryptoHelper.createKeyPair(PASSWORD);
         carlKey = CryptoHelper.createKeyPair(PASSWORD);
-        bobPublicKey = new PublicKey(bobKey.getKeyId(), bobKey.getPublicKey());
-        alicePublicKey = new PublicKey(aliceKey.getKeyId(), aliceKey.getPublicKey());
-        carlPublicKey = new PublicKey(carlKey.getKeyId(), carlKey.getPublicKey());
+        bobPublicKey = new PublicKey(bobKey.getKeyId(), bobKey.getPub());
+        alicePublicKey = new PublicKey(aliceKey.getKeyId(), aliceKey.getPub());
+        carlPublicKey = new PublicKey(carlKey.getKeyId(), carlKey.getPub());
         rulesVerification = new RulesVerification(List.of(
                 new AllowRuleVerification(), 
                 new CreateRuleVerification(),

@@ -78,8 +78,8 @@ class ServiceAccountRepositoryTest {
 		sa1 = ServiceAccount.builder().name("sa1").activeKeyPair(kp1).projectId(projectId).providerSubject("subject1").build();
 		sa2 = ServiceAccount.builder().name("sa2").activeKeyPair(kp2).projectId(projectId).providerSubject("subject2").build();
 		
-		kp1NoKey = new KeyPair(kp1.getKeyId(),kp1.getPublicKey(), null);
-		kp2NoKey = new KeyPair(kp2.getKeyId(),kp2.getPublicKey(), null);
+		kp1NoKey = new KeyPair(kp1.getKeyId(),kp1.getPub(), null);
+		kp2NoKey = new KeyPair(kp2.getKeyId(),kp2.getPub(), null);
 		sa1NoKey = ServiceAccount.builder().id(sa1.getId()).name("sa1").activeKeyPair(kp1NoKey).projectId(projectId).providerSubject("subject1").build();
 		sa2NoKey = ServiceAccount.builder().id(sa2.getId()).name("sa2").activeKeyPair(kp2NoKey).projectId(projectId).providerSubject("subject2").build();
 		

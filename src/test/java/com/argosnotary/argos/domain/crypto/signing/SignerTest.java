@@ -52,7 +52,7 @@ class SignerTest {
     @BeforeEach
     void setUp() throws GeneralSecurityException, IOException, OperatorCreationException {
     	keyPair = CryptoHelper.createKeyPair(PASSWORD);
-    	publicKey = com.argosnotary.argos.domain.crypto.PublicKey.instance(keyPair.getPublicKey());
+    	publicKey = com.argosnotary.argos.domain.crypto.PublicKey.instance(keyPair.getPub());
     }
 
     @Test

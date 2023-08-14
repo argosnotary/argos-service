@@ -38,7 +38,7 @@ public class PublicKey  implements Serializable {
 
     @Indexed
     private final String keyId;
-    private final byte[] publicKey;
+    private final byte[] pub;
 
 	
 	static {

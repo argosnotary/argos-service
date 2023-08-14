@@ -69,6 +69,6 @@ public class SignatureValidator {
     }
 
     private static java.security.PublicKey getPublicKey(PublicKey key) throws GeneralSecurityException, IOException {
-    	return PublicKey.instance(key.getPublicKey());
+    	return PublicKey.instance(key.getPub());
     }
 }

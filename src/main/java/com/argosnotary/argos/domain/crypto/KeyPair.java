@@ -31,8 +31,8 @@ import lombok.ToString;
 public class KeyPair extends PublicKey implements Serializable {
     private final byte[] encryptedPrivateKey;
     
-    public KeyPair(String keyId, byte[] publicKey, byte[] encryptedPrivateKey) {
-    	super(keyId, publicKey);
+    public KeyPair(String keyId, byte[] pub, byte[] encryptedPrivateKey) {
+    	super(keyId, pub);
         this.encryptedPrivateKey = encryptedPrivateKey;
     }
 }

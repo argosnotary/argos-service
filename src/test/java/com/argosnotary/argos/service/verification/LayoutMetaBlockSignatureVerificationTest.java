@@ -84,8 +84,8 @@ class LayoutMetaBlockSignatureVerificationTest {
         Step step = Step.builder().build();
         // valid
         pair = CryptoHelper.createKeyPair(PASSPHRASE);
-        keyId = KeyIdProvider.computeKeyId(pair.getPublicKey());
-        domainPublicKey = new PublicKey(keyId, pair.getPublicKey());
+        keyId = KeyIdProvider.computeKeyId(pair.getPub());
+        domainPublicKey = new PublicKey(keyId, pair.getPub());
         Layout layout = Layout.builder()
                 .steps(List.of(step))
         		.keys(List.of(domainPublicKey)).build();
@@ -97,8 +97,8 @@ class LayoutMetaBlockSignatureVerificationTest {
         
         // key not found
         pair2 = CryptoHelper.createKeyPair(PASSPHRASE);
-        keyId2 = KeyIdProvider.computeKeyId(pair2.getPublicKey());
-        domainPublicKey2 = new PublicKey(keyId2, pair2.getPublicKey());
+        keyId2 = KeyIdProvider.computeKeyId(pair2.getPub());
+        domainPublicKey2 = new PublicKey(keyId2, pair2.getPub());
         layout = Layout.builder()
                 .steps(List.of(step))
         		.keys(List.of(domainPublicKey)).build();

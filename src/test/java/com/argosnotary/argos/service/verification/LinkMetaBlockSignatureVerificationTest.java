@@ -93,13 +93,13 @@ class LinkMetaBlockSignatureVerificationTest {
                 .materials(singletonList(Artifact.builder().hash("hash").uri("/path/tofile").build())).build();
 
         KeyPair pair = CryptoHelper.createKeyPair(PASSPHRASE);
-        keyId = KeyIdProvider.computeKeyId(pair.getPublicKey());
-        domainPublicKey = new PublicKey(keyId, pair.getPublicKey());
+        keyId = KeyIdProvider.computeKeyId(pair.getPub());
+        domainPublicKey = new PublicKey(keyId, pair.getPub());
         signature = CryptoHelper.sign(pair, PASSPHRASE, new JsonSigningSerializer().serialize(link));
         
         pair = CryptoHelper.createKeyPair(PASSPHRASE);
-        keyId2 = KeyIdProvider.computeKeyId(pair.getPublicKey());
-        domainPublicKey2 = new PublicKey(keyId2, pair.getPublicKey());
+        keyId2 = KeyIdProvider.computeKeyId(pair.getPub());
+        domainPublicKey2 = new PublicKey(keyId2, pair.getPub());
         signature2 = CryptoHelper.sign(pair, PASSPHRASE, new JsonSigningSerializer().serialize(link));
         
         // make invalid

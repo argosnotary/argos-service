@@ -104,7 +104,7 @@ class PersonalAccountRestServiceTest {
     void setUp() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, OperatorCreationException, PemGenerationException {
     	keyPair = CryptoHelper.createKeyPair(PRIVAT_KEY_PASSPHRASE);
         restKeyPair = keyPairMapper.convertToRestKeyPair(keyPair);
-        restPublicKey = new RestPublicKey(restKeyPair.getKeyId(), restKeyPair.getPublicKey());
+        restPublicKey = new RestPublicKey(restKeyPair.getKeyId(), restKeyPair.getPub());
         personalAccount = PersonalAccount.builder()
         		.name(USER_NAME)
         		.id(ACCOUNT_ID)
@@ -156,7 +156,7 @@ class PersonalAccountRestServiceTest {
 
     @Test
     void storeKeyShouldReturnBadRequest() {
-        RestKeyPair rkp = new RestKeyPair(keyPair.getEncryptedPrivateKey(), "incorrect key", keyPair.getPublicKey());
+        RestKeyPair rkp = new RestKeyPair(keyPair.getEncryptedPrivateKey(), "incorrect key", keyPair.getPub());
         restKeyPair = keyPairMapper.convertToRestKeyPair(keyPairMapper.convertFromRestKeyPair(rkp));
         assertThrows(ResponseStatusException.class, () -> service.createKey(restKeyPair));
     }
