@@ -2,13 +2,13 @@
 	"signatures": [
 		{
 			"keyId": "keyId1",
-			"signature": "signature1",
+			"sig": "signature1",
 			"keyAlgorithm": "EC",
 			"hashAlgorithm": "SHA384"
 		},
 		{
 			"keyId": "keyId2",
-			"signature": "signature2"
+			"sig": "signature2"
 		}
 	],
 	"layout": {

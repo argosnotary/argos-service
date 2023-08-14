@@ -53,7 +53,7 @@ class RestLinkMetaBlockTest {
                 "signature.hashAlgorithm", "must not be null",
                 "signature.keyAlgorithm", "must not be null",
                 "signature.keyId", "must not be null",
-                "signature.signature", "must not be null")));
+                "signature.sig", "must not be null")));
     }
 
     @Test
@@ -63,7 +63,7 @@ class RestLinkMetaBlockTest {
                 .addProductsItem(new RestArtifact())
                 .addMaterialsItem(new RestArtifact()))
                 .signature(new RestSignature()
-                        .signature("signature")
+                        .sig("signature")
                         .keyId("keyId")
                         .hashAlgorithm(RestHashAlgorithm.SHA384)
                         .keyAlgorithm(RestKeyAlgorithm.EC)
@@ -75,7 +75,7 @@ class RestLinkMetaBlockTest {
                 "link.stepName", "must match \"^([a-z]|[a-z][a-z0-9-]*[a-z0-9])?$\"",
                 "signature.keyId", "must match \"^[0-9a-f]*$\"",
                 "signature.keyId", "size must be between 64 and 64",
-                "signature.signature", "must match \"^[0-9a-f]*$\"")));
+                "signature.sig", "must match \"^[0-9a-f]*$\"")));
     }
 
     @Test
@@ -110,6 +110,6 @@ class RestLinkMetaBlockTest {
         		.hashAlgorithm(RestHashAlgorithm.SHA256)
         		.keyAlgorithm(RestKeyAlgorithm.EC)
                 .keyId("c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254")
-                .signature("c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254");
+                .sig("c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254");
     }
 }

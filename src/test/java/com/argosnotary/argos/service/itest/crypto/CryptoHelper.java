@@ -117,7 +117,7 @@ public class CryptoHelper {
     	sig.setKeyId(keyPair.getKeyId());
     	sig.setHashAlgorithm(DEFAULT_HASH_ALGORITHM);
     	sig.setKeyAlgorithm(DEFAULT_KEY_ALGORITHM);
-    	sig.setSignature(createSignature(CryptUtil.decryptPrivateKey(keyPassphrase, keyPair.getEncryptedPrivateKey()), 
+    	sig.setSig(createSignature(CryptUtil.decryptPrivateKey(keyPassphrase, keyPair.getEncryptedPrivateKey()), 
 					jsonRepresentation, SignatureAlgorithm.getSignatureAlgorithm(sig.getKeyAlgorithm(), sig.getHashAlgorithm())));
 		return sig;
     }

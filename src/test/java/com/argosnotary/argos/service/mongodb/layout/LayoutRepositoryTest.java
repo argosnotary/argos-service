@@ -132,7 +132,7 @@ class LayoutRepositoryTest {
     private Signature createSignature() {
         return Signature.builder()
                 .keyId("2392017103413adf6fa3b535e3714b30bc0a901229d0e76784f5ffca653f905e")
-                .signature("signature")
+                .sig("signature")
                 .build();
     }
 }

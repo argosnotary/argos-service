@@ -61,7 +61,7 @@ public class SignatureValidator {
             java.security.Signature publicSignature = java.security.Signature.getInstance(signature.getAlgorithm().getStringValue());
             publicSignature.initVerify(publicKey);
             publicSignature.update(signableJson.getBytes(UTF_8));
-            byte[] signatureBytes = Hex.decodeHex(signature.getSignature());
+            byte[] signatureBytes = Hex.decodeHex(signature.getSig());
             return publicSignature.verify(signatureBytes);
         } catch (GeneralSecurityException | DecoderException e) {
             throw new ArgosError(e.getMessage(), e);

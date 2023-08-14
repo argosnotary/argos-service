@@ -22,18 +22,14 @@ package com.argosnotary.argos.domain.crypto;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.security.spec.X509EncodedKeySpec;
 
 import org.apache.commons.codec.binary.Hex;
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -50,7 +46,6 @@ import org.bouncycastle.util.io.pem.PemObject;
 
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.domain.crypto.signing.SignatureAlgorithm;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class CryptoHelper {
 	
@@ -61,7 +56,7 @@ public class CryptoHelper {
     public static Signature sign(KeyPair keyPair, char[] keyPassphrase, String jsonRepresentation) {
     	Signature sig = Signature.builder().keyId(keyPair.getKeyId()).build();
     	try {
-			sig.setSignature(createSignature(decryptPrivateKey(keyPair, keyPassphrase), jsonRepresentation, sig.getAlgorithm()));
+			sig.setSig(createSignature(decryptPrivateKey(keyPair, keyPassphrase), jsonRepresentation, sig.getAlgorithm()));
 		} catch (GeneralSecurityException e) {
             throw new ArgosError(e.getMessage(), e);
 		}

@@ -57,7 +57,7 @@ class KeyPairTest {
 				new String(Base64.getEncoder().encode(keyPair.getEncryptedPrivateKey())), 
 				passphrase));
 		Signature signature = CryptoHelper.sign(keyPair, passphrase.toCharArray(), "zomaar");
-		System.out.println("signature: "+new String(Base64.getEncoder().encode(signature.getSignature().getBytes())));
+		System.out.println("signature: "+new String(Base64.getEncoder().encode(signature.getSig().getBytes())));
 		assertThat(signature.getKeyId(), is(keyPair.getKeyId()));
 		assertThat(signature.getKeyAlgorithm(), is(KeyAlgorithm.valueOf(PublicKey.getJavaPublicKey(keyPair.getPub()).getAlgorithm())));
 		

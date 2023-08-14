@@ -44,9 +44,9 @@ class RequiredNumberOfLinksVerificationTest {
     private static final String STEP_NAME3 = "stepName3";
     private static final String KEY_ID_1 = "keyid1";
     private static final String KEY_ID_2 = "keyid2";
-    private static final Signature SIGNATURE_1 = Signature.builder().keyId(KEY_ID_1).signature("sig1").build();
-    private static final Signature SIGNATURE_2 = Signature.builder().keyId(KEY_ID_2).signature("sig2").build();
-    private static final Signature SIGNATURE_3 = Signature.builder().keyId(KEY_ID_1).signature("sig3").build();
+    private static final Signature SIGNATURE_1 = Signature.builder().keyId(KEY_ID_1).sig("sig1").build();
+    private static final Signature SIGNATURE_2 = Signature.builder().keyId(KEY_ID_2).sig("sig2").build();
+    private static final Signature SIGNATURE_3 = Signature.builder().keyId(KEY_ID_1).sig("sig3").build();
     private RequiredNumberOfLinksVerification requiredNumberOfLinksVerification;
 
     private VerificationContext context;

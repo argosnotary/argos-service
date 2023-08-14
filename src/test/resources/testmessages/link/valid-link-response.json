@@ -2,7 +2,7 @@
   {
     "signature": {
       "keyId": "#string",
-      "signature": "#string",
+      "sig": "#string",
       "keyAlgorithm": "EC",
       "hashAlgorithm": "SHA384"
     },

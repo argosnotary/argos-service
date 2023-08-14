@@ -1,7 +1,7 @@
 {
   "signature": {
     "keyId": "keyId1",
-    "signature": "sig1",
+    "sig": "sig1",
     "hashAlgorithm": "SHA256",
     "keyAlgorithm": "EC"
   },

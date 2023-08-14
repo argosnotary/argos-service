@@ -64,7 +64,7 @@ class SignerTest {
         signatureValidator.initVerify(publicKey);
         signatureValidator.update("string to sign".getBytes(StandardCharsets.UTF_8));
 
-        assertTrue(signatureValidator.verify(Hex.decodeHex(signature.getSignature())));
+        assertTrue(signatureValidator.verify(Hex.decodeHex(signature.getSig())));
     }
     
     @Test

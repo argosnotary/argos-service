@@ -1654,7 +1654,7 @@ components:
         - hashAlgorithm
         - keyAlgorithm
         - keyId
-        - signature
+        - sig
       properties:
         hashAlgorithm:
           $ref: '#/components/schemas/HashAlgorithm'
@@ -1662,7 +1662,7 @@ components:
           $ref: '#/components/schemas/KeyAlgorithm'
         keyId:
           $ref: '#/components/schemas/KeyId'
-        signature:
+        sig:
           $ref: "#/components/schemas/HexString"
     
     Link:

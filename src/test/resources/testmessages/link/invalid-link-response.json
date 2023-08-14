@@ -51,7 +51,7 @@
 			"message": "size must be between 64 and 64"
 		},
 		{
-			"field": "signature.signature",
+			"field": "signature.sig",
 			"type": "DATA_INPUT",
 			"message": "must match \"^[0-9a-f]*$\""
 		}

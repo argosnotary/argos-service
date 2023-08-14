@@ -397,9 +397,6 @@
                         <excludedClasse>com.argosnotary.argos.domain.link.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.domain.layout.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.domain.release.**</excludedClasse>
-                        <excludedClasse>com.argosnotary.argos.service.mongodb.**</excludedClasse>
-                        <excludedClasse>com.argosnotary.argos.service.itest.**</excludedClasse>
-                        <excludedClasse>com.argosnotary.argos.service.openapi.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.link.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.layout.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.release.**</excludedClasse>
@@ -408,14 +405,14 @@
                         <excludedClasse>com.argosnotary.argos.service.rest.release.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.rest.verification.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.verification.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.itest.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.openapi.**</excludedClasse>
+                        <excludedClasse>com.argosnotary.argos.service.mongodb.**</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.security.SecurityConfig</excludedClasse>
                         <excludedClasse>com.argosnotary.argos.service.ArgosServiceApplication</excludedClasse>
-                        <excludedClasse>com.argosnotary.argos.service.account.ServiceAccountProviderServiceImpl</excludedClasse>                        
+                        <excludedClasse>com.argosnotary.argos.service.account.ServiceAccountProviderServiceImpl</excludedClasse>
                     </excludedClasses>
                     <excludedTestClasses>
-                        <excludedTestClasse>com.argosnotary.argos.service.mongodb.**</excludedTestClasse>
-                        <excludedTestClasse>com.argosnotary.argos.service.itest.**</excludedTestClasse>
-                        <excludedTestClasse>com.argosnotary.argos.service.openapi.**</excludedTestClasse>
                         <excludedTestClasse>com.argosnotary.argos.service.link.**</excludedTestClasse>
                         <excludedTestClasse>com.argosnotary.argos.service.layout.**</excludedTestClasse>
                         <excludedTestClasse>com.argosnotary.argos.service.rest.link.**</excludedTestClasse>
@@ -423,6 +420,9 @@
                         <excludedTestClasse>com.argosnotary.argos.service.rest.release.**</excludedTestClasse>
                         <excludedTestClasse>com.argosnotary.argos.service.rest.verification.**</excludedTestClasse>
                         <excludedTestClasse>com.argosnotary.argos.service.verification.**</excludedTestClasse>
+                        <excludedTestClasse>com.argosnotary.argos.service.openapi.**</excludedTestClasse>
+                        <excludedTestClasse>com.argosnotary.argos.service.mongodb.**</excludedTestClasse>
+                        <excludedTestClasse>com.argosnotary.argos.service.itest.**</excludedTestClasse>
                         <excludedTestClasse>com.argosnotary.argos.service.security.SecurityConfigTest</excludedTestClasse>
                         <excludedTestClasse>com.argosnotary.argos.service.ArgosServiceApplicationTest</excludedTestClasse>
                         <excludedTestClasse>com.argosnotary.argos.service.account.ServiceAccountProviderServiceTest</excludedTestClasse>

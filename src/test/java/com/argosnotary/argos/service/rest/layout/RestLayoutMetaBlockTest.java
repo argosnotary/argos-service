@@ -63,7 +63,7 @@ class RestLayoutMetaBlockTest {
                 "signatures[0].hashAlgorithm", "must not be null",
                 "signatures[0].keyAlgorithm", "must not be null",
                 "signatures[0].keyId", "must not be null",
-                "signatures[0].signature", "must not be null")));
+                "signatures[0].sig", "must not be null")));
     }
 
     @Test
@@ -72,7 +72,7 @@ class RestLayoutMetaBlockTest {
         assertThat(ValidateHelper.validate(new RestLayoutMetaBlock()
                 .addSignaturesItem(new RestSignature()
                         .keyId("keyId")
-                        .signature("signature")
+                        .sig("signature")
                         .hashAlgorithm(RestHashAlgorithm.SHA256)
                         .keyAlgorithm(RestKeyAlgorithm.EC))
                 .layout(new RestLayout()
@@ -88,7 +88,7 @@ class RestLayoutMetaBlockTest {
                 "layout.steps", "size must be between 1 and 256",
                 "signatures[0].keyId", "must match \"^[0-9a-f]*$\"",
                 "signatures[0].keyId", "size must be between 64 and 64",
-                "signatures[0].signature", "must match \"^[0-9a-f]*$\""
+                "signatures[0].sig", "must match \"^[0-9a-f]*$\""
                 )));
     }
 
@@ -177,6 +177,6 @@ class RestLayoutMetaBlockTest {
                 .hashAlgorithm(RestHashAlgorithm.SHA256)
                 .keyAlgorithm(RestKeyAlgorithm.EC)
                 .keyId("c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254")
-                .signature("c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254");
+                .sig("c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254c8df0a497ab0df7136c4f97892f17914e6e5e021fdc039f0ea7c27d5a95c1254");
     }
 }

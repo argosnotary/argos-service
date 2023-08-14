@@ -135,7 +135,7 @@ class SignatureValidatorTest {
         String signature = "bla";
         LinkMetaBlock linkMetaBlock = LinkMetaBlock.builder()
                 .signature(Signature.builder()
-                    .signature(signature)
+                    .sig(signature)
                     .keyAlgorithm(KeyAlgorithm.EC)
                     .hashAlgorithm(HashAlgorithm.SHA384)
                     .build())

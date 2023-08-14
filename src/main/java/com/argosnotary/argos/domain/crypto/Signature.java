@@ -32,11 +32,11 @@ import lombok.ToString;
 @Builder
 @Setter
 @Getter
-@EqualsAndHashCode(exclude={"signature"})
+@EqualsAndHashCode(exclude={"sig"})
 @ToString
 public class Signature {
     private String keyId;
-    private String signature;
+    private String sig;
     @Builder.Default
     private KeyAlgorithm keyAlgorithm = KeyAlgorithm.EC;
     @Builder.Default

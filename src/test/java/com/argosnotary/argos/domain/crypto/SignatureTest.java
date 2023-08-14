@@ -33,15 +33,15 @@ class SignatureTest {
 
     @Test
     void equalsTest() {
-        Signature sig1 = Signature.builder().keyId("keyId").signature("sig1").build();
-        Signature sig2 = Signature.builder().keyId("keyId").signature("sig2").build();
+        Signature sig1 = Signature.builder().keyId("keyId").sig("sig1").build();
+        Signature sig2 = Signature.builder().keyId("keyId").sig("sig2").build();
         assertThat(sig1, is(sig2));
     }
     
     @Test
     void toStringTest() {
-        Signature sig1 = Signature.builder().keyId("keyId").signature("sig1").build();
-        assertThat(sig1.toString(), is("Signature(keyId=keyId, signature=sig1, keyAlgorithm=EC, hashAlgorithm=SHA384)"));
+        Signature sig1 = Signature.builder().keyId("keyId").sig("sig1").build();
+        assertThat(sig1.toString(), is("Signature(keyId=keyId, sig=sig1, keyAlgorithm=EC, hashAlgorithm=SHA384)"));
     }
 
 }
