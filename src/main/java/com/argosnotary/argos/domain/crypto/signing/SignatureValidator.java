@@ -28,6 +28,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import com.argosnotary.argos.domain.ArgosError;
+import com.argosnotary.argos.domain.attest.Statement;
 import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.domain.crypto.Signature;
 import com.argosnotary.argos.domain.layout.Layout;
@@ -51,6 +52,14 @@ public class SignatureValidator {
     public static boolean isValid(Layout layout, Signature signature, PublicKey key) {
         try {
         	return isValid(new JsonSigningSerializer().serialize(layout), signature, getPublicKey(key));
+		} catch (GeneralSecurityException | IOException e) {
+            throw new ArgosError(e.getMessage(), e);
+		}
+    }
+
+    public static boolean isValid(Statement statement, Signature signature, PublicKey key) {
+        try {
+        	return isValid(new JsonSigningSerializer().serialize(statement), signature, getPublicKey(key));
 		} catch (GeneralSecurityException | IOException e) {
             throw new ArgosError(e.getMessage(), e);
 		}

@@ -74,7 +74,7 @@ class RestLinkMetaBlockTest {
                 "link.products[0].uri", "must not be null",
                 "link.stepName", "must match \"^([a-z]|[a-z][a-z0-9-]*[a-z0-9])?$\"",
                 "signature.keyId", "must match \"^[0-9a-f]*$\"",
-                "signature.keyId", "size must be between 64 and 64",
+                "signature.keyId", "size must be between 24 and 128",
                 "signature.sig", "must match \"^[0-9a-f]*$\"")));
     }
 
@@ -87,10 +87,10 @@ class RestLinkMetaBlockTest {
                 .signature(createSignature()
                 )), contains(expectedErrors(
                         "link.materials[0].hash", "must match \"^[0-9a-f]*$\"",
-                        "link.materials[0].hash", "size must be between 64 and 64",
+                        "link.materials[0].hash", "size must be between 24 and 128",
                         "link.materials[0].uri", "must match \"^(?!.*\\\\).*$\"",
                         "link.products[0].hash", "must match \"^[0-9a-f]*$\"",
-                        "link.products[0].hash", "size must be between 64 and 64",
+                        "link.products[0].hash", "size must be between 24 and 128",
                         "link.stepName", "must match \"^([a-z]|[a-z][a-z0-9-]*[a-z0-9])?$\"")));
     }
 

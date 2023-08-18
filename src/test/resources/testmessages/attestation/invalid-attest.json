@@ -1,0 +1,53 @@
+{
+    "envelope": {
+        "signatures": [{
+            "sig": "theSig",
+            "keyId": "theKeyId"
+        }],
+        "payload": {
+            "_type": "https://in-toto.io/Statement/v1",
+            "predicate": {
+                "buildDefinition": {
+                    "resolvedDependencies": [
+                        {
+                            "uri": "uri1",
+                            "argosDigest": {
+                                "hash": "hash1"
+                            }
+                        }
+                    ]
+                },
+                "runDetails": {
+                    "builder": {
+                        "builderDependencies": [
+                            {
+                                "argosDigest": {
+                                    "hash": "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+                                },
+                                "uri": "https://github.com/argosnotary/argos-service/commit/86b64f3da76f56e46f800a80945ac8fdf67719e4"
+                            }
+                        ]
+                    },
+                    "metadata": {
+                        "invocationId": "theInvocationId",
+                        "startedOn": "1985-04-12T23:20:50.52Z",
+                        "finishedOn": "1985-04-12T23:25:50.52Z"
+                    }
+                }
+            },
+            "predicateType": "https://slsa.dev/provenance/v1",
+            "subject": [
+                {
+                    "argosDigest": {
+                        "hash": "0123456789"
+                    },
+                    "digest": {
+                        "sha256": "956c0ea99f13ef0c866c87f1afd457d798198e96ad0561dee7d59d4e95444484"
+                    },
+                    "uri": "package.jar"
+                }
+            ]
+        }
+    },
+    "supplyChainId": "#(supplyChainId)"
+}

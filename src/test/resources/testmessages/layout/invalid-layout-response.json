@@ -33,7 +33,7 @@
 		{
 			"field": "signatures[0].keyId",
 			"type": "DATA_INPUT",
-			"message": "size must be between 64 and 64"
+			"message": "size must be between 24 and 128"
 		}
 	]
 }

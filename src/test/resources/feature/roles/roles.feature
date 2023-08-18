@@ -84,7 +84,7 @@ Feature: Organization
     * match result.response == { name: 'org1', id: '#uuid', 'pathToRoot':['#uuid'] }
     * def orgId = result.response.id
     
-    * def expectedPermissions = ['LINK_ADD','ROLE_WRITE','READ','RELEASE','WRITE']
+    * def expectedPermissions = ['LINK_ADD','ATTESTATION_ADD','ROLE_WRITE','READ','RELEASE','WRITE']
     Given path '/api/roles/'+orgId
     When method GET
     Then status 200

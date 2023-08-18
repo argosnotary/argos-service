@@ -22,9 +22,9 @@ Feature: Permissions
 
   Background:
     * url karate.properties['server.baseurl']
-    * def defaultTestData = call read('classpath:default-test-data.js')
 
   Scenario: get oauth providers return 200
+    * configure headers = {'Content-Type': 'application/json'}
     Given path '/api/oauthprovider'
     And method GET
     Then status 200

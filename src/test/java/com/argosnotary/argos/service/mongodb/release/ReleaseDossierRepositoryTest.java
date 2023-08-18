@@ -58,7 +58,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 
 @Testcontainers
 @DataMongoTest(properties= {"spring.data.mongodb.auto-index-creation=true","spring.data.mongodb.database=argos"})
-@ImportAutoConfiguration(classes=MongoConfig.class)
+@ImportAutoConfiguration(classes= {MongoConfig.class, ReleaseDossierRepository.class, JsonMapperConfig.class})
 class ReleaseDossierRepositoryTest {
 
 	static MongoDBContainer mongoDBContainer = ArgosTestContainers.getMongoDBContainer();
@@ -75,10 +75,11 @@ class ReleaseDossierRepositoryTest {
 	private Release r11;
 	private Organization org1;
 
+	@Autowired
 	ReleaseDossierRepository releaseDossierRepository;
 	
-	@Autowired
-	private GridFsTemplate gridFsTemplate;
+//	@Autowired
+//	private GridFsTemplate gridFsTemplate;
 	
 	JsonMapperConfig jsonMapperConfig = new JsonMapperConfig();
 	
@@ -95,10 +96,18 @@ class ReleaseDossierRepositoryTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		releaseDossierRepository = new ReleaseDossierRepository(gridFsTemplate, mapper);
 		org1 = new Organization(UUID.randomUUID(), "org1", Domain.builder().name("domainName1").build());
 		
-		r11 = Release.builder().name("releaseName11").qualifiedSupplyChainName("supply1.domainName1").releaseDate(OffsetDateTime.now(ZoneOffset.UTC)).supplyChainId(UUID.randomUUID()).id(UUID.randomUUID()).domain(Domain.builder().name("domainName1").build()).releasedProductsHashes(Set.of("hash111","hash112","hash113")).build();
+		r11 = Release.builder()
+				.name("releaseName11")
+				.qualifiedSupplyChainName("supply1.domainName1")
+				.releaseDate(OffsetDateTime.now(ZoneOffset.UTC))
+				.supplyChainId(UUID.randomUUID())
+				.id(UUID.randomUUID())
+				.domain(Domain.builder()
+						.name("domainName1")
+						.build())
+				.releasedProductsHashes(Set.of("hash111","hash112","hash113")).build();
 		
 		
 	}

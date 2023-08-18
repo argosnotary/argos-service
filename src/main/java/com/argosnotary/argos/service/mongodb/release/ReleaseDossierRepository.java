@@ -42,18 +42,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class ReleaseDossierRepository {
-
-    public static final String ID_FIELD = "_id";
-    public static final String METADATA_RELEASE_ARTIFACTS_ARTIFACTS_HASH_FIELD = "metadata.releaseArtifacts.artifactsHash";
-    public static final String METADATA_RELEASE_ARTIFACTS_FIELD = "metadata.releaseArtifacts";
-    public static final String METADATA_SUPPLY_CHAIN_PATH_FIELD = "metadata.supplyChainPath";
-    public static final String COLLECTION_NAME = "fs.files";
-    public static final String RELEASE_ARTIFACTS_FIELD = "releaseArtifacts";
-    public static final String ARTIFACTS_HASH = "artifactsHash";
-    public static final String HASHES = "hashes";
-    public static final String SUPPLY_CHAIN_PATH_FIELD = "supplyChainPath";
-    public static final String RELEASE_DATE_FIELD = "releaseDate";
-    public static final String METADATA_FIELD = "metadata";
     
     private final GridFsTemplate gridFsTemplate;
 

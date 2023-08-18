@@ -19,7 +19,6 @@
  */
 package com.argosnotary.argos.domain.crypto.signing;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,14 +34,18 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.io.pem.PemGenerationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.argosnotary.argos.domain.ArgosError;
+import com.argosnotary.argos.domain.attest.Attestation;
+import com.argosnotary.argos.domain.attest.AttestationData;
+import com.argosnotary.argos.domain.attest.Envelope;
+import com.argosnotary.argos.domain.attest.Statement;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.HashAlgorithm;
 import com.argosnotary.argos.domain.crypto.KeyAlgorithm;
@@ -56,6 +59,8 @@ import com.argosnotary.argos.domain.link.Link;
 import com.argosnotary.argos.domain.link.LinkMetaBlock;
 
 class SignatureValidatorTest {
+	
+	private static final Map<String, Attestation> DATA_MAP = AttestationData.createTestData();
 
     private Link link;
     private Layout layout;
@@ -144,6 +149,40 @@ class SignatureValidatorTest {
         Signature sig = linkMetaBlock.getSignature();
 
         ArgosError argosError = assertThrows(ArgosError.class, () -> SignatureValidator.isValid(link, sig, ecPair));
+        assertThat(argosError.getMessage(), is("Odd number of characters."));
+
+    }
+    
+    @Test
+    void isValidStatement() {
+
+        Envelope e = DATA_MAP.get("at2").getEnvelope();
+    	//Signature signature = CryptoHelper.sign(ecPair, "test".toCharArray(), serializer.serialize(st));
+    	
+        assertThat(SignatureValidator.isValid(e.getPayload(), e.getSignatures().get(0), AttestationData.ecPair), is(true));
+    }
+
+    @Test
+    void inValidSignatureStatement() throws NoSuchAlgorithmException, OperatorCreationException, PemGenerationException {
+
+        Envelope e = DATA_MAP.get("at2").getEnvelope();
+        
+        KeyPair other = CryptoHelper.createKeyPair("test".toCharArray());
+    	
+        assertThat(SignatureValidator.isValid(e.getPayload(), e.getSignatures().get(0), other), is(false));
+
+    }
+
+    @Test
+    void inValidSignatureStatementTrhows() {
+        Signature sig = Signature.builder()
+                .sig("foo")
+                .keyAlgorithm(KeyAlgorithm.EC)
+                .hashAlgorithm(HashAlgorithm.SHA384)
+                .build();
+        Statement st = DATA_MAP.get("at1").getEnvelope().getPayload();
+
+        ArgosError argosError = assertThrows(ArgosError.class, () -> SignatureValidator.isValid(st, sig, ecPair));
         assertThat(argosError.getMessage(), is("Odd number of characters."));
 
     }

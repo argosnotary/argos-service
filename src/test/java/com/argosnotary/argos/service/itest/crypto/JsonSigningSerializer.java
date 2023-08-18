@@ -25,6 +25,7 @@ import org.mapstruct.factory.Mappers;
 
 import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.service.itest.rest.api.model.RestArtifact;
+import com.argosnotary.argos.service.itest.rest.api.model.RestInTotoStatement;
 import com.argosnotary.argos.service.itest.rest.api.model.RestLayout;
 import com.argosnotary.argos.service.itest.rest.api.model.RestLink;
 import com.argosnotary.argos.service.itest.rest.api.model.RestStep;
@@ -32,11 +33,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class JsonSigningSerializer implements SigningSerializer {
 	
 	private static final JsonMapper jsonMapper = JsonMapper.builder()
 			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+    		.addModule(new JavaTimeModule())
 			.serializationInclusion(JsonInclude.Include.NON_NULL)
 			.build();
 
@@ -53,6 +56,11 @@ public class JsonSigningSerializer implements SigningSerializer {
         RestLayout layoutClone = Mappers.getMapper(Cloner.class).clone(layout);
         layoutClone.getSteps().sort(comparing(RestStep::getName));
         return serializeSignable(layoutClone);
+	}
+
+	@Override
+	public String serialize(RestInTotoStatement statement) throws JsonProcessingException {
+        return serializeSignable(statement);
 	}
 
     private String serializeSignable(Object signable) {

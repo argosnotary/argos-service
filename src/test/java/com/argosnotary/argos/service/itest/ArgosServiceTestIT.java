@@ -172,6 +172,11 @@ class ArgosServiceTestIT {
     }
 
     @Karate.Test
+    Karate attestation() {
+        return Karate.run("classpath:feature/attestation/attestation.feature").tags("~@ignore");
+    }
+
+    @Karate.Test
     Karate layout() {
         return Karate.run("classpath:feature/layout/layout.feature").tags("~@ignore");
     }

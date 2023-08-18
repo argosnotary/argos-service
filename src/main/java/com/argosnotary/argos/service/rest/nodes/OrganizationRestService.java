@@ -23,22 +23,33 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.argosnotary.argos.service.openapi.rest.api.OrganizationApi;
 import com.argosnotary.argos.service.openapi.rest.model.RestOrganization;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import jakarta.validation.Valid;
+
 public interface OrganizationRestService extends OrganizationApi {
 
 	@Override
-	public ResponseEntity<RestOrganization> createOrganization(RestOrganization restOrganization);
+	ResponseEntity<RestOrganization> createOrganization(
+	        @Parameter(name = "RestOrganization", description = "", required = true) @Valid @RequestBody RestOrganization restOrganization);
 
 	@Override
-	public ResponseEntity<Void> deleteOrganizationById(UUID organizationId);
+	ResponseEntity<Void> deleteOrganizationById(
+	        @Parameter(name = "organizationId", description = "organization id", required = true, in = ParameterIn.PATH) @PathVariable("organizationId") UUID organizationId);
 
 	@Override
-	public ResponseEntity<RestOrganization> getOrganization(UUID organizationId);
+	ResponseEntity<RestOrganization> getOrganization(
+	        @Parameter(name = "organizationId", description = "this will be the organizationId id", required = true, in = ParameterIn.PATH) @PathVariable("organizationId") UUID organizationId);
 
 	@Override
-	public ResponseEntity<List<RestOrganization>> getOrganizations(UUID nodeId);
+	ResponseEntity<List<RestOrganization>> getOrganizations(
+	        @Parameter(name = "nodeId", description = "this is be id of the node in tree", in = ParameterIn.QUERY) @Valid @RequestParam(value = "nodeId", required = false) UUID nodeId);
 
 }

@@ -19,25 +19,21 @@
  */
 package com.argosnotary.argos.service.mongodb;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import org.bson.UuidRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
-import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
-import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+import org.springframework.data.mongodb.core.convert.MongoCustomConversions.MongoConverterConfigurationAdapter;
 
-import com.argosnotary.argos.service.mongodb.release.OffSetDateTimeWriteConverter;
-import com.argosnotary.argos.service.mongodb.release.OffsetDateTimeReadConverter;
+import com.argosnotary.argos.service.mongodb.convert.OffSetDateTimeWriteConverter;
+import com.argosnotary.argos.service.mongodb.convert.OffsetDateTimeReadConverter;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -46,13 +42,11 @@ import com.mongodb.client.MongoClients;
 @Configuration
 public class MongoConfig extends AbstractMongoClientConfiguration {
     
-    private final List<Converter<?, ?>> converterList = new ArrayList<>();    
-    @Bean
     @Override
-    public MongoCustomConversions customConversions() {
-        converterList.add(new OffsetDateTimeReadConverter());
-        converterList.add(new OffSetDateTimeWriteConverter());
-        return new MongoCustomConversions(converterList);
+    protected void configureConverters(@Autowired MongoConverterConfigurationAdapter adapter) { 
+
+    	adapter.registerConverter(new OffsetDateTimeReadConverter());
+    	adapter.registerConverter(new OffSetDateTimeWriteConverter());
     }
 
     @Value("${spring.data.mongodb.uri}")
@@ -61,12 +55,6 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
     
-    @Bean
-    public GridFsTemplate gridFsTemplate(MongoMappingContext mappingContext) {
-    	return new GridFsTemplate(mongoDbFactory(), mappingMongoConverter(mongoDbFactory(),
-                customConversions(), mappingContext));
-    }
-
     @Bean
     public MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
         return new MongoTransactionManager(dbFactory);

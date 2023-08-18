@@ -33,6 +33,7 @@ import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.domain.roles.Role.Contributor;
 import com.argosnotary.argos.domain.roles.Role.LinkAdder;
+import com.argosnotary.argos.domain.roles.Role.AttestationAdder;
 import com.argosnotary.argos.domain.roles.Role.Owner;
 import com.argosnotary.argos.domain.roles.Role.Reader;
 import com.argosnotary.argos.domain.roles.Role.Releaser;
@@ -47,6 +48,7 @@ class RoleTest {
                 Permission.ROLE_WRITE,
                 Permission.WRITE,
                 Permission.READ, 
+                Permission.ATTESTATION_ADD,
                 Permission.LINK_ADD));
         
     }
@@ -57,10 +59,12 @@ class RoleTest {
     	Role contributor = new Contributor();
     	Role owner = new Owner();
     	Role linkAdder = new LinkAdder();
+    	Role attester = new AttestationAdder();
     	Role releaser = new Releaser();
         assertThat(reader.getPermissions(), is(Set.of(Permission.READ)));
-        assertThat(contributor.getPermissions(), is(Set.of(Permission.READ,Permission.LINK_ADD,Permission.RELEASE,Permission.WRITE)));
-        assertThat(owner.getPermissions(), is(Set.of(Permission.READ,Permission.LINK_ADD,Permission.RELEASE,Permission.WRITE,Permission.ROLE_WRITE)));
+        assertThat(contributor.getPermissions(), is(Set.of(Permission.READ,Permission.LINK_ADD,Permission.ATTESTATION_ADD,Permission.RELEASE,Permission.WRITE)));
+        assertThat(owner.getPermissions(), is(Set.of(Permission.READ,Permission.LINK_ADD,Permission.ATTESTATION_ADD,Permission.RELEASE,Permission.WRITE,Permission.ROLE_WRITE)));
+        assertThat(attester.getPermissions(), is(Set.of(Permission.READ, Permission.ATTESTATION_ADD)));
         assertThat(linkAdder.getPermissions(), is(Set.of(Permission.READ, Permission.LINK_ADD)));
         assertThat(releaser.getPermissions(), is(Set.of(Permission.READ, Permission.RELEASE)));
     }

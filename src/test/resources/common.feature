@@ -28,7 +28,14 @@ function(args) {
 """
 function(args) {
      var KarateClient = Java.type('com.argosnotary.argos.service.itest.KarateClient');
-     return KarateClient.signLink(args.passphrase, karate.toJava(args.keyPair), karate.toJava   (args.linkMetaBlock));
+     return KarateClient.signLink(args.passphrase, karate.toJava(args.keyPair), karate.toJava(args.linkMetaBlock));
+}
+"""
+    * def signAttestation =
+"""
+function(args) {
+     var KarateClient = Java.type('com.argosnotary.argos.service.itest.KarateClient');
+     return KarateClient.signAttestation(args.passphrase, karate.toJava(args.keyPair), karate.toJava(args.attestation));
 }
 """
     * def paLogin =

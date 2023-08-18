@@ -23,17 +23,17 @@ import java.security.GeneralSecurityException;
 
 import com.argosnotary.argos.domain.crypto.signing.SignatureAlgorithm;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 @Builder
-@Setter
-@Getter
+@Data
 @EqualsAndHashCode(exclude={"sig"})
-@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Signature {
     private String keyId;
     private String sig;

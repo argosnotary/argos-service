@@ -30,14 +30,14 @@ public class Role {
 
 	public static class Owner extends Role {
 		public Owner() {
-			this.setPermissions(Set.of(Permission.ROLE_WRITE, Permission.READ, Permission.WRITE, Permission.LINK_ADD,
+			this.setPermissions(Set.of(Permission.ROLE_WRITE, Permission.READ, Permission.WRITE, Permission.LINK_ADD, Permission.ATTESTATION_ADD,
 					Permission.RELEASE));
 		}
 	}
 
 	public static class Contributor extends Role {
 		public Contributor() {
-			this.setPermissions(Set.of(Permission.READ, Permission.WRITE, Permission.LINK_ADD, Permission.RELEASE));
+			this.setPermissions(Set.of(Permission.READ, Permission.WRITE, Permission.LINK_ADD, Permission.ATTESTATION_ADD, Permission.RELEASE));
 		}
 	}
 
@@ -50,6 +50,12 @@ public class Role {
 	public static class LinkAdder extends Role {
 		public LinkAdder() {
 			this.setPermissions(Set.of(Permission.READ, Permission.LINK_ADD));
+		}
+	}
+
+	public static class AttestationAdder extends Role {
+		public AttestationAdder() {
+			this.setPermissions(Set.of(Permission.READ, Permission.ATTESTATION_ADD));
 		}
 	}
 

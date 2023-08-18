@@ -8,7 +8,7 @@
 		{
 			"field": "link.materials[0].hash",
 			"type": "DATA_INPUT",
-			"message": "size must be between 64 and 64"
+			"message": "size must be between 24 and 128"
 		},
 		{
 			"field": "link.materials[1].hash",
@@ -18,7 +18,7 @@
 		{
 			"field": "link.materials[1].hash",
 			"type": "DATA_INPUT",
-			"message": "size must be between 64 and 64"
+			"message": "size must be between 24 and 128"
 		},
 		{
 			"field": "link.products[0].hash",
@@ -28,7 +28,7 @@
 		{
 			"field": "link.products[0].hash",
 			"type": "DATA_INPUT",
-			"message": "size must be between 64 and 64"
+			"message": "size must be between 24 and 128"
 		},
 		{
 			"field": "link.products[1].hash",
@@ -38,7 +38,7 @@
 		{
 			"field": "link.products[1].hash",
 			"type": "DATA_INPUT",
-			"message": "size must be between 64 and 64"
+			"message": "size must be between 24 and 128"
 		},
 		{
 			"field": "signature.keyId",
@@ -48,7 +48,7 @@
 		{
 			"field": "signature.keyId",
 			"type": "DATA_INPUT",
-			"message": "size must be between 64 and 64"
+			"message": "size must be between 24 and 128"
 		},
 		{
 			"field": "signature.sig",

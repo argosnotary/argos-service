@@ -24,6 +24,7 @@ import static java.util.Comparator.comparing;
 import org.mapstruct.factory.Mappers;
 
 import com.argosnotary.argos.domain.ArgosError;
+import com.argosnotary.argos.domain.attest.Statement;
 import com.argosnotary.argos.domain.layout.Layout;
 import com.argosnotary.argos.domain.layout.Step;
 import com.argosnotary.argos.domain.link.Artifact;
@@ -32,11 +33,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class JsonSigningSerializer implements SigningSerializer {
 	
 	private static final JsonMapper jsonMapper = JsonMapper.builder()
 			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+    		.addModule(new JavaTimeModule())
 			.serializationInclusion(JsonInclude.Include.NON_NULL)
 			.build();
 
@@ -55,9 +58,14 @@ public class JsonSigningSerializer implements SigningSerializer {
         return serializeSignable(layoutClone);
     }
 
+	@Override
+	public String serialize(Statement statement) {
+		return serializeSignable(statement);
+	}
+
     private String serializeSignable(Object signable) {
         try {
-            return jsonMapper.writeValueAsString(signable);
+        	return jsonMapper.writeValueAsString(signable);
         } catch (JsonProcessingException e) {
             throw new ArgosError(e.getMessage(), e);
         }

@@ -49,6 +49,11 @@ public class KarateClient {
 		return helper.signLink(password, keyPairJson, restLinkMetaBlockJson);
 	}
 	
+	public static String signAttestation(String password, HashMap keyPairJson, HashMap restAttestationJson) throws JsonProcessingException, OperatorCreationException, GeneralSecurityException, IOException, PKCSException {
+		CryptoHelper helper = new CryptoHelper();
+		return helper.signAttestation(password, keyPairJson, restAttestationJson);
+	}
+	
 	public static String getAuditLogs() {
 		MongoDbClient client = new MongoDbClient(System.getProperty("mongo-url"));
 		return client.getAuditLogs();
