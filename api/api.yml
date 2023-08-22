@@ -28,8 +28,6 @@ info:
     
 servers:
   - url: /api
-security:
-  - bearerAuth: []
 
 paths:
   /oauthprovider:
@@ -110,8 +108,6 @@ paths:
       operationId: getOrganization
       tags:
         - organization
-      security:
-        - bearerAuth: []
 
       parameters:
         - name: organizationId
@@ -219,8 +215,6 @@ paths:
       operationId: getManagementNode
       tags:
         - management node
-      security:
-        - bearerAuth: []
       parameters:
         - name: managementNodeId
           in: path
@@ -327,8 +321,6 @@ paths:
       operationId: getProject
       tags:
         - project
-      security:
-        - bearerAuth: []
 
       parameters:
         - name: projectId
@@ -791,8 +783,6 @@ paths:
     get:
       summary: searches on keys of service accounts and personal accounts
       operationId: searchKeysFromAccount
-      security:
-        - bearerAuth: []
       tags:
         - searchAccount
       parameters:
@@ -863,8 +853,6 @@ paths:
       operationId: createLink
       tags:
         - link
-      security:
-        - bearerAuth: []
       parameters:
         - name: supplyChainId
           in: path
@@ -985,8 +973,6 @@ paths:
       operationId: getReleaseConfiguration
       tags:
         - layout
-      security:
-        - bearerAuth: []
       parameters:
         - name: supplyChainId
           in: path
@@ -1010,8 +996,6 @@ paths:
       operationId: createReleaseConfiguration
       tags:
         - layout
-      security:
-        - bearerAuth: []
       parameters:
         - name: supplyChainId
           in: path
@@ -1043,8 +1027,6 @@ paths:
       operationId: getApprovalConfigurations
       tags:
         - layout
-      security:
-        - bearerAuth: []
       parameters:
         - name: supplyChainId
           in: path
@@ -1070,8 +1052,6 @@ paths:
       operationId: createApprovalConfigurations
       tags:
         - layout
-      security:
-        - bearerAuth: []
       parameters:
         - name: supplyChainId
           in: path
@@ -1108,8 +1088,6 @@ paths:
       operationId: getApprovalsForAccount
       tags:
         - layout
-      security:
-        - bearerAuth: []
       parameters:
         - name: supplyChainId
           in: path
@@ -1173,8 +1151,6 @@ paths:
       operationId: createAttestation
       tags:
         - attestation
-      security:
-        - bearerAuth: []
       parameters:
         - name: supplyChainId
           in: path
@@ -1212,8 +1188,6 @@ paths:
       operationId: performVerification
       tags:
         - verification
-      security:
-        - bearerAuth: []
       parameters:
         - name: supplyChainId
           in: path
@@ -1562,14 +1536,6 @@ paths:
           $ref: '#/components/responses/Error'
   
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-    basicAuth:
-      type: http
-      scheme: basic
   responses:
     Error:
       description: validation error

@@ -20,7 +20,6 @@
 package com.argosnotary.argos.domain.attest.predicate.provenance;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 
 import com.argosnotary.argos.domain.ArgosError;
