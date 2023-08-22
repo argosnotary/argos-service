@@ -52,6 +52,7 @@ public class ServiceAccount extends Account {
     	 Set<Role> rs = new HashSet<>();
     	 rs.add(new Role.Releaser());
     	 rs.add(new Role.LinkAdder());
+    	 rs.add(new Role.AttestationAdder());
     	 roles = Collections.unmodifiableSet(rs);
     }
     

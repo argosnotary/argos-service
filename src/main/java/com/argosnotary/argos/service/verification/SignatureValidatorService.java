@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
+import com.argosnotary.argos.domain.attest.Statement;
 import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.domain.crypto.Signature;
 import com.argosnotary.argos.domain.crypto.signing.SignatureValidator;
@@ -54,6 +55,15 @@ public class SignatureValidatorService {
 
 	public boolean validateSignature(Link link, Signature signature, Optional<PublicKey> key) {
 		return key.isPresent() && SignatureValidator.isValid(link, signature, key.get());
+	}
+
+	public boolean validateSignature(Statement statement, Signature signature, Optional<PublicKey> key) {
+		return key.isPresent() && SignatureValidator.isValid(statement, signature, key.get());
+	}
+
+	public boolean validateSignature(Statement statement, Signature signature) {
+		Optional<PublicKey> key = getPublicKey(signature);
+		return validateSignature(statement, signature, key);
 	}
 
 

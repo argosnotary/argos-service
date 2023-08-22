@@ -1,0 +1,52 @@
+{
+    "envelope": {
+        "payload": {
+            "_type": "https://in-toto.io/Statement/v1",
+            "predicate": {
+                "buildDefinition": {
+                    "resolvedDependencies": [
+                        {
+                            "argosResourceIdentifier": "hash1",
+                            "uri": "uri1"
+                        }
+                    ]
+                },
+                "runDetails": {
+                    "builder": {
+                        "builderDependencies": [
+                            {
+                                "argosResourceIdentifier": "86b64f3da76f56e46f800a80945ac8fdf67719e4",
+                                "uri": "https://github.com/argosnotary/argos-service/commit/86b64f3da76f56e46f800a80945ac8fdf67719e4"
+                            }
+                        ],
+                        "version": {}
+                    },
+                    "metadata": {
+                        "finishedOn": "1985-04-12T23:25:50.52Z",
+                        "invocationId": "theInvocationId",
+                        "startedOn": "1985-04-12T23:20:50.52Z"
+                    }
+                }
+            },
+            "predicateType": "https://slsa.dev/provenance/v1",
+            "subject": [
+                {
+                    "argosResourceIdentifier": "956c0ea99f13ef0c866c87f1afd457d798198e96ad0561dee7d59d4e95444484",
+                    "digest": {
+                        "sha256": "956c0ea99f13ef0c866c87f1afd457d798198e96ad0561dee7d59d4e95444484"
+                    },
+                    "uri": "package.jar"
+                }
+            ]
+        },
+        "signatures": [
+            {
+                "hashAlgorithm": "SHA384",
+                "keyAlgorithm": "EC",
+                "keyId": "04e7037e252110567d083f4b43467aff80b19d4b25fc3bb326e5d6e82d9186ca",
+                "sig": "3065023100bdc4cacc9a59aa8d658d5c9a48ba8847a8aa85c27aad345d3fa2bd79daf91eb144c69071b8938acff616fa00d895ab1b02302f1d5cdb984f81325ce2c680544cda309f989bd5bafdd75733c535e340750720a788aded4ad4be20a56d3ba2c35ebb7e"
+            }
+        ]
+    },
+    "supplyChainId": "#(scId)"
+}

@@ -143,7 +143,7 @@ class RoleAssignmentServiceTest {
 	@Test
 	void testGetAllPermissionDownTreeServiceAccount() {
 		when(accountSecurityContext.getAuthenticatedAccount()).thenReturn(Optional.of(sa));
-		assertThat(roleAssignmentService.findAllPermissionDownTree(project211), is(Set.of(Permission.LINK_ADD, Permission.RELEASE, Permission.READ)));
+		assertThat(roleAssignmentService.findAllPermissionDownTree(project211), is(Set.of(Permission.LINK_ADD, Permission.ATTESTATION_ADD, Permission.RELEASE, Permission.READ)));
 	}
 	
 	@Test

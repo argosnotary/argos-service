@@ -44,7 +44,9 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.util.io.pem.PemGenerationException;
 import org.bouncycastle.util.io.pem.PemObject;
 
+import com.argosnotary.argos.service.itest.rest.api.model.RestAttestation;
 import com.argosnotary.argos.service.itest.rest.api.model.RestHashAlgorithm;
+import com.argosnotary.argos.service.itest.rest.api.model.RestInTotoStatement;
 import com.argosnotary.argos.service.itest.rest.api.model.RestKeyAlgorithm;
 import com.argosnotary.argos.service.itest.rest.api.model.RestKeyPair;
 import com.argosnotary.argos.service.itest.rest.api.model.RestLayoutMetaBlock;
@@ -85,6 +87,20 @@ public class CryptoHelper {
         restLinkMetaBlock.setSignature(signature);
         
         return objectMapper.writeValueAsString(restLinkMetaBlock);
+
+    }
+	
+	public String signAttestation(String password, HashMap keyPairJson, HashMap restAttestationJson) throws JsonProcessingException, OperatorCreationException, GeneralSecurityException, IOException, PKCSException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		RestKeyPair keyPair = objectMapper.convertValue(keyPairJson, RestKeyPair.class);
+		RestAttestation restAttestation = objectMapper.convertValue(restAttestationJson, RestAttestation.class);
+		
+		RestSignature signature = sign(keyPair, password.toCharArray(), new JsonSigningSerializer().serialize(restAttestation.getEnvelope().getPayload()));
+		restAttestation.getEnvelope().getSignatures().add(signature);
+        
+        String ff = objectMapper.writeValueAsString(restAttestation);
+        
+        return objectMapper.writeValueAsString(restAttestation);
 
     }
 	

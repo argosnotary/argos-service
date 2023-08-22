@@ -47,7 +47,7 @@ class LinkMetaBlockMapperTest {
     @BeforeEach
     void setUp() throws IOException {
         mapper = new ObjectMapper();
-        linkJson = IOUtils.toString(LinkMetaBlockMapperTest.class.getResourceAsStream("/link.json"), StandardCharsets.UTF_8);
+        linkJson = IOUtils.toString(LinkMetaBlockMapperTest.class.getResource("/link.json"), StandardCharsets.UTF_8);
     }
 
     @Test

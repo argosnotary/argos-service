@@ -45,5 +45,5 @@ public interface LinkMetaBlockRestService extends LinkApi {
 	@Override
 	public ResponseEntity<List<RestLinkMetaBlock>> findLink(
 			@Parameter(name = "supplyChainId", description = "supply chain id", required = true, in = ParameterIn.PATH) @PathVariable("supplyChainId") UUID supplyChainId,
-			@Pattern(regexp = "^[0-9a-f]*$") @Size(min = 64, max = 64) @Parameter(name = "hash", description = "hash of product or material", in = ParameterIn.QUERY) @Valid @RequestParam(value = "hash", required = false) String hash);
+			@Pattern(regexp = "^[0-9a-f]*$") @Size(min = 24, max = 128) @Parameter(name = "hash", description = "hash of product or material", in = ParameterIn.QUERY) @Valid @RequestParam(value = "hash", required = false) String hash);
 }

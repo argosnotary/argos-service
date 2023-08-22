@@ -23,6 +23,7 @@ public enum Permission {
     READ,
     WRITE,
     ROLE_WRITE,
+    ATTESTATION_ADD,
     LINK_ADD,
     RELEASE;
 }

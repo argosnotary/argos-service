@@ -1,0 +1,49 @@
+{
+    "messages": [
+        {
+            "field": "envelope.payload.predicate.buildDefinition.resolvedDependencies[0].argosDigest.hash",
+            "type": "DATA_INPUT",
+            "message": "must match \"^[0-9a-f]*$\""
+        },
+        {
+            "field": "envelope.payload.predicate.buildDefinition.resolvedDependencies[0].argosDigest.hash",
+            "type": "DATA_INPUT",
+            "message": "size must be between 24 and 128"
+        },
+        {
+            "field": "envelope.payload.predicate.runDetails.builder.builderDependencies[0].argosDigest.hash",
+            "type": "DATA_INPUT",
+            "message": "size must be between 24 and 128"
+        },
+        {
+            "field": "envelope.payload.subject[0].argosDigest.hash",
+            "type": "DATA_INPUT",
+            "message": "size must be between 24 and 128"
+        },
+        {
+            "field": "envelope.signatures[0].hashAlgorithm",
+            "type": "DATA_INPUT",
+            "message": "must not be null"
+        },
+        {
+            "field": "envelope.signatures[0].keyAlgorithm",
+            "type": "DATA_INPUT",
+            "message": "must not be null"
+        },
+        {
+            "field": "envelope.signatures[0].keyId",
+            "type": "DATA_INPUT",
+            "message": "must match \"^[0-9a-f]*$\""
+        },
+        {
+            "field": "envelope.signatures[0].keyId",
+            "type": "DATA_INPUT",
+            "message": "size must be between 24 and 128"
+        },
+        {
+            "field": "envelope.signatures[0].sig",
+            "type": "DATA_INPUT",
+            "message": "must match \"^[0-9a-f]*$\""
+        }
+    ]
+}

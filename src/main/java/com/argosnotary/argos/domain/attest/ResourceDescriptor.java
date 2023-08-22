@@ -17,20 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.mongodb.release;
+package com.argosnotary.argos.domain.attest;
 
+import java.net.URI;
 
-import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.mongodb.core.index.Indexed;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Data;
 
-public class OffsetDateTimeReadConverter implements Converter<Date, OffsetDateTime>{
-
-    @Override
-    public OffsetDateTime convert(Date date) {
-        return date == null ? null : date.toInstant().atOffset(ZoneOffset.UTC);
-    }
+@Builder
+@Data
+public class ResourceDescriptor {
+	private final Digest digest;
+	@NotNull
+	private final URI uri;
+	
+	@NotNull
+	@Indexed
+	private final ArgosDigest argosDigest;
 
 }

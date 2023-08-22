@@ -40,7 +40,7 @@ Feature: Organization
     * def result = call read('create-organization.feature') {org: { name: 'org1'}}
     * match result.response == { name: 'org1', id: '#uuid', 'pathToRoot':['#uuid'] }
     * match result.responseHeaders['Location'][0] contains '/api/organizations/'+result.response.id
-    * def expectedPermissions = ['LINK_ADD','ROLE_WRITE','READ','RELEASE','WRITE']
+    * def expectedPermissions = ['LINK_ADD','ATTESTATION_ADD','ROLE_WRITE','READ','RELEASE','WRITE']
     Given path '/api/roles/'+result.response.id
     When method GET
     Then status 200

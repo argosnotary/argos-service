@@ -46,6 +46,9 @@ services:
   
   mongodb:
     image: mongo:6
+    command: "--bind_ip_all --replSet rs0"
+    volumes:
+    - $PWD/mongo/replica-init.js:/docker-entrypoint-initdb.d/replica-init.js
     ports:
     - 27017:27017
 

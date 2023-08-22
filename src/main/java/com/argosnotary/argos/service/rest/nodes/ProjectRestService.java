@@ -23,22 +23,34 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.argosnotary.argos.service.openapi.rest.api.ProjectApi;
 import com.argosnotary.argos.service.openapi.rest.model.RestProject;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import jakarta.validation.Valid;
+
 public interface ProjectRestService extends ProjectApi {
 
 	@Override
-	ResponseEntity<RestProject> createProject(UUID parentId, RestProject restProject);
+	ResponseEntity<RestProject> createProject(
+	        @Parameter(name = "parentId", description = "this will be the parent id", required = true, in = ParameterIn.PATH) @PathVariable("parentId") UUID parentId,
+	        @Parameter(name = "RestProject", description = "", required = true) @Valid @RequestBody RestProject restProject);
 
 	@Override
-	ResponseEntity<Void> deleteProjectById(UUID projectId);
+	ResponseEntity<Void> deleteProjectById(
+	        @Parameter(name = "projectId", description = "project id", required = true, in = ParameterIn.PATH) @PathVariable("projectId") UUID projectId);
 
 	@Override
-	ResponseEntity<RestProject> getProject(UUID projectId);
+	ResponseEntity<RestProject> getProject(
+	        @Parameter(name = "projectId", description = "this will be the project id", required = true, in = ParameterIn.PATH) @PathVariable("projectId") UUID projectId);
 
 	@Override
-	ResponseEntity<List<RestProject>> getProjects(UUID parentId);
+	ResponseEntity<List<RestProject>> getProjects(
+	        @Parameter(name = "nodeId", description = "this will be the parent id", in = ParameterIn.QUERY) @Valid @RequestParam(value = "nodeId", required = false) UUID nodeId);
 
 }

@@ -22,12 +22,13 @@ package com.argosnotary.argos.service.verification;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.bouncycastle.operator.OperatorCreationException;
@@ -37,8 +38,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.argosnotary.argos.domain.attest.Attestation;
+import com.argosnotary.argos.domain.attest.AttestationData;
+import com.argosnotary.argos.domain.attest.Envelope;
 import com.argosnotary.argos.domain.crypto.CryptoHelper;
 import com.argosnotary.argos.domain.crypto.KeyIdProvider;
 import com.argosnotary.argos.domain.crypto.KeyPair;
@@ -50,11 +53,12 @@ import com.argosnotary.argos.domain.layout.Step;
 import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.link.Link;
 import com.argosnotary.argos.service.account.AccountService;
-import com.argosnotary.argos.service.verification.SignatureValidatorService;
 
 
 @ExtendWith(MockitoExtension.class)
 class SignatureValidatorServiceTest {
+	
+	private static final Map<String, Attestation> DATA_MAP = AttestationData.createTestData();
     private char[] PASSPHRASE = "test".toCharArray();
 
     private static final String KEY_ID = "keyId";
@@ -156,7 +160,6 @@ class SignatureValidatorServiceTest {
     @Test
     void inValidLinkSignature() {
         when(accountService.findPublicKeyByKeyId(keyId)).thenReturn(Optional.of(pair));
-        boolean ff = service.validateSignature(link, linkSignature2);
 
         assertThat(service.validateSignature(link, linkSignature2), is(false));
     }
@@ -165,6 +168,45 @@ class SignatureValidatorServiceTest {
     void keyNotFoundLinkSignature() {
         when(accountService.findPublicKeyByKeyId(keyId)).thenReturn(Optional.empty());
         assertThat(service.validateSignature(link, linkSignature), is(false));
+    }
+    
+    @Test
+    void validStatementSignatureKeyFound() {
+    	Envelope e = DATA_MAP.get("at1").getEnvelope();
+    	when(accountService.findPublicKeyByKeyId(e.getSignatures().get(0).getKeyId())).thenReturn(Optional.of(AttestationData.ecPair));
+        assertThat(service.validateSignature(e.getPayload(), e.getSignatures().get(0)), is(true));
+    	
+    }
+    
+    @Test
+    void invalidStatementSignatureKeyNotFound() {
+    	Envelope e = DATA_MAP.get("at1").getEnvelope();
+    	when(accountService.findPublicKeyByKeyId(e.getSignatures().get(0).getKeyId())).thenReturn(Optional.empty());
+        assertThat(service.validateSignature(e.getPayload(), e.getSignatures().get(0)), is(false));
+    	
+    }
+    
+    @Test
+    void invalidStatementSignatureKeyFound() throws NoSuchAlgorithmException, OperatorCreationException, PemGenerationException {
+        
+        KeyPair other = CryptoHelper.createKeyPair("test".toCharArray());
+    	Envelope e = DATA_MAP.get("at1").getEnvelope();
+    	when(accountService.findPublicKeyByKeyId(e.getSignatures().get(0).getKeyId())).thenReturn(Optional.of(other));
+        assertThat(service.validateSignature(e.getPayload(), e.getSignatures().get(0)), is(false));
+    	
+    }
+    
+    @Test
+    void validateStatementSignatureWithKey() throws NoSuchAlgorithmException, OperatorCreationException, PemGenerationException {
+    	KeyPair other = CryptoHelper.createKeyPair("test".toCharArray());
+	
+    	Envelope e = DATA_MAP.get("at1").getEnvelope();
+        assertThat(service.validateSignature(e.getPayload(), e.getSignatures().get(0), Optional.of(AttestationData.ecPair)), is(true));
+
+        assertThat(service.validateSignature(e.getPayload(), e.getSignatures().get(0), Optional.empty()), is(false));
+
+        assertThat(service.validateSignature(e.getPayload(), e.getSignatures().get(0), Optional.of(other)), is(false));
+    	
     }
     
 

@@ -26,7 +26,6 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -60,7 +59,6 @@ public class LinkMetaBlockRestServiceImpl implements LinkMetaBlockRestService {
     @Override
     @PermissionCheck(permissions = Permission.LINK_ADD)
     @AuditLog
-    @Transactional
     public ResponseEntity<RestLinkMetaBlock> createLink(UUID supplyChainId, RestLinkMetaBlock restLinkMetaBlock) {
         log.info("createLink supplyChainId : {}", supplyChainId);
         if (!supplyChainService.exists(supplyChainId)) {

@@ -87,7 +87,7 @@ class RestLayoutMetaBlockTest {
                 "layout.keys[0].pub", "must not be null",
                 "layout.steps", "size must be between 1 and 256",
                 "signatures[0].keyId", "must match \"^[0-9a-f]*$\"",
-                "signatures[0].keyId", "size must be between 64 and 64",
+                "signatures[0].keyId", "size must be between 24 and 128",
                 "signatures[0].sig", "must match \"^[0-9a-f]*$\""
                 )));
     }
@@ -111,7 +111,7 @@ class RestLayoutMetaBlockTest {
                 ), contains(ValidateHelper.expectedErrors(
                                 "layout.expectedEndProducts[0].destinationStepName", "must match \"^([a-z]|[a-z][a-z0-9-]*[a-z0-9])?$\"",
                                 "layout.keys[0].keyId", "must match \"^[0-9a-f]*$\"",
-                                "layout.keys[0].keyId", "size must be between 64 and 64",
+                                "layout.keys[0].keyId", "size must be between 24 and 128",
                                 "layout.steps[0].authorizedKeyIds", "size must be between 1 and 256",
                                 "layout.steps[0].name", "must not be null",
                                 "layout.steps[0].requiredNumberOfLinks", "must not be null")));

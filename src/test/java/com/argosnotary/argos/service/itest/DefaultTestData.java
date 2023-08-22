@@ -25,18 +25,21 @@ import static com.argosnotary.argos.service.itest.ServiceClient.getPersonalAccou
 import static com.argosnotary.argos.service.itest.ServiceClient.getProjectApi;
 import static com.argosnotary.argos.service.itest.ServiceClient.getRoleAssignmentApi;
 import static com.argosnotary.argos.service.itest.ServiceClient.getServiceAccountApi;
-import static com.argosnotary.argos.service.itest.ServiceClient.getToken;
 import static com.argosnotary.argos.service.itest.ServiceClient.getServiceAccountToken;
+import static com.argosnotary.argos.service.itest.ServiceClient.getToken;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
 import org.bouncycastle.operator.OperatorCreationException;
 
+import com.argosnotary.argos.domain.roles.Permission;
 import com.argosnotary.argos.domain.roles.Role;
 import com.argosnotary.argos.service.itest.crypto.CryptoHelper;
 import com.argosnotary.argos.service.itest.rest.api.client.PersonalAccountApi;
@@ -126,34 +129,34 @@ public class DefaultTestData {
 
     private static Map<String, TestPersonalAccount> createDefaultPersonalAccount(String ownerToken, RestOrganization defaultOrganization) throws ClientProtocolException, IOException, NoSuchAlgorithmException, OperatorCreationException {
     	Map<String, TestPersonalAccount> personalAccounts =  new HashMap<>();
-    	personalAccounts.put("default-pa"+1, createDefaultPersonalAccount(1, ownerToken, defaultOrganization, new Role.Contributor()));
-    	personalAccounts.put("default-pa"+2, createDefaultPersonalAccount(2, ownerToken, defaultOrganization, new Role.Reader()));
-    	personalAccounts.put("default-pa"+3, createDefaultPersonalAccount(3, ownerToken, defaultOrganization, new Role.Contributor()));
-    	personalAccounts.put("default-pa"+4, createDefaultPersonalAccount(4, ownerToken, defaultOrganization, null));
-    	personalAccounts.put("default-pa"+5, createDefaultPersonalAccount(5, ownerToken, defaultOrganization, new Role.LinkAdder()));
+    	personalAccounts.put("default-pa"+1, createDefaultPersonalAccount(1, ownerToken, defaultOrganization, Set.of(new Role.Contributor()) ));
+    	personalAccounts.put("default-pa"+2, createDefaultPersonalAccount(2, ownerToken, defaultOrganization, Set.of(new Role.Reader())));
+    	personalAccounts.put("default-pa"+3, createDefaultPersonalAccount(3, ownerToken, defaultOrganization, Set.of(new Role.Contributor())));
+    	personalAccounts.put("default-pa"+4, createDefaultPersonalAccount(4, ownerToken, defaultOrganization, Set.of()));
+    	personalAccounts.put("default-pa"+5, createDefaultPersonalAccount(5, ownerToken, defaultOrganization, Set.of(new Role.LinkAdder(), new Role.AttestationAdder())));
     	return personalAccounts;
     }
     
-    private static TestPersonalAccount createDefaultPersonalAccount(int userNo, String ownerToken, RestOrganization defaultOrganization, Role role) throws ClientProtocolException, IOException, NoSuchAlgorithmException, OperatorCreationException {
+    private static TestPersonalAccount createDefaultPersonalAccount(int userNo, String ownerToken, RestOrganization defaultOrganization, Set<Role> roles) throws ClientProtocolException, IOException, NoSuchAlgorithmException, OperatorCreationException {
     	String userName = "user"+userNo;
     	
     	TestPersonalAccount account = createTestPersonalAccount(userName);
     	
-    	if (role == null) {
+    	if (roles == null) {
     		return account;
     	}
-    	RestRole restRole = new RestRole();
-    	role.getPermissions().forEach(p -> {
-    		RestPermission perm = RestPermission.valueOf(p.name());
-    		restRole.addPermissionsItem(perm);
-    	});
-    	RestRoleAssignment ra = new RestRoleAssignment() ;
-    	ra.setIdentityId(account.getPersonalAccount().getId());
-    	ra.setResourceId(defaultOrganization.getId());
-    	ra.setRole(restRole);
 
     	RoleAssignmentApi roleAssignmentApi = getRoleAssignmentApi(ownerToken);
-    	RestRoleAssignment res = roleAssignmentApi.createRoleAssignment(defaultOrganization.getId(), ra);
+    	
+    	roles.forEach(r -> {
+    		List<RestPermission> lp = r.getPermissions().stream().map(p -> RestPermission.valueOf(p.name())).toList();
+        	RestRole restRole = new RestRole().permissions(lp);
+        	RestRoleAssignment ra = new RestRoleAssignment() ;
+        	ra.setIdentityId(account.getPersonalAccount().getId());
+        	ra.setResourceId(defaultOrganization.getId());
+        	ra.setRole(restRole);
+        	RestRoleAssignment res = roleAssignmentApi.createRoleAssignment(defaultOrganization.getId(), ra);
+    	});
     	return account;
     	
     }

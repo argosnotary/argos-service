@@ -39,7 +39,8 @@ public class JsonMapperConfig {
         return JsonMapper.builder()
         		.addModule(dateTimeModule())
         		.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        		.serializationInclusion(NON_NULL).build();
+        		.serializationInclusion(NON_NULL)
+        		.build();
     }
     
     @Bean

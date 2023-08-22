@@ -19,6 +19,7 @@
  */
 package com.argosnotary.argos.service.itest.crypto;
 
+import com.argosnotary.argos.service.itest.rest.api.model.RestInTotoStatement;
 import com.argosnotary.argos.service.itest.rest.api.model.RestLayout;
 import com.argosnotary.argos.service.itest.rest.api.model.RestLink;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,4 +29,6 @@ public interface SigningSerializer {
     String serialize(RestLink link) throws JsonProcessingException;
     
     String serialize(RestLayout layout) throws JsonProcessingException;
+    
+    String serialize(RestInTotoStatement statement) throws JsonProcessingException;
 }

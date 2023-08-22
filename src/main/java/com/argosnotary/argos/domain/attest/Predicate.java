@@ -17,19 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.service.mongodb.release;
+package com.argosnotary.argos.domain.attest;
 
+import java.net.URL;
 
-import org.springframework.core.convert.converter.Converter;
+import lombok.Data;
 
-import java.time.OffsetDateTime;
-import java.util.Date;
+@Data
+public abstract class Predicate {
 
-public class OffSetDateTimeWriteConverter implements Converter<OffsetDateTime, Date>{
-
-    @Override
-    public Date convert(OffsetDateTime offsetDateTime) {
-        return offsetDateTime == null ? null : Date.from(offsetDateTime.toInstant());
-    }
+	public abstract URL getPredicateType();
 
 }
