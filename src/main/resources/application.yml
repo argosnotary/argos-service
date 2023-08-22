@@ -24,6 +24,7 @@ spring:
             auto-index-creation: true
             database: "argos"
             uri: "mongodb://localhost:27017"
+  
 spring.security:
     oauth2:
       client:
