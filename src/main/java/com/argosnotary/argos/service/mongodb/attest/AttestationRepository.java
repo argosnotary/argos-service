@@ -36,7 +36,7 @@ public interface AttestationRepository  extends MongoRepository<Attestation, UUI
 	@Query("{supplyChainId: ?0}")
 	public List<Attestation> findBySupplyChainId(UUID argosSupplyChainId);
 	
-	@Query("{$and: [{supplyChainId: ?0}, {$or: [{'envelope.payload.subject.argosDigest.hash': ?1}, {'envelope.payload.predicate.buildDefinition.resolvedDependencies.argosDigest.hash': ?1}]}]}")
+	@Query("{$and: [{supplyChainId: ?0}, {'envelope.payload.subject.argosDigest.hash': ?1}]}")
 	public List<Attestation> findBySupplyChainIdAndHash(UUID supplyChainId, String hash);
 
 }

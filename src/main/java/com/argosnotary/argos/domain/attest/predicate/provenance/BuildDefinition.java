@@ -19,20 +19,44 @@
  */
 package com.argosnotary.argos.domain.attest.predicate.provenance;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.argosnotary.argos.domain.attest.ResourceDescriptor;
+import com.argosnotary.argos.domain.crypto.signing.Canonicalable;
 
-import lombok.Data;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 @Builder
-@Data
-public class BuildDefinition {
+@Getter
+@ToString
+@EqualsAndHashCode
+public class BuildDefinition implements Canonicalable<BuildDefinition>{
 	
 	private final String buildType;
-	private final Object externalParameters;
-	private final Object internalParameters;
+	private final Map<String, String> externalParameters;
+	private final Map<String, String> internalParameters;
     private final List<ResourceDescriptor> resolvedDependencies;
+
+	public BuildDefinition(String buildType, Map<String, String> externalParameters,
+	        Map<String, String> internalParameters, List<ResourceDescriptor> resolvedDependencies) {
+		super();
+		this.buildType = buildType;
+		this.externalParameters = externalParameters == null ? null : Collections.unmodifiableMap(externalParameters);
+		this.internalParameters = internalParameters == null ? null : Collections.unmodifiableMap(internalParameters);
+		this.resolvedDependencies = resolvedDependencies == null ? null : Collections.unmodifiableList(resolvedDependencies);
+	}
+    
+	@Override
+	public BuildDefinition cloneCanonical() {
+		return new BuildDefinition(buildType, externalParameters == null ? null : new TreeMap<>(externalParameters), 
+				internalParameters == null ? null : new TreeMap<>(internalParameters), 
+				resolvedDependencies == null ? null : resolvedDependencies.stream().sorted().map(ResourceDescriptor::cloneCanonical).toList());
+	}
 
 }

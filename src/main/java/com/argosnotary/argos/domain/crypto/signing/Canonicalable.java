@@ -17,25 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.domain.attest;
+package com.argosnotary.argos.domain.crypto.signing;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-
-import com.argosnotary.argos.domain.crypto.HashAlgorithm;
-
-import lombok.Builder;
-import lombok.Data;
-
-@Builder
-@Data
-public class ArgosDigest implements Comparable<ArgosDigest>{
-	@Indexed
-	private final String hash;
-	private final HashAlgorithm algorithm;
+public interface Canonicalable<T> {
 	
-	@Override
-	public int compareTo(ArgosDigest o) {
-		return hash.compareTo(o.getHash());
-	}
+	public T cloneCanonical();
 
 }

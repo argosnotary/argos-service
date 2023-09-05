@@ -39,12 +39,6 @@ public class Provenance extends Predicate {
 	
 	private final RunDetails runDetails;
 
-	public Provenance(BuildDefinition buildDefinition, RunDetails runDetails) {
-		super();
-		this.buildDefinition = buildDefinition;
-		this.runDetails = runDetails;
-	}
-
 	@Override
 	@JsonIgnore
 	public URL getPredicateType() {
@@ -53,5 +47,10 @@ public class Provenance extends Predicate {
 		} catch (MalformedURLException e) {
 			throw new ArgosError(e.getMessage());
 		}
+	}
+
+	@Override
+	public Predicate cloneCanonical() {
+		return new Provenance(buildDefinition == null ? null : buildDefinition.cloneCanonical(), runDetails == null ? null : runDetails.cloneCanonical());
 	}
 }

@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -89,6 +90,12 @@ class AttestationMapperTest {
 		public StatementTester() {
 			super("foo");
 		}
+
+		@Override
+		public Statement cloneCanonical() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 		
 	}
 	
@@ -96,7 +103,7 @@ class AttestationMapperTest {
 	@Test
 	void testNotProvenance() {
 		Predicate p = new PredicateTester();
-		Attestation at = Attestation.builder().envelope(Envelope.builder().payload(new InTotoStatement(null, p)).build()).build();
+		Attestation at = Attestation.builder().envelope(Envelope.builder().payload(new InTotoStatement(List.of(), p)).build()).build();
 		
 		ArgosError exception = assertThrows(ArgosError.class, () -> {
     		attestationMapper.convertToRestAttestation(at);
@@ -116,6 +123,12 @@ class AttestationMapperTest {
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
+			return null;
+		}
+
+		@Override
+		public Predicate cloneCanonical() {
+			// TODO Auto-generated method stub
 			return null;
 		}
 		

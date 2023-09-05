@@ -23,8 +23,8 @@ import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.Builder;
 
 @Data
 @Builder

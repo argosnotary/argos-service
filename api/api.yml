@@ -2304,18 +2304,12 @@ components:
         argosDigest:
           $ref: "#/components/schemas/ArgosDigest"
         digest:
-          $ref: "#/components/schemas/Digest"
+          type: object
+          additionalProperties:
+            type: string
         uri:
           type: string
           format: uri
-
-    Digest:
-      type: object
-      required:
-      - sha256
-      properties:
-        sha256:
-          $ref: "#/components/schemas/HashString"
 
     ArgosDigest:
       type: object
@@ -2346,8 +2340,12 @@ components:
           type: string
         externalParameters:
           type: object
+          additionalProperties:
+            type: string
         internalParameters:
           type: object
+          additionalProperties:
+            type: string
         resolvedDependencies:
           type: array
           items:

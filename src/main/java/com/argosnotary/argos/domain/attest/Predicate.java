@@ -21,10 +21,12 @@ package com.argosnotary.argos.domain.attest;
 
 import java.net.URL;
 
+import com.argosnotary.argos.domain.crypto.signing.Canonicalable;
+
 import lombok.Data;
 
 @Data
-public abstract class Predicate {
+public abstract class Predicate implements Canonicalable<Predicate> {
 
 	public abstract URL getPredicateType();
 

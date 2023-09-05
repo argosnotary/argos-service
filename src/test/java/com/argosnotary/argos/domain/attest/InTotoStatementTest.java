@@ -20,15 +20,19 @@
 package com.argosnotary.argos.domain.attest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.argosnotary.argos.domain.ArgosError;
+import com.argosnotary.argos.domain.attest.predicate.provenance.Provenance;
 import com.argosnotary.argos.domain.attest.statement.InTotoStatement;
 
 class InTotoStatementTest {
@@ -41,6 +45,35 @@ class InTotoStatementTest {
 		InTotoStatement ist = new InTotoStatement(s.getSubject(), s.getPredicate());
 		assertEquals("https://in-toto.io/Statement/v1", ist.getType());
 		assertEquals(new URL("https://slsa.dev/provenance/v1"), ist.getPredicateType());
+		
+	}
+	
+	@Test
+	void testConstructorNulls() {
+		Throwable exception = assertThrows(ArgosError.class, () -> {
+			new InTotoStatement(null, null);
+          });
+        
+        assertEquals("Wrong InTotoStatement defintion, properties are null: subject: [null], predicate: [null]", exception.getMessage());
+		
+        exception = assertThrows(ArgosError.class, () -> {
+			new InTotoStatement(List.of(), null);
+          });
+        
+        assertEquals("Wrong InTotoStatement defintion, properties are null: subject: [[]], predicate: [null]", exception.getMessage());
+		
+        exception = assertThrows(ArgosError.class, () -> {
+			new InTotoStatement(null, Provenance.builder().build());
+          });
+        
+        assertEquals("Wrong InTotoStatement defintion, properties are null: subject: [null], predicate: [Provenance(buildDefinition=null, runDetails=null)]", exception.getMessage());
+	}
+	
+	@Test
+	void testCloneCanonicalNulls() throws URISyntaxException, MalformedURLException {
+		InTotoStatement expected = (InTotoStatement) DATA_MAP.get("at2clone").getEnvelope().getPayload();
+		InTotoStatement s = (InTotoStatement) DATA_MAP.get("at2").getEnvelope().getPayload();
+		assertEquals(expected, s.cloneCanonical());
 		
 	}
 
