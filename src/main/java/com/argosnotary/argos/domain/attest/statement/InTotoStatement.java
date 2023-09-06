@@ -20,20 +20,22 @@
 package com.argosnotary.argos.domain.attest.statement;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.annotation.Transient;
 
+import com.argosnotary.argos.domain.ArgosError;
 import com.argosnotary.argos.domain.attest.Predicate;
 import com.argosnotary.argos.domain.attest.ResourceDescriptor;
 import com.argosnotary.argos.domain.attest.Statement;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
-@Data
+@Getter
 @EqualsAndHashCode(callSuper=true)
 @ToString(callSuper=true)
 public class InTotoStatement extends Statement {
@@ -50,9 +52,17 @@ public class InTotoStatement extends Statement {
 
 	public InTotoStatement(List<ResourceDescriptor> subject, Predicate predicate) {
 		super(TYPE);
-		this.subject = subject;
+		if (subject == null || predicate == null) {
+			throw new ArgosError(String.format("Wrong InTotoStatement defintion, properties are null: subject: [%s], predicate: [%s]", subject == null ? null : subject.toString(), predicate == null ? null : predicate.toString()));
+		}
+		this.subject =  Collections.unmodifiableList(subject);
 		this.predicateType = predicate.getPredicateType();
 		this.predicate = predicate;
+	}	
+
+	@Override
+	public Statement cloneCanonical() {
+		return new InTotoStatement(subject.stream().sorted().map(ResourceDescriptor::cloneCanonical).toList(), predicate.cloneCanonical());
 	}
 	
 }

@@ -25,34 +25,16 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.argosnotary.argos.domain.attest.ArgosDigest;
-import com.argosnotary.argos.domain.attest.Attestation;
 import com.argosnotary.argos.domain.attest.AttestationData;
-import com.argosnotary.argos.domain.attest.Digest;
-import com.argosnotary.argos.domain.attest.Predicate;
-import com.argosnotary.argos.domain.attest.ResourceDescriptor;
 import com.argosnotary.argos.domain.attest.Statement;
-import com.argosnotary.argos.domain.attest.predicate.provenance.BuildDefinition;
-import com.argosnotary.argos.domain.attest.predicate.provenance.Builder;
-import com.argosnotary.argos.domain.attest.predicate.provenance.Metadata;
-import com.argosnotary.argos.domain.attest.predicate.provenance.Provenance;
-import com.argosnotary.argos.domain.attest.predicate.provenance.RunDetails;
-import com.argosnotary.argos.domain.attest.statement.InTotoStatement;
 import com.argosnotary.argos.domain.crypto.PublicKey;
 import com.argosnotary.argos.domain.layout.ArtifactType;
 import com.argosnotary.argos.domain.layout.Layout;
@@ -62,8 +44,6 @@ import com.argosnotary.argos.domain.layout.rule.Rule;
 import com.argosnotary.argos.domain.layout.rule.RuleType;
 import com.argosnotary.argos.domain.link.Artifact;
 import com.argosnotary.argos.domain.link.Link;
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -80,8 +60,8 @@ class JsonSigningSerializerTest {
                         Artifact.builder().uri("zbc.jar").hash("hash1").build(),
                         Artifact.builder().uri("abc.jar").hash("hash2").build()))
                 .products(Arrays.asList(
-                        Artifact.builder().uri("_bc.jar").hash("hash3").build(),
-                        Artifact.builder().uri("_abc.jar").hash("hash4").build()))
+                        Artifact.builder().uri("_abc.jar").hash("hash4").build(),
+                        Artifact.builder().uri("_bc.jar").hash("hash3").build()))
                 .build());
         String expectedJson = getExpectedJson("/expectedLinkSigning.json");
         assertThat(serialized, is(expectedJson));
@@ -141,8 +121,13 @@ class JsonSigningSerializerTest {
 
 	@Test
 	void testPredicateJsonSerialize() throws URISyntaxException {
+		String expected = "{\"_type\":\"https://in-toto.io/Statement/v1\",\"predicate\":{\"buildDefinition\":{\"externalParameters\":{},\"internalParameters\":{},\"resolvedDependencies\":[{\"argosDigest\":{\"hash\":\"hash2\"},\"digest\":{},\"uri\":\"uri2\"}]},\"runDetails\":{\"builder\":{\"builderDependencies\":[{\"argosDigest\":{\"hash\":\"86b64f3da76f56e46f800a80945ac8fdf67719e4\"},\"digest\":{},\"uri\":\"https://github.com/argosnotary/argos-service/commit/86b64f3da76f56e46f800a80945ac8fdf67719e4\"}],\"version\":{}},\"metadata\":{\"finishedOn\":\"1985-04-12T23:25:50.52Z\",\"invocationId\":\"theInvocationId\",\"startedOn\":\"1985-04-12T23:20:50.52Z\"}}},\"predicateType\":\"https://slsa.dev/provenance/v1\",\"subject\":[{\"argosDigest\":{\"hash\":\"hash1\"},\"digest\":{},\"uri\":\"uri1\"},{\"argosDigest\":{\"hash\":\"hash2\"},\"digest\":{},\"uri\":\"uri2\"}]}";
 		Statement st = (Statement) AttestationData.createTestData().get("at2").getEnvelope().getPayload();
 		String serialized = new JsonSigningSerializer().serialize(st);
-		assertEquals("{\"_type\":\"https://in-toto.io/Statement/v1\",\"predicate\":{\"buildDefinition\":{\"resolvedDependencies\":[{\"argosDigest\":{\"hash\":\"hash2\"},\"uri\":\"uri2\"}]},\"runDetails\":{\"builder\":{\"builderDependencies\":[{\"argosDigest\":{\"hash\":\"86b64f3da76f56e46f800a80945ac8fdf67719e4\"},\"uri\":\"https://github.com/argosnotary/argos-service/commit/86b64f3da76f56e46f800a80945ac8fdf67719e4\"}],\"version\":{}},\"metadata\":{\"finishedOn\":\"1985-04-12T23:25:50.52Z\",\"invocationId\":\"theInvocationId\",\"startedOn\":\"1985-04-12T23:20:50.52Z\"}}},\"predicateType\":\"https://slsa.dev/provenance/v1\",\"subject\":[{\"argosDigest\":{\"hash\":\"hash2\"},\"uri\":\"uri2\"}]}", serialized);
+		assertEquals(expected, serialized);
+		
+		st = (Statement) AttestationData.createTestData().get("at2clone").getEnvelope().getPayload();
+		serialized = new JsonSigningSerializer().serialize(st);
+		assertEquals(expected, serialized);
 	}
 }

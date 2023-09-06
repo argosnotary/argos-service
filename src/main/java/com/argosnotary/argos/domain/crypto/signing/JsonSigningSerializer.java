@@ -24,7 +24,6 @@ import static java.util.Comparator.comparing;
 import org.mapstruct.factory.Mappers;
 
 import com.argosnotary.argos.domain.ArgosError;
-import com.argosnotary.argos.domain.attest.Statement;
 import com.argosnotary.argos.domain.layout.Layout;
 import com.argosnotary.argos.domain.layout.Step;
 import com.argosnotary.argos.domain.link.Artifact;
@@ -59,8 +58,9 @@ public class JsonSigningSerializer implements SigningSerializer {
     }
 
 	@Override
-	public String serialize(Statement statement) {
-		return serializeSignable(statement);
+	public <T> String serialize(Canonicalable<T> signable) {
+		T clone = signable.cloneCanonical();
+		return serializeSignable(clone);
 	}
 
     private String serializeSignable(Object signable) {

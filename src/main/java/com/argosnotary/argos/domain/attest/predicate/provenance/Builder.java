@@ -19,18 +19,40 @@
  */
 package com.argosnotary.argos.domain.attest.predicate.provenance;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.argosnotary.argos.domain.attest.ResourceDescriptor;
+import com.argosnotary.argos.domain.crypto.signing.Canonicalable;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-@Data
+@Getter
+@ToString
+@EqualsAndHashCode
 @lombok.Builder
-public class Builder {
+public class Builder implements Canonicalable<Builder>{
 	private final String id;
     private final List<ResourceDescriptor>  builderDependencies;
     private final Map<String, String> version;
+
+	public Builder(String id, List<ResourceDescriptor> builderDependencies, Map<String, String> version) {
+		super();
+		this.id = id;
+		this.builderDependencies =  builderDependencies == null ? null : Collections.unmodifiableList(builderDependencies);
+		this.version =  version == null ? null : Collections.unmodifiableMap(version);
+	}
+    
+	@Override
+	public Builder cloneCanonical() {
+		return new Builder(
+				id, 
+				builderDependencies == null ? null : builderDependencies.stream().sorted().map(ResourceDescriptor::cloneCanonical).toList(), 
+						version == null ? null : new TreeMap<>(version));
+	}
 	
 }

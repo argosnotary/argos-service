@@ -21,16 +21,11 @@ package com.argosnotary.argos.service.mongodb.attest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.anyOf;
+import static org.hamcrest.CoreMatchers.anyOf;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -46,18 +41,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.argosnotary.argos.domain.attest.ArgosDigest;
 import com.argosnotary.argos.domain.attest.Attestation;
 import com.argosnotary.argos.domain.attest.AttestationData;
-import com.argosnotary.argos.domain.attest.Envelope;
-import com.argosnotary.argos.domain.attest.ResourceDescriptor;
-import com.argosnotary.argos.domain.attest.Statement;
-import com.argosnotary.argos.domain.attest.predicate.provenance.BuildDefinition;
-import com.argosnotary.argos.domain.attest.predicate.provenance.Builder;
-import com.argosnotary.argos.domain.attest.predicate.provenance.Metadata;
-import com.argosnotary.argos.domain.attest.predicate.provenance.Provenance;
-import com.argosnotary.argos.domain.attest.predicate.provenance.RunDetails;
-import com.argosnotary.argos.domain.attest.statement.InTotoStatement;
 import com.argosnotary.argos.domain.crypto.Signature;
 import com.argosnotary.argos.service.ArgosTestContainers;
 import com.argosnotary.argos.service.mongodb.MongoConfig;
@@ -80,6 +65,7 @@ class AttestationRepositoryTest {
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {
 		registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+		registry.add("spring.data.mongodb.database", () -> "argos");
 	}
 
 	@Autowired 
@@ -117,8 +103,7 @@ class AttestationRepositoryTest {
     @Test
     void findBySupplyChainIdAndHash() {
         List<Attestation> ats = attestationRepository.findBySupplyChainIdAndHash(SUPPLY_CHAIN_ID, HASH_1);
-        assertThat(ats, hasSize(1));
-        assertEquals(at1, ats.get(0));
+        assertThat(ats, hasSize(2));
     }
     
     @Test

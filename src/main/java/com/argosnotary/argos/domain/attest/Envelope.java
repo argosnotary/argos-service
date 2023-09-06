@@ -35,6 +35,5 @@ public class Envelope {
 	
 	@NotNull
 	private final Statement payload;
-	
 
 }

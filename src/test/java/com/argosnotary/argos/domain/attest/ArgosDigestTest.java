@@ -19,23 +19,28 @@
  */
 package com.argosnotary.argos.domain.attest;
 
-import org.springframework.data.mongodb.core.index.Indexed;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.argosnotary.argos.domain.crypto.HashAlgorithm;
 
-import lombok.Builder;
-import lombok.Data;
+class ArgosDigestTest {
 
-@Builder
-@Data
-public class ArgosDigest implements Comparable<ArgosDigest>{
-	@Indexed
-	private final String hash;
-	private final HashAlgorithm algorithm;
-	
-	@Override
-	public int compareTo(ArgosDigest o) {
-		return hash.compareTo(o.getHash());
+	@BeforeEach
+	void setUp() throws Exception {
+	}
+
+	@Test
+	void testCompareTo() {
+		ArgosDigest ad1 = new ArgosDigest("hash1", HashAlgorithm.SHA256);
+		ArgosDigest ad12 = new ArgosDigest("hash1", HashAlgorithm.SHA256);
+		ArgosDigest ad2 = new ArgosDigest("hash2", HashAlgorithm.SHA256);
+		assertEquals(0, ad1.compareTo(ad12));
+		assertEquals(-1, ad1.compareTo(ad2));
+		assertEquals(1, ad2.compareTo(ad1));
+		
 	}
 
 }

@@ -19,7 +19,6 @@
  */
 package com.argosnotary.argos.domain.crypto.signing;
 
-import com.argosnotary.argos.domain.attest.Statement;
 import com.argosnotary.argos.domain.layout.Layout;
 import com.argosnotary.argos.domain.link.Link;
 
@@ -29,5 +28,5 @@ public interface SigningSerializer {
 
     String serialize(Layout layout);
 
-    String serialize(Statement statement);
+    public <T> String serialize(Canonicalable<T> signable);
 }

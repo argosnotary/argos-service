@@ -21,12 +21,13 @@ package com.argosnotary.argos.domain.attest;
 
 import org.springframework.data.annotation.Transient;
 
+import com.argosnotary.argos.domain.crypto.signing.Canonicalable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
 @Data
-public abstract class Statement {
+public abstract class Statement implements Canonicalable<Statement> {
 
 	@Transient
 	@JsonProperty("_type")

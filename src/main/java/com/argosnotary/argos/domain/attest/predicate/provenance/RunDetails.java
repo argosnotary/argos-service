@@ -19,18 +19,36 @@
  */
 package com.argosnotary.argos.domain.attest.predicate.provenance;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.argosnotary.argos.domain.attest.ResourceDescriptor;
+import com.argosnotary.argos.domain.crypto.signing.Canonicalable;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 @lombok.Builder
-@Data
-public class RunDetails {
+@Getter
+@ToString
+@EqualsAndHashCode
+public class RunDetails implements Canonicalable<RunDetails> {
 	
 	private final Builder builder;
     private final Metadata metadata;
     private final List<ResourceDescriptor> byproducts;
+
+	public RunDetails(Builder builder, Metadata metadata, List<ResourceDescriptor> byproducts) {
+		super();
+		this.builder = builder;
+		this.metadata = metadata;
+		this.byproducts = byproducts == null ? null : Collections.unmodifiableList(byproducts);
+	}
+    
+    @Override
+	public RunDetails cloneCanonical() {
+		return new RunDetails(builder == null ? null : builder.cloneCanonical(), metadata, byproducts == null ? null : byproducts.stream().sorted().map(ResourceDescriptor::cloneCanonical).toList());
+	}
 
 }

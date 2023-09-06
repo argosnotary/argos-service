@@ -84,17 +84,15 @@ public class AttestationData {
 			uri3 = new URI("uri3");
 			uri4 = new URI("uri4");
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        ResourceDescriptor r1 = ResourceDescriptor.builder().argosDigest(ArgosDigest.builder().hash(HASH_1).build()).uri(uri1).build();
-        ResourceDescriptor r2 = ResourceDescriptor.builder().argosDigest(ArgosDigest.builder().hash(HASH_2).build()).uri(uri2).build();
-        ResourceDescriptor r3 = ResourceDescriptor.builder().argosDigest(ArgosDigest.builder().hash(HASH_3).build()).uri(uri3).build();
-        ResourceDescriptor r4 = ResourceDescriptor.builder().argosDigest(ArgosDigest.builder().hash(HASH_4).build()).uri(uri4).build();
-        Provenance p1 = Provenance.builder().buildDefinition(BuildDefinition.builder().resolvedDependencies(List.of(r1)).build()).build();
+        ResourceDescriptor r1 = ResourceDescriptor.builder().digest(Map.of()).argosDigest(ArgosDigest.builder().hash(HASH_1).build()).uri(uri1).build();
+        ResourceDescriptor r2 = ResourceDescriptor.builder().digest(Map.of()).argosDigest(ArgosDigest.builder().hash(HASH_2).build()).uri(uri2).build();
+        ResourceDescriptor r3 = ResourceDescriptor.builder().digest(Map.of()).argosDigest(ArgosDigest.builder().hash(HASH_3).build()).uri(uri3).build();
+        ResourceDescriptor r4 = ResourceDescriptor.builder().digest(Map.of()).argosDigest(ArgosDigest.builder().hash(HASH_4).build()).uri(uri4).build();
     	ResourceDescriptor gitCommit = null;
 		try {
-			gitCommit = ResourceDescriptor.builder()
+			gitCommit = ResourceDescriptor.builder().digest(Map.of())
 					.uri(new URI("https://github.com/argosnotary/argos-service/commit/86b64f3da76f56e46f800a80945ac8fdf67719e4")).argosDigest(ArgosDigest.builder().hash("86b64f3da76f56e46f800a80945ac8fdf67719e4").build()).build();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
@@ -108,19 +106,25 @@ public class AttestationData {
 				.startedOn(OffsetDateTime.of(startedOn, ZoneOffset.UTC))
 				.finishedOn(OffsetDateTime.of(finishedOn, ZoneOffset.UTC))
 				.build(); 
-		Provenance p2 = Provenance.builder().buildDefinition(BuildDefinition.builder().resolvedDependencies(List.of(r2)).build()).runDetails(RunDetails.builder().builder(b).metadata(m).build()).build();
-		Provenance p3 = Provenance.builder().buildDefinition(BuildDefinition.builder().resolvedDependencies(List.of(r3)).build()).build();
-		Provenance p4 = Provenance.builder().buildDefinition(BuildDefinition.builder().resolvedDependencies(List.of(r4)).build()).build();
+        Provenance p1 = Provenance.builder().buildDefinition(BuildDefinition.builder().internalParameters(Map.of()).externalParameters(Map.of()).resolvedDependencies(List.of(r1)).build()).build();
+		Provenance p2 = Provenance.builder().buildDefinition(BuildDefinition.builder().internalParameters(Map.of()).externalParameters(Map.of()).resolvedDependencies(List.of(r2)).build()).runDetails(RunDetails.builder().builder(b).metadata(m).build()).build();
+		Provenance p3 = Provenance.builder().buildDefinition(BuildDefinition.builder().internalParameters(Map.of()).externalParameters(Map.of()).resolvedDependencies(List.of(r3)).build()).build();
+		Provenance p4 = Provenance.builder().buildDefinition(BuildDefinition.builder().internalParameters(Map.of()).externalParameters(Map.of()).resolvedDependencies(List.of(r4)).build()).build();
 		Statement s1 = new InTotoStatement(List.of(r1),p1);
-		Statement s2 = new InTotoStatement(List.of(r2),p2);
+		Statement s2 = new InTotoStatement(List.of(r2, r1),p2);
 		Statement s3 = new InTotoStatement(List.of(r3),p3);
 		Statement s4 = new InTotoStatement(List.of(r4),p4);
+		Statement s5 = new InTotoStatement(List.of(r1, r2),p2);
 		map.put("at1", Attestation.builder()
     			.envelope(Envelope.builder().signatures(List.of(createSignature(s1))).payload(s1).build())
     			.supplyChainId(SUPPLY_CHAIN_ID)
     			.build());
 		map.put("at2", Attestation.builder()
-    			.envelope(Envelope.builder().signatures(List.of(createSignature(s2), createSignature(s1))).payload(s2).build())
+    			.envelope(Envelope.builder().signatures(List.of(createSignature(s2), createSignature(s2))).payload(s2).build())
+    			.supplyChainId(SUPPLY_CHAIN_ID)
+    			.build());
+		map.put("at2clone", Attestation.builder()
+    			.envelope(Envelope.builder().signatures(List.of(createSignature(s2), createSignature(s5))).payload(s5).build())
     			.supplyChainId(SUPPLY_CHAIN_ID)
     			.build());
 		map.put("at3", Attestation.builder()

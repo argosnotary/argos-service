@@ -17,25 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.argosnotary.argos.domain.attest;
+package com.argosnotary.argos.domain.attest.predicate.provenance;
 
-import org.springframework.data.mongodb.core.index.Indexed;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.argosnotary.argos.domain.crypto.HashAlgorithm;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import lombok.Builder;
-import lombok.Data;
+class BuilderTest {
 
-@Builder
-@Data
-public class ArgosDigest implements Comparable<ArgosDigest>{
-	@Indexed
-	private final String hash;
-	private final HashAlgorithm algorithm;
-	
-	@Override
-	public int compareTo(ArgosDigest o) {
-		return hash.compareTo(o.getHash());
+	@BeforeEach
+	void setUp() throws Exception {
+	}
+
+	@Test
+	void testCloneCanonical() {
+		Builder b = Builder.builder().build();
+		assertEquals(b, b.cloneCanonical());
 	}
 
 }

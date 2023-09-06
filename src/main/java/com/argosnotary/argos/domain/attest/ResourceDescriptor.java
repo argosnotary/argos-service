@@ -20,8 +20,13 @@
 package com.argosnotary.argos.domain.attest;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+
+import com.argosnotary.argos.domain.ArgosError;
+import com.argosnotary.argos.domain.crypto.signing.Canonicalable;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -29,13 +34,36 @@ import lombok.Data;
 
 @Builder
 @Data
-public class ResourceDescriptor {
-	private final Digest digest;
+public class ResourceDescriptor implements Comparable<ResourceDescriptor>,Canonicalable<ResourceDescriptor>{
+	private final Map<String,String> digest;
 	@NotNull
 	private final URI uri;
 	
 	@NotNull
 	@Indexed
 	private final ArgosDigest argosDigest;
+
+	public ResourceDescriptor(Map<String, String> digest, @NotNull URI uri, @NotNull ArgosDigest argosDigest) {
+		if (uri == null || argosDigest == null) {
+			throw new ArgosError(String.format("Wrong ResourceDescriptor defintion, properties are null: uri: [%s], argosDigest: [%s]", uri == null ? null : uri.toString(), argosDigest == null ? null : argosDigest.toString()));
+		}
+		this.digest = digest;
+		this.uri = uri;
+		this.argosDigest = argosDigest;
+	}
+
+	@Override
+	public int compareTo(ResourceDescriptor o) {
+		int result = uri.compareTo(o.getUri());
+		if (result == 0) {
+			return argosDigest.compareTo(o.getArgosDigest());
+		}
+		return result;
+	}
+
+	@Override
+	public ResourceDescriptor cloneCanonical() {
+		return new ResourceDescriptor(digest == null ? null : new TreeMap<>(digest), uri, new ArgosDigest(argosDigest.getHash(), argosDigest.getAlgorithm() == null ? null : argosDigest.getAlgorithm()));
+	}
 
 }
