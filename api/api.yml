@@ -2260,6 +2260,7 @@ components:
           $ref: '#/components/schemas/InTotoStatement'
         signatures:
           type: array
+          maxItems: 4
           items:
             $ref: '#/components/schemas/Signature'
         
@@ -2280,20 +2281,9 @@ components:
           format: url
         subject:
           type: array
+          maxItems: 4096
           items:
             $ref: "#/components/schemas/ResourceDescriptor"
-          
-
-#    ResourceDescriptor:
-#      type: object
-#      properties:
-#        name:
-#          type: string
-#        uri:
-#          type: string
-#          format: uri
-#        digest:
-#          $ref: "#/components/schemas/Digest"
 
     ResourceDescriptor:
       type: object
@@ -2305,6 +2295,7 @@ components:
           $ref: "#/components/schemas/ArgosDigest"
         digest:
           type: object
+          maxProperties: 5
           additionalProperties:
             type: string
         uri:
@@ -2340,14 +2331,17 @@ components:
           type: string
         externalParameters:
           type: object
+          maxProperties: 5
           additionalProperties:
             type: string
         internalParameters:
           type: object
+          maxProperties: 5
           additionalProperties:
             type: string
         resolvedDependencies:
           type: array
+          maxItems: 4096
           items:
             $ref: "#/components/schemas/ResourceDescriptor"
   
@@ -2358,6 +2352,7 @@ components:
           $ref: "#/components/schemas/Builder"
         byproducts:
           type: array
+          maxItems: 4096
           items:
             $ref: "#/components/schemas/ResourceDescriptor"
         metadata:
@@ -2368,12 +2363,14 @@ components:
       properties:
         builderDependencies:
           type: array
+          maxItems: 4096
           items:
             $ref: "#/components/schemas/ResourceDescriptor"
         id:
           type: string
         version: 
           type: object
+          maxProperties: 5
           additionalProperties:
             type: string
     
