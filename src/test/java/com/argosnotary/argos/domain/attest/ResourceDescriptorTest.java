@@ -19,6 +19,10 @@
  */
 package com.argosnotary.argos.domain.attest;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -30,32 +34,32 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.argosnotary.argos.domain.ArgosError;
+import com.argosnotary.argos.domain.attest.ResourceDescriptor.ResourceDescriptorBuilder;
 import com.argosnotary.argos.domain.attest.statement.InTotoStatement;
 import com.argosnotary.argos.domain.crypto.HashAlgorithm;
-import com.argosnotary.argos.domain.attest.ResourceDescriptor.ResourceDescriptorBuilder;
 
 class ResourceDescriptorTest {
-	ResourceDescriptor r1, r2;
+	ResourceDescriptor r1, r3;
 	
 	private static final Map<String, Attestation> DATA_MAP = AttestationData.createTestData();
 
 	@BeforeEach
 	void setUp() throws Exception {
 		r1 = ((InTotoStatement)DATA_MAP.get("at1").getEnvelope().getPayload()).getSubject().get(0);
-		r2 = ((InTotoStatement)DATA_MAP.get("at2").getEnvelope().getPayload()).getSubject().get(0);
+		r3 = ((InTotoStatement)DATA_MAP.get("at3").getEnvelope().getPayload()).getSubject().get(0);
 	}
 
 	@Test
 	void testCompareTo() throws URISyntaxException {
 		ResourceDescriptor t = ((InTotoStatement)DATA_MAP.get("at1").getEnvelope().getPayload()).getSubject().get(0);
 		assertEquals(0, r1.compareTo(t));
-		assertEquals(1, r2.compareTo(r1));
-		assertEquals(-1, r1.compareTo(r2));
+		assertThat(r3.compareTo(r1), greaterThan(0));
+		assertThat(r1.compareTo(r3), lessThan(0));
 		
 		ResourceDescriptor gitCommit = ResourceDescriptor.builder().digest(Map.of())
 					.uri(new URI("https://github.com/argosnotary/argos-service/commit/86b64f3da76f56e46f800a80945ac8fdf67719e4")).argosDigest(ArgosDigest.builder().hash("86b64f3da76f56e46f800a80945ac8fdf67719e4").build()).build();
 
-		assertEquals(-1, r1.compareTo(gitCommit));
+		assertThat(r1.compareTo(gitCommit), greaterThan(0));
 		
 	}
 

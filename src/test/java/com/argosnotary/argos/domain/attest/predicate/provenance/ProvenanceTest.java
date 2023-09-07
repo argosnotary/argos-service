@@ -59,7 +59,7 @@ class ProvenanceTest {
 		ResourceDescriptor gitCommit = ResourceDescriptor.builder().digest(Map.of())
 					.uri(new URI("https://github.com/argosnotary/argos-service/commit/86b64f3da76f56e46f800a80945ac8fdf67719e4")).argosDigest(ArgosDigest.builder().hash("86b64f3da76f56e46f800a80945ac8fdf67719e4").build()).build();
 		
-		Builder b = Builder.builder().version(Map.of("key2", "value", "key1", "value")).builderDependencies(List.of(gitCommit, r1)).build();
+		Builder b = Builder.builder().version(Map.of("key2", "value", "key1", "value")).builderDependencies(List.of(r1, gitCommit)).build();
 		LocalDateTime startedOn = LocalDateTime.parse("1985-04-12T23:20:50.52Z", DateTimeFormatter.ofPattern(DATE_FORMAT));
 		LocalDateTime finishedOn = LocalDateTime.parse("1985-04-12T23:25:50.52Z", DateTimeFormatter.ofPattern(DATE_FORMAT));
 		Metadata m = Metadata.builder()
@@ -69,7 +69,7 @@ class ProvenanceTest {
 				.build(); 
 		Provenance p = Provenance.builder().buildDefinition(BuildDefinition.builder().internalParameters(Map.of("key2", "value", "key1", "value")).externalParameters(Map.of("key2", "value", "key1", "value")).resolvedDependencies(List.of(r2,r1)).build()).runDetails(RunDetails.builder().builder(b).metadata(m).build()).build();
 		
-		Builder expectedB = Builder.builder().version(Map.of("key1", "value", "key2", "value")).builderDependencies(List.of(r1, gitCommit)).build();
+		Builder expectedB = Builder.builder().version(Map.of("key1", "value", "key2", "value")).builderDependencies(List.of(gitCommit, r1)).build();
 		Provenance expected = Provenance.builder().buildDefinition(BuildDefinition.builder().internalParameters(Map.of("key1", "value", "key2", "value")).externalParameters(Map.of("key1", "value", "key2", "value")).resolvedDependencies(List.of(r1,r2)).build()).runDetails(RunDetails.builder().builder(expectedB).metadata(m).build()).build();
 		
 		assertEquals(expected, p.cloneCanonical());

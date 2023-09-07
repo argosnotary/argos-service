@@ -33,11 +33,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.argosnotary.argos.domain.account.Account;
 import com.argosnotary.argos.domain.account.PersonalAccount;
-import com.argosnotary.argos.service.account.AccountSecurityContext;
-import com.argosnotary.argos.service.account.AccountSecurityContextImpl;
-import com.argosnotary.argos.service.account.ArgosUserDetails;
 
 @ExtendWith(MockitoExtension.class)
 class AccountSecurityContextTest {

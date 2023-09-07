@@ -54,7 +54,7 @@ public class ResourceDescriptor implements Comparable<ResourceDescriptor>,Canoni
 
 	@Override
 	public int compareTo(ResourceDescriptor o) {
-		int result = uri.compareTo(o.getUri());
+		int result = uri.toString().compareTo(o.getUri().toString());
 		if (result == 0) {
 			return argosDigest.compareTo(o.getArgosDigest());
 		}
