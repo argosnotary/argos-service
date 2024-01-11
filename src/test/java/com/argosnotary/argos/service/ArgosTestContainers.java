@@ -30,7 +30,7 @@ public class ArgosTestContainers {
 	private static final String MONGO_IMAGE_NAME = "mongo:6";
 	private static final String MONGO_IMAGE_NAME_PROPERTY = "mongo.default.image.name";
 	
-	private static final String KEYCLOAK_IMAGE_NAME = "quay.io/keycloak/keycloak:22.0";
+	private static final String KEYCLOAK_IMAGE_NAME = "quay.io/keycloak/keycloak:23.0";
 
 	public static MongoDBContainer getMongoDBContainer() {
 		return new MongoDBContainer(DockerImageName.parse(System.getProperty(MONGO_IMAGE_NAME_PROPERTY, MONGO_IMAGE_NAME)))

@@ -92,8 +92,14 @@ public class ServiceAccountProviderServiceImpl implements ServiceAccountProvider
         try {
         	response = userResource.create(user);
         } catch (ProcessingException exc) {
-            log.info("Error in registering a service account message: [%s]", exc.getMessage());
-        	throw new ArgosError(String.format("Error in registering a service account message: [%s]", exc.getMessage()));
+        	String message = String.format("Error in registering a service account message: [%s]", exc.getMessage());
+            log.info(message);
+        	throw new ArgosError(message);
+        }
+        if (response.getStatus() != 201) {
+        	String message = String.format("Error in registering a service account response status [%s], response status info [%s]", response.getStatus(), response.getStatusInfo());
+        	log.info(message);
+        	throw new ArgosError(message);
         }
         String[] parts = response.getLocation().getPath().split("/");
         String subject = parts[parts.length-1];            
