@@ -146,7 +146,7 @@ class SecurityConfigTest {
     	.exchange()
     	.expectAll(
     		spec -> spec.expectStatus().isNotFound(),
-    		spec -> spec.expectHeader().contentType(MediaType.APPLICATION_JSON)
+    		spec -> spec.expectHeader().contentType(MediaType.APPLICATION_PROBLEM_JSON)
     	);
     }
     
