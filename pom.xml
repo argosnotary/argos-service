@@ -152,7 +152,7 @@
             <groupId>io.quarkus</groupId>
             <artifactId>
                 quarkus-keycloak-admin-client</artifactId>
-            <version>3.8.0</version>
+            <version>3.8.1</version>
         </dependency>
 
         <dependency>
