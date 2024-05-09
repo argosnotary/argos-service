@@ -79,6 +79,8 @@ class RestLayoutMetaBlockTest {
                         .addAuthorizedKeyIdsItem("authorizedKeyId")
                         .addExpectedEndProductsItem(new RestMatchRule())
                         .addKeysItem(new RestPublicKey()))), contains(ValidateHelper.expectedErrors(
+                "layout.authorizedKeyIds[0].<list element>", "must match \"^[0-9a-f]*$\"",
+                "layout.authorizedKeyIds[0].<list element>", "size must be between 24 and 128",
                 "layout.expectedEndProducts[0].destinationStepName", "must not be null",
                 "layout.expectedEndProducts[0].destinationType", "must not be null",
                 "layout.expectedEndProducts[0].pattern", "must not be null",
@@ -109,6 +111,8 @@ class RestLayoutMetaBlockTest {
                         .addStepsItem(new RestStep())
                         )
                 ), contains(ValidateHelper.expectedErrors(
+                				"layout.authorizedKeyIds[0].<list element>", "must match \"^[0-9a-f]*$\"",
+                				"layout.authorizedKeyIds[0].<list element>", "size must be between 24 and 128",
                                 "layout.expectedEndProducts[0].destinationStepName", "must match \"^([a-z]|[a-z][a-z0-9-]*[a-z0-9])?$\"",
                                 "layout.keys[0].keyId", "must match \"^[0-9a-f]*$\"",
                                 "layout.keys[0].keyId", "size must be between 24 and 128",
@@ -138,6 +142,8 @@ class RestLayoutMetaBlockTest {
                                 .addAuthorizedKeyIdsItem("authorizedKeyId"))
                         )
                 ), contains(ValidateHelper.expectedErrors(
+                "layout.authorizedKeyIds[0].<list element>", "must match \"^[0-9a-f]*$\"",
+				"layout.authorizedKeyIds[0].<list element>", "size must be between 24 and 128",
                 "layout.steps[0].expectedMaterials[0].pattern", "must not be null",
                 "layout.steps[0].expectedMaterials[0].ruleType", "must not be null",
                 "layout.steps[0].expectedProducts[0].pattern", "must not be null",
@@ -168,8 +174,11 @@ class RestLayoutMetaBlockTest {
                                 .name("step1")
                                 .addAuthorizedKeyIdsItem("authorizedKeyId"))
                         )
-                ), empty()
-        );
+                ), contains(ValidateHelper.expectedErrors(
+                        "layout.authorizedKeyIds[0].<list element>", "must match \"^[0-9a-f]*$\"",
+        				"layout.authorizedKeyIds[0].<list element>", "size must be between 24 and 128"
+                )
+        ));
     }
 
     private RestSignature createSignature() {
