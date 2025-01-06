@@ -141,7 +141,7 @@ class CustomStatelessAuthorizationRequestRepositoryTest {
           });
         
         assertEquals("Unrecognized token 'aCookie': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')\n"
-        		+ " at [Source: (String)\"aCookie\"; line: 1, column: 8]", exception.getMessage());
+        		+ " at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 8]", exception.getMessage());
 		
     }
     
