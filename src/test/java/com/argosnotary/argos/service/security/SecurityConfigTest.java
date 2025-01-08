@@ -48,6 +48,7 @@ import org.htmlunit.ElementNotFoundException;
 import org.htmlunit.FailingHttpStatusCodeException;
 import org.htmlunit.WebClient;
 import org.htmlunit.WebResponse;
+import org.htmlunit.html.HtmlButton;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlPage;
 import org.htmlunit.html.HtmlPasswordInput;
@@ -206,7 +207,7 @@ class SecurityConfigTest {
 			userField.type(userName);
 
 			// Now submit the form by clicking the button and get back the second page.
-			HtmlSubmitInput button = form.getInputByName("login");
+			HtmlButton button = form.getButtonByName("login");
 			WebResponse response = button.click().getWebResponse();
 			tokenStr = response.getContentAsString();
 		} catch (FailingHttpStatusCodeException | ElementNotFoundException e) {
