@@ -3,7 +3,7 @@
 # Argos Notary - A new way to secure the Software Supply Chain
 #
 # Copyright (C) 2019 - 2020 Rabobank Nederland
-# Copyright (C) 2019 - 2024 Gerard Borst <gerard.borst@argosnotary.com>
+# Copyright (C) 2019 - 2025 Gerard Borst <gerard.borst@argosnotary.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
+
 set -e
 
 keycloak_version=26.0
