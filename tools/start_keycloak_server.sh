@@ -19,9 +19,22 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+set -e
 
-username=0895000d-1f79-4f1b-91e4-12c9061cdbd3
+keycloak_version=26.0
 
-curl -X POST -H "Content-Type: application/json" \
-   -d '{"accountId": "0895000d-1f79-4f1b-91e4-12c9061cdbd3", "passphrase": "test"}' \
-   "http://localhost:8080/api/serviceaccounts/me/token"
+save_dir=$PWD
+script_dir=$(dirname "$0")
+
+cd ${script_dir}
+
+docker run --name mykeycloak -p 8080:8080 -p 9000:9000 \
+   -v $PWD/../src/test/resources/dev/keycloak/import:/opt/keycloak/data/import \
+   --rm \
+   quay.io/keycloak/keycloak:${keycloak_version} \
+      start-dev \
+         -Dkeycloak.migration.action=import \
+         -Dkeycloak.migration.provider=dir \
+         -Dkeycloak.migration.dir=/opt/keycloak/data/import
+        
+cd ${save_dir}
